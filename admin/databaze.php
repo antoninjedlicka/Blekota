@@ -180,7 +180,6 @@ function blkt_uprav_konfiguraci_podle_kodu(string $kod, string $hodnota): bool {
     ]);
 }
 
-
 /* === TABULKA blkt_prispevky === */
 
 /**
@@ -204,11 +203,10 @@ function blkt_drop_table_prispevky(): void {
     blkt_db_connect()->exec("DROP TABLE IF EXISTS blkt_prispevky;");
 }
 
-
 /**
  * Vloží nový příspěvek.
  *
- * @param array $data ['nazev','kategorie','blkt-obsah-stranky']
+ * @param array $data ['nazev','kategorie','blkt_obsah']
  * @return int
  */
 function blkt_insert_prispevek(array $data): int {
@@ -225,12 +223,11 @@ function blkt_insert_prispevek(array $data): int {
     return (int) $pdo->lastInsertId();
 }
 
-
 /**
  * Aktualizuje příspěvek podle ID.
  *
  * @param int   $id
- * @param array $data ['nazev','kategorie','blkt-obsah-stranky']
+ * @param array $data ['nazev','kategorie','blkt_obsah']
  * @return bool
  */
 function blkt_update_prispevek(int $id, array $data): bool {
@@ -248,7 +245,6 @@ function blkt_update_prispevek(int $id, array $data): bool {
         ':id'        => $id,
     ]);
 }
-
 
 /**
  * Smaže příspěvek podle ID.
@@ -279,7 +275,9 @@ function blkt_vytvor_tabku_obrazku(): void {
     blkt_db_connect()->exec($sql);
 }
 
-
+/**
+ * Vloží nový obrázek do databáze a nahraje soubor
+ */
 function blkt_vloz_obrazek(array $file, string $title = '', string $alt = '', string $description = ''): int {
     $pdo = blkt_db_connect();
 
@@ -307,36 +305,65 @@ function blkt_vloz_obrazek(array $file, string $title = '', string $alt = '', st
     // Kontrola MIME typu pomocí finfo
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mimeType = $finfo->file($file['tmp_name']);
-    
+
     $allowedMimes = [
         'image/jpeg' => 'jpg',
         'image/png' => 'png',
         'image/gif' => 'gif',
-        'image/webp' => 'webp'
+        'image/webp' => 'webp',
+        'image/svg+xml' => 'svg',
+        'image/svg' => 'svg',
+        'text/xml' => 'svg',
+        'application/svg+xml' => 'svg',
+        'application/xml' => 'svg'
     ];
 
     if (!isset($allowedMimes[$mimeType])) {
-        throw new Exception('Nepodporovaný formát obrázku. Povolené jsou pouze JPG, PNG, GIF a WebP.');
+        throw new Exception('Nepodporovaný formát obrázku. Povolené jsou pouze JPG, PNG, GIF, WebP a SVG.');
     }
 
     // Získání správné přípony podle MIME typu
     $ext = $allowedMimes[$mimeType];
 
-    // Další kontrola - ověření, že jde skutečně o obrázek
-    $imageInfo = @getimagesize($file['tmp_name']);
-    if ($imageInfo === false) {
-        throw new Exception('Nahraný soubor není platný obrázek.');
-    }
+    // Další kontrola - ověření, že jde skutečně o obrázek (kromě SVG)
+    if (!in_array($mimeType, ['image/svg+xml', 'image/svg', 'text/xml', 'application/svg+xml', 'application/xml'])) {
+        $imageInfo = @getimagesize($file['tmp_name']);
+        if ($imageInfo === false) {
+            throw new Exception('Nahraný soubor není platný obrázek.');
+        }
 
-    // Kontrola rozměrů obrázku
-    $maxWidth = 4000;
-    $maxHeight = 4000;
-    if ($imageInfo[0] > $maxWidth || $imageInfo[1] > $maxHeight) {
-        throw new Exception("Obrázek je příliš velký. Maximální rozměry jsou {$maxWidth}x{$maxHeight}px.");
+        // Kontrola rozměrů obrázku
+        $maxWidth = 4000;
+        $maxHeight = 4000;
+        if ($imageInfo[0] > $maxWidth || $imageInfo[1] > $maxHeight) {
+            throw new Exception("Obrázek je příliš velký. Maximální rozměry jsou {$maxWidth}x{$maxHeight}px.");
+        }
+    } else {
+        // Pro SVG ověříme základní strukturu
+        $svgContent = file_get_contents($file['tmp_name']);
+        if (strpos($svgContent, '<svg') === false && strpos($svgContent, '<?xml') === false) {
+            throw new Exception('Nahraný soubor není platný SVG.');
+        }
+
+        // Bezpečnostní kontrola SVG obsahu
+        $dangerousPatterns = [
+            '/<script/i',
+            '/on\w+\s*=/i', // onclick, onload, etc.
+            '/<iframe/i',
+            '/<embed/i',
+            '/<object/i',
+            '/javascript:/i'
+        ];
+
+        foreach ($dangerousPatterns as $pattern) {
+            if (preg_match($pattern, $svgContent)) {
+                throw new Exception('SVG soubor obsahuje nebezpečný obsah.');
+            }
+        }
     }
 
     // Cesty - OPRAVA: správná cesta
-    $baseDir = dirname(dirname(__DIR__)) . '/media/upload'; // Jdeme o 2 úrovně nahoru z admin/databaze.php
+    $baseDir = dirname(__DIR__) . '/media/upload'; // Jdeme o 1 úroveň nahoru z admin/databaze.php
     $year = date('Y');
     $month = date('m');
     $yearDir = "$baseDir/$year";
@@ -363,7 +390,7 @@ function blkt_vloz_obrazek(array $file, string $title = '', string $alt = '', st
     $htaccessContent .= "    Order Deny,Allow\n";
     $htaccessContent .= "    Deny from all\n";
     $htaccessContent .= "</FilesMatch>\n";
-    
+
     file_put_contents("$monthDir/.htaccess", $htaccessContent);
 
     if (!is_writable($monthDir)) {
@@ -412,7 +439,7 @@ function blkt_vloz_obrazek(array $file, string $title = '', string $alt = '', st
         VALUES
             (:filename, :orig, :title, :alt, :desc)
     ");
-    
+
     $stmt->execute([
         ':filename' => "$year/$month/$filename",
         ':orig'     => basename($file['name']), // Pouze název souboru, bez cesty
@@ -430,6 +457,11 @@ function blkt_vloz_obrazek(array $file, string $title = '', string $alt = '', st
  * @param string $mimeType MIME typ
  */
 function blkt_optimalizuj_obrazek(string $path, string $mimeType): void {
+    // SVG nepotřebuje optimalizaci
+    if (in_array($mimeType, ['image/svg+xml', 'image/svg', 'text/xml', 'application/svg+xml', 'application/xml'])) {
+        return;
+    }
+
     // Načtení obrázku
     switch ($mimeType) {
         case 'image/jpeg':
@@ -464,7 +496,7 @@ function blkt_optimalizuj_obrazek(string $path, string $mimeType): void {
         $newHeight = (int)($height * $ratio);
 
         $newImage = imagecreatetruecolor($newWidth, $newHeight);
-        
+
         // Zachování průhlednosti pro PNG a WebP
         if ($mimeType === 'image/png' || $mimeType === 'image/webp') {
             imagealphablending($newImage, false);
@@ -498,7 +530,7 @@ function blkt_optimalizuj_obrazek(string $path, string $mimeType): void {
 }
 
 /**
- * Aktualizuje metadata obrázku a volitelně nahradí soubor - TAKÉ UPRAVIT
+ * Aktualizuje metadata obrázku a volitelně nahradí soubor
  */
 function blkt_uprav_obrazek(int $id, string $title = '', string $alt = '', string $description = '', ?array $file = null): bool {
     $pdo = blkt_db_connect();
@@ -520,12 +552,17 @@ function blkt_uprav_obrazek(int $id, string $title = '', string $alt = '', strin
         // Kontrola MIME typu
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->file($file['tmp_name']);
-        
+
         $allowedMimes = [
             'image/jpeg' => 'jpg',
             'image/png' => 'png',
             'image/gif' => 'gif',
-            'image/webp' => 'webp'
+            'image/webp' => 'webp',
+            'image/svg+xml' => 'svg',
+            'image/svg' => 'svg',
+            'text/xml' => 'svg',
+            'application/svg+xml' => 'svg',
+            'application/xml' => 'svg'
         ];
 
         if (!isset($allowedMimes[$mimeType])) {
@@ -535,7 +572,7 @@ function blkt_uprav_obrazek(int $id, string $title = '', string $alt = '', strin
         $ext = $allowedMimes[$mimeType];
 
         // Cesty
-        $baseDir = dirname(dirname(__DIR__)) . '/media/upload';
+        $baseDir = dirname(__DIR__) . '/media/upload';
         $year = date('Y');
         $month = date('m');
         $yearDir = "$baseDir/$year";
@@ -604,7 +641,7 @@ function blkt_smaz_obrazek(int $id): bool {
     $filename = $stmt0->fetchColumn();
 
     if ($filename) {
-        $filePath = dirname(__DIR__) . '/public_html/media/upload/' . $filename;
+        $filePath = dirname(__DIR__) . '/media/upload/' . $filename;
         if (file_exists($filePath)) {
             @unlink($filePath);
         }
@@ -657,10 +694,10 @@ function blkt_insert_obsah_detail(int $parentId, string $type, string $slug, str
         (:pid, :type, :slug, :tags)
     ");
     $stmt->execute([
-      ':pid'  => $parentId,
-      ':type' => $type,
-      ':slug' => $slug,
-      ':tags' => $tags
+        ':pid'  => $parentId,
+        ':type' => $type,
+        ':slug' => $slug,
+        ':tags' => $tags
     ]);
     return (int)$pdo->lastInsertId();
 }
@@ -682,10 +719,10 @@ function blkt_update_obsah_detail(int $parentId, string $type, string $slug, str
       WHERE blkt_parent_id = :pid AND blkt_type = :type
     ");
     return $stmt->execute([
-      ':slug'  => $slug,
-      ':tags'  => $tags,
-      ':pid'   => $parentId,
-      ':type'  => $type
+        ':slug'  => $slug,
+        ':tags'  => $tags,
+        ':pid'   => $parentId,
+        ':type'  => $type
     ]);
 }
 
@@ -702,8 +739,8 @@ function blkt_delete_obsah_detail(int $parentId, string $type): bool {
       WHERE blkt_parent_id = :pid AND blkt_type = :type
     ");
     return $stmt->execute([
-      ':pid'  => $parentId,
-      ':type' => $type
+        ':pid'  => $parentId,
+        ':type' => $type
     ]);
 }
 
@@ -722,8 +759,8 @@ function blkt_get_obsah_detail(int $parentId, string $type): ?array {
       LIMIT 1
     ");
     $stmt->execute([
-      ':pid'  => $parentId,
-      ':type' => $type
+        ':pid'  => $parentId,
+        ':type' => $type
     ]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     return $row ?: null;
