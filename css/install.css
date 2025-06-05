@@ -1,0 +1,212 @@
+/* 0) Import písma Inter */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+/* 1) Globální nastavení */
+body {
+  position: relative;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+}
+@keyframes gradientBG {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 2) Box instalátoru */
+.wizard {
+  position: relative;
+  z-index: 1;
+  width: 400px;
+  height: 600px;
+  max-width: 90vw;
+  max-height: 90vh;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 0 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  overflow-y: auto;
+}
+
+/* 3) Nadpis kroku */
+.wizard h2 {
+    margin: 0 -2rem 2rem;
+    padding: 25px 2rem 15px;
+    background: #fff;
+    font-size: 16px;
+    border-radius: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-transform: uppercase;
+    text-align: center;
+}
+
+/* 4) Seznam s ikonou */
+.icon-list {
+  padding: 0;
+  margin-bottom: 1rem;
+}
+.icon-list li {
+  list-style: none;
+  background: url('../media/icons/data.svg') no-repeat left center;
+  padding-left: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+/* 5) Plovoucí popisky */
+.blkt-formular-skupina {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+.blkt-formular-skupina input,
+.blkt-formular-skupina select {
+    width: 100%;
+    padding: 20px 1rem 10px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    font-size: 12px;
+    background: transparent;
+    box-sizing: border-box;
+    transition: background 0.2s, border 0.2s;
+    appearance: none;
+}
+.blkt-formular-skupina input:focus,
+.blkt-formular-skupina input:not(:placeholder-shown),
+.blkt-formular-skupina select:focus,
+.blkt-formular-skupina select:valid {
+  background: #fff;
+  border: 1px solid transparent;
+  outline: none;
+}
+.blkt-formular-skupina label {
+  position: absolute;
+  left: 0;
+  top: .7rem;
+  pointer-events: none;
+  padding: 4px 1rem;
+  transition: all 0.2s ease-out;
+  color: rgba(0,0,0,0.6);
+  font-weight: 600;
+  background: none;
+}
+.blkt-formular-skupina input:focus + label,
+.blkt-formular-skupina input:not(:placeholder-shown) + label,
+.blkt-formular-skupina select:focus + label,
+.blkt-formular-skupina select:valid + label {
+  top: -0.55rem;
+  font-size: 0.85rem;
+  color: rgba(0,0,0,0.8);
+  background: #fff;
+  border-radius: 4px;
+}
+
+/* 6) Tlačítka Další/Dokončit */
+a.btn,
+button.btn {
+  min-width: 150px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  padding: 0.6rem 1rem;
+  font-size: 14px;
+  line-height: 1;
+  position: absolute;
+  bottom: 1.5rem;
+  right: 2rem;
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+a.btn:hover,
+button.btn:hover {
+  background: #218838;
+}
+a.btn:disabled,
+button.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #28a745;
+}
+
+/* 7) Chybové zprávy */
+.error {
+    color: #d9534f;
+    margin-bottom: 2rem;
+    padding: 10px 1rem;
+    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid #dedede;
+}
+
+/* 8) Procentuální ikona */
+.percent-icon {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 2rem;
+  width: 32px;
+  height: auto;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* 9) Autoportrét v kroku 1 */
+.author-img {
+    position: absolute;
+    left: 1rem;
+    bottom: 0rem;
+    max-height: 300px;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* === RESPONSIVITA pro instalátor === */
+@media screen and (max-width: 768px) {
+
+  /* Kontejner průvodce */
+  .wizard {
+    width: 90%;
+    margin: 0 auto;
+    padding: 0 2rem; /* Boční padding ANO, horní a spodní NIC navíc */
+    box-sizing: border-box;
+  }
+
+}
+
+/* Ještě menší zařízení - mobily */
+@media screen and (max-width: 480px) {
+
+
+  .author-img {
+    width: 90%;
+    max-width: 200px;
+  }
+
+}
+
+.krok {
+  display: none;
+}
+.krok.active {
+  display: block;
+}
+
+div#strength-indicator {
+    position: absolute;
+    right: 1rem;
+    top: .8rem;
+}

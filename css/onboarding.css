@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+body {
+  position: relative;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+}
+
+@keyframes gradientBG {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
+}
+
+.onboarding-container {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 1s ease, transform 1s ease, box-shadow 1s ease;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0); /* Začneme bez stínu */
+  max-width: 300px;
+  width: 90%;
+  text-align: center;
+}
+
+/* Po aktivaci (když opacity 1) se automaticky "rozsvítí" */
+.onboarding-container.show {
+  opacity: 1;
+  transform: scale(1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); /* Krásný jemný stín */
+}
+
+
+#messages {
+  margin-bottom: 2rem;
+}
+
+.message {
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 0;
+  margin-bottom: 1rem;
+  transition: opacity 1s ease;
+}
+.messageB {
+  font-size: 13px;
+  font-weight: 400;
+  opacity: 0;
+  margin-bottom: 1rem;
+  transition: opacity 1s ease;
+}
+
+/* Tlačítko */
+.btn {
+  opacity: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  padding: 0.6rem 1rem;
+  font-size: 14px;
+  line-height: 1;
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  min-width: 150px;
+  transition: opacity 1s ease, transform 1s ease;
+  transform: scale(0.95); /* Začneme malinko menší */
+}
+
+.btn:hover {
+  background: #218838;
+}

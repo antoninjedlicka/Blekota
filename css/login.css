@@ -1,0 +1,130 @@
+/* 0) Import písma Inter */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+/* 1) Globální nastavení */
+body {
+  position: relative;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+}
+
+@keyframes gradientBG {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 2) Box login */
+.login-container {
+  position: relative;
+  z-index: 1;
+  width: 400px;
+  max-width: 90vw;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  overflow-y: auto;
+  text-align: center;
+}
+
+/* 3) Nadpis */
+.login-container h2 {
+  margin-bottom: 2rem;
+  font-size: 18px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* 4) Formulář */
+.blkt-formular-skupina {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+.blkt-formular-skupina input {
+  width: 100%;
+  padding: 20px 1rem 10px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  font-size: 12px;
+  background: transparent;
+  box-sizing: border-box;
+  transition: background 0.2s, border 0.2s;
+}
+.blkt-formular-skupina input:focus,
+.blkt-formular-skupina input:not(:placeholder-shown) {
+  background: #fff;
+  border: 1px solid transparent;
+  outline: none;
+}
+.blkt-formular-skupina label {
+  position: absolute;
+  left: 0;
+  top: .7rem;
+  pointer-events: none;
+  padding: 4px 1rem;
+  transition: all 0.2s ease-out;
+  color: rgba(0,0,0,0.6);
+  font-weight: 600;
+  background: none;
+}
+.blkt-formular-skupina input:focus + label,
+.blkt-formular-skupina input:not(:placeholder-shown) + label {
+  top: -0.55rem;
+  font-size: 0.85rem;
+  color: rgba(0,0,0,0.8);
+  background: #fff;
+  border-radius: 4px;
+}
+
+/* 5) Tlačítko */
+button.btn {
+  min-width: 150px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  padding: 0.6rem 1rem;
+  font-size: 14px;
+  line-height: 1;
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+button.btn:hover {
+  background: #218838;
+}
+
+/* 6) Chybová hláška */
+.error {
+  color: #d9534f;
+  margin-bottom: 2rem;
+  padding: 10px 1rem;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #dedede;
+}
+
+/* === RESPONSIVITA pro login === */
+@media screen and (max-width: 768px) {
+  .login-container {
+    width: 90%;
+    margin: 0 auto;
+    padding: 2rem;
+    box-sizing: border-box;
+  }
+}

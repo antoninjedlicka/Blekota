@@ -1,0 +1,35 @@
+# admin/.htaccess
+
+# Základní ochrana
+Options -Indexes
+Options -ExecCGI
+
+# Povolení přístupu pouze přihlášeným uživatelům
+# (funguje pouze pokud máte správně nastavenou autentizaci)
+# AuthType Basic
+# AuthName "Administrace"
+# AuthUserFile /path/to/.htpasswd
+# Require valid-user
+
+# Blokování přímého přístupu k action a content souborům
+<FilesMatch "^(action|content)">
+    Order deny,allow
+    Deny from all
+</FilesMatch>
+
+# Povolení pouze určitých IP adres (volitelné)
+# Order deny,allow
+# Deny from all
+# Allow from 192.168.1.0/24
+# Allow from 10.0.0.0/8
+
+# Ochrana include souborů
+<FilesMatch "\.(inc|include)\.php$">
+    Order deny,allow
+    Deny from all
+</FilesMatch>
+
+# Bezpečnostní hlavičky
+<IfModule mod_headers.c>
+    Header set X-Robots-Tag "noindex, nofollow"
+</IfModule>

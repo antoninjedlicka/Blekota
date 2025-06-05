@@ -1,0 +1,88 @@
+/* CSS pro blog */
+
+/* Definování animace */
+@keyframes zakladnianimace {
+    0% {
+        transform: translateY(50px); /* Začíná pod obrazovkou */
+        opacity: 0; /* Začíná neviditelné */
+    }
+    100% {
+        transform: translateY(0); /* Konec animace - vrací se na původní pozici */
+        opacity: 1; /* Konec animace - plně viditelné */
+    }
+}
+
+/* Stránka s blogem a příspěvky */
+.blkt-blog-kontejner {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 30px;
+    padding: 20px;
+    gap: 20px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    /* 🔽 Výchozí neviditelný stav */
+    opacity: 0;
+    transform: translateY(50px);
+    /* Pokračuje animace */
+    animation: zakladnianimace 1s ease-out forwards; /* Délka animace, typ zrychlení, 'forwards' aby zůstal v konečné pozici */
+}
+.blkt-blog-nahled {
+    width: auto;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+.blkt-blog-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.blkt-blog-nadpis {
+    font-size: 1.5em;
+    margin: 0 0 10px 0;
+}
+.blkt-blog-vynatek {
+    font-size: 0.95em;
+    color: #333;
+}
+.blkt-blog-tlacitko {
+    align-self: flex-end;
+    margin-top: 15px;
+}
+.blkt-blog-tlacitko a {
+    background: #007b5e;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+.blkt-blog-tlacitko a:hover {
+    background: #005f48;
+}
+section.blkt-blog-seznam {
+    display: flex;
+    flex-direction: column;
+    width: 95%;
+    max-width: 800px;
+    margin: 130px auto;
+}
+
+/* Mobilní zobrazení */
+@media (max-width: 768px) {
+    .blkt-blog-kontejner {
+        display: flex;
+        flex-direction: column;
+    }
+    .blkt-blog-nahled {
+        width: 100%;
+        height: auto;
+    }
+    section.blkt-blog-seznam {
+        margin: 150px auto;
+    }
+}
