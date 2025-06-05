@@ -269,6 +269,7 @@ p img {
   -webkit-overflow-scrolling: touch;
   margin-top: /* výšku hlavičky */ 0;
   margin-bottom: /* výšku patičky */ 0;
+  width: 100%;
 }
 
 article.blkt-prispevek {
