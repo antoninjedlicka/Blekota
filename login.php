@@ -1,13 +1,7 @@
 <?php
-// login.php - JEDNODUCHÁ BEZPEČNÁ VERZE
-// Nastavení cookie parametrů před session_start()
-session_set_cookie_params([
-    'path' => '/',
-    'secure' => isset($_SERVER['HTTPS']), // pouze přes HTTPS
-    'httponly' => true,
-    'samesite' => 'Strict'
-]);
-session_start();
+// login.php - AKTUALIZOVANÁ VERZE S NÁVRATEM
+// Načtení centrální session konfigurace
+require_once __DIR__ . '/includes/session.php';
 
 // OCHRANA LOGINU: Limity pokusů
 if (!isset($_SESSION['blkt_login_pokusy'])) {
@@ -17,7 +11,14 @@ if (!isset($_SESSION['blkt_login_pokusy'])) {
 
 // Pokud už je přihlášený, přesměruj
 if (isset($_SESSION['blkt_prihlasen']) && $_SESSION['blkt_prihlasen'] === true) {
-    header('Location: index.php');
+    // Pokud máme return URL, použijeme ji
+    if (isset($_SESSION['blkt_return_url'])) {
+        $return_url = $_SESSION['blkt_return_url'];
+        unset($_SESSION['blkt_return_url']);
+        header('Location: ' . $return_url);
+    } else {
+        header('Location: /');
+    }
     exit;
 }
 
@@ -43,8 +44,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($uzivatel && password_verify($heslo, $uzivatel['blkt_heslo'])) {
                     // Úspěšné přihlášení
                     session_regenerate_id(true); // Nové session ID pro bezpečnost
-                    
+
                     $_SESSION['blkt_prihlasen'] = true;
+                    $_SESSION['blkt_uzivatel_id'] = $uzivatel['blkt_id'];
                     $_SESSION['blkt_uzivatel_jmeno'] = $uzivatel['blkt_jmeno'];
                     $_SESSION['blkt_uzivatel_prijmeni'] = $uzivatel['blkt_prijmeni'];
                     $_SESSION['blkt_uzivatel_mail'] = $uzivatel['blkt_mail'];
@@ -54,7 +56,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['blkt_login_pokusy'] = 0;
                     $_SESSION['blkt_login_zamknuto_do'] = 0;
 
-                    header('Location: index.php');
+                    // Přesměrování na původní stránku nebo homepage
+                    if (isset($_SESSION['blkt_return_url'])) {
+                        $return_url = $_SESSION['blkt_return_url'];
+                        unset($_SESSION['blkt_return_url']);
+                        header('Location: ' . $return_url);
+                    } else {
+                        header('Location: /');
+                    }
                     exit;
                 } else {
                     $error = 'Neplatné přihlašovací údaje.';
@@ -78,32 +87,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Přihlášení</title>
-  <link href="https://fonts.googleapis.com/css2?family=Signika+Negative:ital,wght@0,100;0,300;0,400;0,500;0,600;0,700;1,100;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/login.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Přihlášení</title>
+    <link href="https://fonts.googleapis.com/css2?family=Signika+Negative:ital,wght@0,100;0,300;0,400;0,500;0,600;0,700;1,100;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/login.css">
 </head>
 <body>
 
 <div class="login-container">
-  <h2>Přihlášení</h2>
+    <h2>Přihlášení</h2>
 
-  <?php if ($error): ?>
-    <p class="error"><?= htmlspecialchars($error) ?></p>
-  <?php endif; ?>
+    <?php if ($error): ?>
+        <p class="error"><?= htmlspecialchars($error) ?></p>
+    <?php endif; ?>
 
-  <form method="post" autocomplete="off">
-    <div class="blkt-formular-skupina">
-      <input type="email" name="mail" id="mail" placeholder=" " required>
-      <label for="mail">E-mail</label>
-    </div>
-    <div class="blkt-formular-skupina">
-      <input type="password" name="heslo" id="heslo" placeholder=" " required>
-      <label for="heslo">Heslo</label>
-    </div>
-    <button class="btn">Přihlásit se</button>
-  </form>
+    <form method="post" autocomplete="off">
+        <div class="blkt-formular-skupina">
+            <input type="email" name="mail" id="mail" placeholder=" " required>
+            <label for="mail">E-mail</label>
+        </div>
+        <div class="blkt-formular-skupina">
+            <input type="password" name="heslo" id="heslo" placeholder=" " required>
+            <label for="heslo">Heslo</label>
+        </div>
+        <button class="btn">Přihlásit se</button>
+    </form>
 
 </div>
 

@@ -1,13 +1,19 @@
 <?php
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-session_start();
 
-// Ověření přihlášení - PŮVODNÍ JEDNODUCHÁ VERZE
-if (!isset($_SESSION['blkt_prihlasen'])) {
-    header('Location: ../login.php');
-    exit;
-}
+// Načtení centrální session konfigurace
+require_once __DIR__ . '/../includes/session.php';
+
+// Načtení auth funkcí
+require_once __DIR__ . '/../includes/auth.php';
+
+// Kontrola přihlášení a admin oprávnění
+blkt_vyzaduj_prihlaseni();
+blkt_vyzaduj_admina();
+
+// Získání informací o uživateli
+$uzivatel = blkt_uzivatel_info();
 ?>
 <!DOCTYPE html>
 <html lang="cs">
@@ -33,43 +39,43 @@ if (!isset($_SESSION['blkt_prihlasen'])) {
     <?php include __DIR__ . '/includes/header.php'; ?>
 </header>
 <div class="admin-wrapper">
-  <aside class="admin-menu">
-    <div class="menu-item active" data-section="dashboard">
-      <img src="/media/icons/dashboard.svg" alt="Dashboard">
-      <span>Dashboard</span>
-    </div>
-    <div class="menu-item" data-section="uzivatele">
-      <img src="/media/icons/users.svg" alt="Uživatelé">
-      <span>Uživatelé</span>
-    </div>
-    <div class="menu-item" data-section="nastaveni">
-      <img src="/media/icons/settings.svg" alt="Nastavení">
-      <span>Nastavení</span>
-    </div>
-      <div class="menu-item" data-section="homepage">
-          <img src="/media/icons/home.svg" alt="Homepage">
-          <span>Homepage</span>
-      </div>
-      <div class="menu-item" data-section="seo">
-          <img src="/media/icons/seo.svg" alt="SEO">
-          <span>SEO</span>
-      </div>
-    <div class="menu-item" data-section="prispevky">
-      <img src="/media/icons/post.svg" alt="Příspěvky">
-      <span>Příspěvky</span>
-    </div>
-    <div class="menu-item" data-section="obrazky">
-      <img src="/media/icons/images.svg" alt="Média">
-      <span>Média</span>
-    </div>
-  </aside>
+    <aside class="admin-menu">
+        <div class="menu-item active" data-section="dashboard">
+            <img src="/media/icons/dashboard.svg" alt="Dashboard">
+            <span>Dashboard</span>
+        </div>
+        <div class="menu-item" data-section="uzivatele">
+            <img src="/media/icons/users.svg" alt="Uživatelé">
+            <span>Uživatelé</span>
+        </div>
+        <div class="menu-item" data-section="nastaveni">
+            <img src="/media/icons/settings.svg" alt="Nastavení">
+            <span>Nastavení</span>
+        </div>
+        <div class="menu-item" data-section="homepage">
+            <img src="/media/icons/home.svg" alt="Homepage">
+            <span>Homepage</span>
+        </div>
+        <div class="menu-item" data-section="seo">
+            <img src="/media/icons/seo.svg" alt="SEO">
+            <span>SEO</span>
+        </div>
+        <div class="menu-item" data-section="prispevky">
+            <img src="/media/icons/post.svg" alt="Příspěvky">
+            <span>Příspěvky</span>
+        </div>
+        <div class="menu-item" data-section="obrazky">
+            <img src="/media/icons/images.svg" alt="Média">
+            <span>Média</span>
+        </div>
+    </aside>
 
-  <main class="admin-content">
-    <section id="admin-section" class="admin-section">
-      <!-- Sem se AJAXem vloží celý obsah sekce (včetně vlastních záložek) -->
-      <p>Načítám obsah…</p>
-    </section>
-  </main>
+    <main class="admin-content">
+        <section id="admin-section" class="admin-section">
+            <!-- Sem se AJAXem vloží celý obsah sekce (včetně vlastních záložek) -->
+            <p>Načítám obsah…</p>
+        </section>
+    </main>
 </div>
 <footer class="blkt-paticka">
     <?php include __DIR__ . '/includes/footer.php'; ?>

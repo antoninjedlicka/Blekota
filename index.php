@@ -1,20 +1,35 @@
 <?php
-// index.php – front-end router s trvalým intrem
+// index.php – front-end router s kontrolou přihlášení
+
+// Načtení centrální session konfigurace
+require_once __DIR__ . '/includes/session.php';
 
 // 1) Připojení k DB
 require_once __DIR__ . '/databaze.php';
 $pdo = blkt_db_connect();
 
-// 2) Načtení front-end funkce
+// 2) Načtení auth funkcí
+require_once __DIR__ . '/includes/auth.php';
+
+// 3) Kontrola, zda je web nastaven jako nový
+$stmt = $pdo->prepare("SELECT blkt_hodnota FROM blkt_konfigurace WHERE blkt_kod = 'NEW' LIMIT 1");
+$stmt->execute();
+$is_new = $stmt->fetchColumn() === 'true';
+
+// 4) Pokud je web nový a uživatel není přihlášen, přesměruj na login
+if ($is_new && !blkt_je_prihlasen()) {
+    blkt_presmeruj_na_login();
+}
+
+// 5) Načtení front-end funkce
 require_once __DIR__ . '/includes/frontend.php';
 
-// 3) Získat čistou cestu
+// 6) Získat čistou cestu
 $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-// Spustíme výstup bufferu, abychom mohli intro předsadit stránce
+// Routování obsahu
 ob_start();
 
-// Routování obsahu
 if ($requestUri === '/' || $requestUri === '/index.php') {
     include __DIR__ . '/homepage.php';
 
@@ -59,7 +74,7 @@ if ($requestUri === '/' || $requestUri === '/index.php') {
     }
 }
 
-// Získáme obsah a vložíme před něj intro
+// Získáme obsah
 $pageContent = ob_get_clean();
 ?>
 <!DOCTYPE html>

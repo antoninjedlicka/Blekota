@@ -1,6 +1,11 @@
 <?php
 // includes/header.php
-// Pouze obsah hlavičky – neobsahuje žádné HTML tagy navíc!
+// Hlavička s informací o přihlášeném uživateli
+
+// Načtení auth funkcí
+require_once __DIR__ . '/auth.php';
+
+$uzivatel = blkt_uzivatel_info();
 ?>
 
 <div class="blkt-hlavicka-box">
@@ -10,7 +15,13 @@
     <nav class="blkt-navigace">
         <a class="blkt-tlacitko blkt-tlacitko-menu" href="/">Domů</a>
         <a class="blkt-tlacitko blkt-tlacitko-menu" href="/blog">Blog</a>
-        <a class="blkt-tlacitko blkt-tlacitko-menu" href="/admin">Administrace</a>
+        <?php if (blkt_je_prihlasen()): ?>
+            <?php if (blkt_je_admin()): ?>
+                <a class="blkt-tlacitko blkt-tlacitko-menu" href="/admin">Administrace</a>
+            <?php endif; ?>
+            <a class="blkt-tlacitko blkt-tlacitko-smazat" href="/logout.php">Odhlásit (<?= htmlspecialchars($uzivatel['jmeno']) ?>)</a>
+        <?php else: ?>
+            <a class="blkt-tlacitko blkt-tlacitko-menu" href="/login.php">Přihlásit</a>
+        <?php endif; ?>
     </nav>
 </div>
-
