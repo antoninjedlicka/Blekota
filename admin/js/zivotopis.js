@@ -95,7 +95,7 @@ function initZivotopisSection() {
         });
     }
 
-    // Přidávání nových položek - OPRAVENÁ VERZE
+    // Přidávání nových položek
     setupDynamicItems('profese', 'blkt-profese-template', 'blkt-pridat-profesi', 'blkt-profese-container');
     setupDynamicItems('dovednosti', 'blkt-dovednost-template', 'blkt-pridat-dovednost', 'blkt-dovednosti-container');
     setupDynamicItems('vlastnosti', 'blkt-vlastnost-template', 'blkt-pridat-vlastnost', 'blkt-vlastnosti-container');
@@ -107,28 +107,16 @@ function initZivotopisSection() {
         const addBtn = document.getElementById(addBtnId);
         const container = document.getElementById(containerId);
 
-        if (!template || !addBtn || !container) {
-            console.log(`[Zivotopis] Chybí elementy pro ${type}`);
-            return;
-        }
+        if (!template || !addBtn || !container) return;
 
         addBtn.addEventListener('click', () => {
             const items = container.querySelectorAll('[data-index]');
             const newIndex = items.length;
+            const html = template.innerHTML.replace(/{{index}}/g, newIndex);
 
-            // DŮLEŽITÉ: Správně nahradit všechny výskyty {{index}}
-            let html = template.innerHTML;
-            // Použijeme globální nahrazení pomocí regulárního výrazu
-            html = html.replace(/\{\{index\}\}/g, newIndex);
-
-            console.log(`[Zivotopis] Přidávám ${type} s indexem ${newIndex}`);
-
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
-
-            // Přidáme nový element
-            const newElement = tempDiv.firstElementChild;
-            container.appendChild(newElement);
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            container.appendChild(div.firstElementChild);
 
             // Pro profese znovu inicializovat TinyMCE
             if (type === 'profese') {
@@ -141,30 +129,17 @@ function initZivotopisSection() {
     document.addEventListener('click', e => {
         if (e.target.classList.contains('blkt-odebrat-radek') ||
             e.target.classList.contains('blkt-odebrat-pozici')) {
-            e.preventDefault();
             if (confirm('Opravdu chcete tuto položku odebrat?')) {
-                const item = e.target.closest('[data-index]');
-                if (item) {
-                    // Pro profese nejdřív odstranit TinyMCE
-                    if (item.querySelector('.blkt-tinymce-editor')) {
-                        const editorId = item.querySelector('.blkt-tinymce-editor').id;
-                        if (editorId && tinymce.get(editorId)) {
-                            tinymce.get(editorId).remove();
-                        }
-                    }
-                    item.remove();
-                    console.log('[Zivotopis] Položka odebrána');
-                }
+                e.target.closest('[data-index]').remove();
             }
         }
     });
 
-    // Uložení formuláře - OPRAVENÁ VERZE
-    const forms = document.querySelectorAll('form[id^="blkt-form-"]');
-    forms.forEach(form => {
+    // Uložení formuláře
+    const form = document.getElementById('blkt-form-zivotopis');
+    if (form) {
         form.addEventListener('submit', e => {
             e.preventDefault();
-            console.log('[Zivotopis] Odesílám formulář:', form.id);
 
             // Pro TinyMCE musíme nejdřív uložit obsah
             if (typeof tinymce !== 'undefined') {
@@ -173,41 +148,24 @@ function initZivotopisSection() {
 
             const formData = new FormData(form);
 
-            // Debug - vypsat odesílaná data
-            console.log('[Zivotopis] Odesílaná data:');
-            for (let [key, value] of formData.entries()) {
-                console.log(`${key}: ${value}`);
-            }
-
             fetch(form.action, {
                 method: 'POST',
                 body: formData
             })
-                .then(r => {
-                    if (!r.ok) throw new Error('Network response was not ok');
-                    return r.json();
-                })
+                .then(r => r.json())
                 .then(response => {
-                    console.log('[Zivotopis] Odpověď serveru:', response);
                     if (response.status === 'ok') {
-                        alert('Změny byly úspěšně uloženy.');
-                        // Volitelně: znovu načíst stránku pro zobrazení aktuálních dat
-                        // window.location.reload();
+                        alert('Životopis byl úspěšně uložen.');
                     } else {
-                        alert('Chyba při ukládání: ' + (response.error || 'Neznámá chyba'));
+                        alert('Chyba při ukládání: ' + response.error);
                     }
                 })
                 .catch(err => {
-                    console.error('[Zivotopis] Chyba:', err);
                     alert('Síťová chyba: ' + err.message);
                 });
         });
-    });
+    }
 }
 
-// Spustit po načtení
-document.addEventListener('DOMContentLoaded', () => {
-    if (document.querySelector('.blkt-tabs')) {
-        initZivotopisSection();
-    }
-});
+// Spustit po načtení - TOTO JE DŮLEŽITÉ PRO admin.js
+initZivotopisSection();
