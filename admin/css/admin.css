@@ -883,6 +883,160 @@ p img {
   box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
 }
 
+/* === ADMIN GALERIE STYLY === */
+
+/* Náhledy v galerii */
+.blkt-gallery-thumb {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  cursor: pointer;
+  margin: 0.25rem;
+}
+
+/* Náhledy v modalu pro výběr fotky (životopis) */
+.blkt-gallery-thumb-modal {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  cursor: pointer;
+  margin: 5px;
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.blkt-gallery-thumb-modal:hover {
+  border-color: #667eea;
+}
+
+.blkt-gallery-thumb-modal.blkt-vybrano {
+  border-color: #28a745;
+}
+
+/* Upload zóna */
+.blkt-upload-zone {
+  position: relative;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 3rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.blkt-upload-zone:hover {
+  border-color: #999;
+  background: rgba(0,0,0,0.02);
+}
+
+.blkt-upload-zone.blkt-upload-over {
+  border-color: #28a745;
+  background: rgba(40, 167, 69, 0.1);
+}
+
+/* Karta obrázku */
+.blkt-image-card {
+  position: relative;
+  display: inline-block;
+  margin: 0.5rem;
+}
+
+.blkt-image-card img {
+  max-height: 150px;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Akční tlačítka na kartě */
+.blkt-card-actions {
+  position: absolute;
+  top: 0.3rem;
+  right: 0.3rem;
+  display: none;
+  gap: 0.4rem;
+}
+
+.blkt-image-card:hover .blkt-card-actions {
+  display: flex;
+}
+
+.blkt-card-actions button {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  padding: 4px;
+  border-radius: 4px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.blkt-card-actions button:hover {
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.blkt-card-actions button img {
+  width: 16px;
+  height: 16px;
+}
+
+/* Měsíční rozdělení */
+.month-divider {
+  display: flex;
+  align-items: center;
+  margin: 2rem 0 1rem;
+  font-weight: 600;
+  color: #444;
+  font-size: 0.95em;
+}
+
+.month-divider::before {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: #ccc;
+  margin-right: 1rem;
+}
+
+.month-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: #ccc;
+  margin-left: 1rem;
+}
+
+.month-divider span {
+  white-space: nowrap;
+  padding: 0 1rem;
+}
+
+/* Vyhledávací pole v toolbaru */
+.section-toolbar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.toolbar-search {
+  max-width: 250px;
+  flex: 1;
+}
+
+/* Žádné obrázky info */
+.info-message {
+  text-align: center;
+  color: #666;
+  padding: 3rem;
+  font-style: italic;
+}
+
 /* Responzivita */
 @media (max-width: 1000px) {
   .admin-menu {
@@ -895,5 +1049,4 @@ p img {
     max-width: 1000px;
     border-radius: 0;
   }
-
 }

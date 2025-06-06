@@ -228,3 +228,124 @@ article.blkt-cv {
         margin: 160px auto 120px;
     }
 }
+/* === CV DYNAMICKÉ STYLY === */
+
+/* Tlačítka v pravém dolním rohu */
+.blkt-cv-tlacitka {
+    position: fixed;
+    bottom: 100px;
+    right: 2rem;
+    display: flex;
+    gap: 1rem;
+    z-index: 100;
+}
+
+/* Tlačítko pro tisk */
+.blkt-cv-tlacitko-tisk {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+}
+
+.blkt-cv-tlacitko-tisk:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Tlačítko pro stažení */
+.blkt-cv-tlacitko-stahnout {
+    background: #764ba2;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3);
+    transition: all 0.3s ease;
+}
+
+.blkt-cv-tlacitko-stahnout:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4);
+}
+
+/* Počítadlo let praxe */
+.blkt-cv-leta-praxe {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 1.1em;
+    color: white;
+}
+
+/* Mobilní menu */
+.blkt-cv-mobilni-menu {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 30px;
+    padding: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 100;
+}
+
+.blkt-cv-mobilni-menu button {
+    background: #667eea;
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Animace pro kontakty */
+.blkt-cv-kontakt li {
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: all 0.5s ease;
+}
+
+.blkt-cv-kontakt li.blkt-animovano {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Animace pro tagy */
+.blkt-cv-tag {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+}
+
+.blkt-cv-tag.blkt-animovano {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Animace sekcí - pauza před spuštěním */
+.blkt-cv-sekce {
+    animation-play-state: paused;
+}
+
+.blkt-cv-sekce.blkt-animace-spustena {
+    animation-play-state: running;
+}
