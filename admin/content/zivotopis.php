@@ -33,41 +33,47 @@ foreach ($vsechny_polozky as $polozka) {
     <button data-tab="vzdelani">Vzdělání a zájmy</button>
 </nav>
 
-<!-- JEDEN FORMULÁŘ PRO VŠECHNY ZÁLOŽKY -->
-<form id="blkt-form-zivotopis" method="post" action="action/save_zivotopis.php">
+<!-- WRAPPER PRO SPRÁVNÉ ROZLOŽENÍ -->
+<div class="blkt-zivotopis-wrapper">
 
-    <div id="tab-prehled" class="tab-content">
-        <?php include __DIR__ . '/zivotopis/prehled.php'; ?>
+    <!-- FORMULÁŘ -->
+    <form id="blkt-form-zivotopis" method="post" action="action/save_zivotopis.php">
+
+        <div id="tab-prehled" class="tab-content">
+            <?php include __DIR__ . '/zivotopis/prehled.php'; ?>
+        </div>
+
+        <div id="tab-zakladni" class="tab-content" style="display:none">
+            <?php include __DIR__ . '/zivotopis/zakladni.php'; ?>
+        </div>
+
+        <div id="tab-profese" class="tab-content" style="display:none">
+            <?php include __DIR__ . '/zivotopis/profese.php'; ?>
+        </div>
+
+        <div id="tab-dovednosti" class="tab-content" style="display:none">
+            <?php include __DIR__ . '/zivotopis/dovednosti.php'; ?>
+        </div>
+
+        <div id="tab-vlastnosti" class="tab-content" style="display:none">
+            <?php include __DIR__ . '/zivotopis/vlastnosti.php'; ?>
+        </div>
+
+        <div id="tab-jazyky" class="tab-content" style="display:none">
+            <?php include __DIR__ . '/zivotopis/jazyky.php'; ?>
+        </div>
+
+        <div id="tab-vzdelani" class="tab-content" style="display:none">
+            <?php include __DIR__ . '/zivotopis/vzdelani.php'; ?>
+        </div>
+
+    </form>
+
+    <!-- STICKY SAVE TLAČÍTKO -->
+    <div class="blkt-sticky-save">
+        <button type="submit" form="blkt-form-zivotopis" class="btn btn-save">Uložit všechny změny</button>
     </div>
 
-    <div id="tab-zakladni" class="tab-content" style="display:none">
-        <?php include __DIR__ . '/zivotopis/zakladni.php'; ?>
-    </div>
-
-    <div id="tab-profese" class="tab-content" style="display:none">
-        <?php include __DIR__ . '/zivotopis/profese.php'; ?>
-    </div>
-
-    <div id="tab-dovednosti" class="tab-content" style="display:none">
-        <?php include __DIR__ . '/zivotopis/dovednosti.php'; ?>
-    </div>
-
-    <div id="tab-vlastnosti" class="tab-content" style="display:none">
-        <?php include __DIR__ . '/zivotopis/vlastnosti.php'; ?>
-    </div>
-
-    <div id="tab-jazyky" class="tab-content" style="display:none">
-        <?php include __DIR__ . '/zivotopis/jazyky.php'; ?>
-    </div>
-
-    <div id="tab-vzdelani" class="tab-content" style="display:none">
-        <?php include __DIR__ . '/zivotopis/vzdelani.php'; ?>
-    </div>
-
-</form><!-- Konec formuláře -->
-
-<div class="blkt-sticky-save">
-    <button type="submit" form="blkt-form-zivotopis" class="btn btn-save">Uložit všechny změny</button>
 </div>
 
 <script defer src="js/zivotopis.js"></script>
