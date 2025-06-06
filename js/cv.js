@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tlacitkoKontejner.className = 'blkt-cv-tlacitka';
         tlacitkoKontejner.style.cssText = `
             position: fixed;
-            bottom: 2rem;
+            bottom: 100px;
             right: 2rem;
             display: flex;
             gap: 1rem;
