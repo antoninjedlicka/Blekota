@@ -8,33 +8,7 @@ if (basename(__FILE__) === basename($_SERVER['SCRIPT_FILENAME'])) {
 }
 
 // Načtení přístupových údajů k databázi
-if (!file_exists(__DIR__ . '/../connect.php')) {
-    die('Konfigurační soubor connect.php nenalezen. Spusť instalátor.');
-}
-require_once __DIR__ . '/../connect.php';
-
-/**
- * Vrátí PDO instanci pro práci s databází.
- *
- * @return PDO
- */
-function blkt_db_connect(): PDO {
-    $dsn = 'mysql:host=' . BLKT_DB_HOST . ';dbname=' . BLKT_DB_NAME . ';charset=utf8mb4';
-    try {
-        return new PDO(
-            $dsn,
-            BLKT_DB_USER,
-            BLKT_DB_PASS,
-            [
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES   => false,
-            ]
-        );
-    } catch (PDOException $e) {
-        die('Chyba připojení k databázi: ' . htmlspecialchars($e->getMessage()));
-    }
-}
+require_once __DIR__ . '/../databaze.php';
 
 /* === TABULKA blkt_uzivatele === */
 
@@ -66,27 +40,99 @@ function blkt_drop_table_uzivatele(): void {
  * Vloží nového uživatele.
  *
  * @param array $data ['jmeno','prijmeni','mail','heslo','stav','admin']
+ * @param array $data
  * @return int ID vloženého záznamu
+ *
+* function blkt_insert_uzivatel(array $data): int {
+    * $pdo = blkt_db_connect();
+    * $stmt = $pdo->prepare("
+      * INSERT INTO blkt_uzivatele
+        * (blkt_jmeno, blkt_prijmeni, blkt_mail, blkt_heslo, blkt_stav, blkt_admin)
+      * VALUES
+        * (:jmeno, :prijmeni, :mail, :heslo, :stav, :admin)
+    * ");
+    * $stmt->execute([
+        * ':jmeno'    => $data['jmeno'],
+        * ':prijmeni' => $data['prijmeni'],
+        * ':mail'     => $data['mail'],
+        * ':heslo'    => password_hash($data['heslo'], PASSWORD_DEFAULT),
+        * ':stav'     => $data['stav'] ? 1 : 0,
+        * ':admin'    => $data['admin'] ? 1 : 0,
+ * ]);
+ * return (int)$pdo->lastInsertId();
+* }
+ * /
+ *
+* /**
+ * Bezpečné vložení uživatele s validací
+ * @return int
+ * @throws Exception
  */
 function blkt_insert_uzivatel(array $data): int {
+    // Validace vstupních dat
+    if (empty($data['mail']) || !filter_var($data['mail'], FILTER_VALIDATE_EMAIL)) {
+        throw new Exception('Neplatná e-mailová adresa.');
+    }
+
+    if (empty($data['heslo']) || strlen($data['heslo']) < 8) {
+        throw new Exception('Heslo musí mít alespoň 8 znaků.');
+    }
+
     $pdo = blkt_db_connect();
+
+    // Kontrola duplicity e-mailu
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM blkt_uzivatele WHERE blkt_mail = :mail");
+    $stmt->execute([':mail' => $data['mail']]);
+    if ($stmt->fetchColumn() > 0) {
+        throw new Exception('Uživatel s tímto e-mailem již existuje.');
+    }
+
+    // Hashování hesla s vyšší náročností
+    $hashedPassword = password_hash($data['heslo'], PASSWORD_ARGON2ID, [
+        'memory_cost' => 65536,
+        'time_cost' => 4,
+        'threads' => 1
+    ]);
+
     $stmt = $pdo->prepare("
-      INSERT INTO blkt_uzivatele
+        INSERT INTO blkt_uzivatele
         (blkt_jmeno, blkt_prijmeni, blkt_mail, blkt_heslo, blkt_stav, blkt_admin)
-      VALUES
+        VALUES
         (:jmeno, :prijmeni, :mail, :heslo, :stav, :admin)
     ");
+
     $stmt->execute([
         ':jmeno'    => $data['jmeno'],
         ':prijmeni' => $data['prijmeni'],
         ':mail'     => $data['mail'],
-        ':heslo'    => password_hash($data['heslo'], PASSWORD_DEFAULT),
-        ':stav'     => $data['stav'] ? 1 : 0,
-        ':admin'    => $data['admin'] ? 1 : 0,
+        ':heslo'    => $hashedPassword,
+        ':stav'     => isset($data['stav']) ? (int)$data['stav'] : 1,
+        ':admin'    => isset($data['admin']) ? (int)$data['admin'] : 0,
     ]);
+
     return (int)$pdo->lastInsertId();
 }
 
+// Přidání indexů pro lepší výkon (spustit jednou při instalaci)
+function blkt_create_indexes(): void {
+    $pdo = blkt_db_connect();
+
+    // Index pro rychlé vyhledávání uživatelů
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_mail ON blkt_uzivatele(blkt_mail)");
+
+    // Index pro konfigurace
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_kod ON blkt_konfigurace(blkt_kod)");
+
+    // Index pro příspěvky
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_kategorie ON blkt_prispevky(blkt_kategorie)");
+
+    // Index pro detaily obsahu
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_slug ON blkt_obsah_detaily(blkt_slug)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_parent_type ON blkt_obsah_detaily(blkt_parent_id, blkt_type)");
+
+    // Index pro obrázky
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_created ON blkt_images(blkt_created_at DESC)");
+}
 /**
  * Aktualizuje existujícího uživatele podle ID.
  *

@@ -1,6 +1,8 @@
 <?php
 // cv.php - dynamická verze načítající data z databáze
 require_once __DIR__ . '/databaze.php';
+require_once __DIR__ . '/admin/databaze.php';
+
 
 $pdo = blkt_db_connect();
 
