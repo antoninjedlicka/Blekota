@@ -785,3 +785,183 @@ function blkt_get_all_tags(): array {
     sort($tags);
     return $tags;
 }
+
+/* === TABULKA blkt_zivotopis === */
+
+/**
+ * Vytvoří tabulku blkt_zivotopis.
+ */
+function blkt_create_table_zivotopis(): void {
+    $sql = "
+    CREATE TABLE IF NOT EXISTS blkt_zivotopis (
+        blkt_id INT AUTO_INCREMENT PRIMARY KEY,
+        blkt_typ VARCHAR(50) NOT NULL,
+        blkt_poradi INT DEFAULT 0,
+        blkt_nazev VARCHAR(255),
+        blkt_podnazev VARCHAR(255),
+        blkt_datum_od VARCHAR(50),
+        blkt_datum_do VARCHAR(50),
+        blkt_popis TEXT,
+        blkt_obsah TEXT,
+        blkt_tagy TEXT,
+        blkt_ikona VARCHAR(50),
+        blkt_uroven VARCHAR(50),
+        blkt_stav TINYINT DEFAULT 1,
+        INDEX idx_typ (blkt_typ),
+        INDEX idx_poradi (blkt_poradi)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+    blkt_db_connect()->exec($sql);
+}
+
+/**
+ * Smaže tabulku blkt_zivotopis.
+ */
+function blkt_drop_table_zivotopis(): void {
+    blkt_db_connect()->exec("DROP TABLE IF EXISTS blkt_zivotopis;");
+}
+
+/**
+ * Vloží novou položku životopisu.
+ *
+ * @param array $data pole s daty
+ * @return int ID vloženého záznamu
+ */
+function blkt_insert_zivotopis_polozka(array $data): int {
+    $pdo = blkt_db_connect();
+    $stmt = $pdo->prepare("
+        INSERT INTO blkt_zivotopis
+        (blkt_typ, blkt_poradi, blkt_nazev, blkt_podnazev, blkt_datum_od, 
+         blkt_datum_do, blkt_popis, blkt_obsah, blkt_tagy, blkt_ikona, 
+         blkt_uroven, blkt_stav)
+        VALUES
+        (:typ, :poradi, :nazev, :podnazev, :datum_od, 
+         :datum_do, :popis, :obsah, :tagy, :ikona, 
+         :uroven, :stav)
+    ");
+
+    $stmt->execute([
+        ':typ'       => $data['typ'],
+        ':poradi'    => $data['poradi'] ?? 0,
+        ':nazev'     => $data['nazev'] ?? null,
+        ':podnazev'  => $data['podnazev'] ?? null,
+        ':datum_od'  => $data['datum_od'] ?? null,
+        ':datum_do'  => $data['datum_do'] ?? null,
+        ':popis'     => $data['popis'] ?? null,
+        ':obsah'     => $data['obsah'] ?? null,
+        ':tagy'      => $data['tagy'] ?? null,
+        ':ikona'     => $data['ikona'] ?? null,
+        ':uroven'    => $data['uroven'] ?? null,
+        ':stav'      => $data['stav'] ?? 1
+    ]);
+
+    return (int)$pdo->lastInsertId();
+}
+
+/**
+ * Aktualizuje položku životopisu podle ID.
+ *
+ * @param int   $id
+ * @param array $data
+ * @return bool
+ */
+function blkt_update_zivotopis_polozka(int $id, array $data): bool {
+    $stmt = blkt_db_connect()->prepare("
+        UPDATE blkt_zivotopis SET
+            blkt_typ = :typ,
+            blkt_poradi = :poradi,
+            blkt_nazev = :nazev,
+            blkt_podnazev = :podnazev,
+            blkt_datum_od = :datum_od,
+            blkt_datum_do = :datum_do,
+            blkt_popis = :popis,
+            blkt_obsah = :obsah,
+            blkt_tagy = :tagy,
+            blkt_ikona = :ikona,
+            blkt_uroven = :uroven,
+            blkt_stav = :stav
+        WHERE blkt_id = :id
+    ");
+
+    return $stmt->execute([
+        ':id'        => $id,
+        ':typ'       => $data['typ'],
+        ':poradi'    => $data['poradi'] ?? 0,
+        ':nazev'     => $data['nazev'] ?? null,
+        ':podnazev'  => $data['podnazev'] ?? null,
+        ':datum_od'  => $data['datum_od'] ?? null,
+        ':datum_do'  => $data['datum_do'] ?? null,
+        ':popis'     => $data['popis'] ?? null,
+        ':obsah'     => $data['obsah'] ?? null,
+        ':tagy'      => $data['tagy'] ?? null,
+        ':ikona'     => $data['ikona'] ?? null,
+        ':uroven'    => $data['uroven'] ?? null,
+        ':stav'      => $data['stav'] ?? 1
+    ]);
+}
+
+/**
+ * Smaže položku životopisu podle ID.
+ *
+ * @param int $id
+ * @return bool
+ */
+function blkt_delete_zivotopis_polozka(int $id): bool {
+    return blkt_db_connect()
+        ->prepare("DELETE FROM blkt_zivotopis WHERE blkt_id = :id")
+        ->execute([':id' => $id]);
+}
+
+/**
+ * Načte všechny položky životopisu podle typu.
+ *
+ * @param string $typ Typ položky nebo 'vse' pro všechny
+ * @return array
+ */
+function blkt_get_zivotopis_polozky(string $typ = 'vse'): array {
+    $pdo = blkt_db_connect();
+
+    if ($typ === 'vse') {
+        $stmt = $pdo->prepare("
+            SELECT * FROM blkt_zivotopis 
+            WHERE blkt_stav = 1 
+            ORDER BY blkt_typ, blkt_poradi, blkt_id
+        ");
+        $stmt->execute();
+    } else {
+        $stmt = $pdo->prepare("
+            SELECT * FROM blkt_zivotopis 
+            WHERE blkt_typ = :typ AND blkt_stav = 1 
+            ORDER BY blkt_poradi, blkt_id
+        ");
+        $stmt->execute([':typ' => $typ]);
+    }
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Načte jednu položku životopisu podle ID.
+ *
+ * @param int $id
+ * @return array|null
+ */
+function blkt_get_zivotopis_polozka(int $id): ?array {
+    $stmt = blkt_db_connect()->prepare("
+        SELECT * FROM blkt_zivotopis WHERE blkt_id = :id LIMIT 1
+    ");
+    $stmt->execute([':id' => $id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $result ?: null;
+}
+
+/**
+ * Smaže všechny položky daného typu.
+ *
+ * @param string $typ
+ * @return bool
+ */
+function blkt_delete_zivotopis_typ(string $typ): bool {
+    return blkt_db_connect()
+        ->prepare("DELETE FROM blkt_zivotopis WHERE blkt_typ = :typ")
+        ->execute([':typ' => $typ]);
+}
