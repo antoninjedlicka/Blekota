@@ -64,6 +64,10 @@ $uzivatel = blkt_uzivatel_info();
             <img src="/media/icons/post.svg" alt="Příspěvky">
             <span>Příspěvky</span>
         </div>
+        <div class="menu-item" data-section="zivotopis">
+            <img src="/media/icons/zivotopis.svg" alt="Životopis">
+            <span>Životopis</span>
+        </div>
         <div class="menu-item" data-section="obrazky">
             <img src="/media/icons/images.svg" alt="Média">
             <span>Média</span>
