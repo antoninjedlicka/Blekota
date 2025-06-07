@@ -42,13 +42,13 @@ function initHomepageSection() {
             .then(r => r.json())
             .then(j => {
                 if (j.status === 'ok') {
-                    alert('Uloženo.');
+                    blkt_notifikace('Nastavení homepage bylo uloženo.', 'success');
                 } else {
-                    alert('Chyba při ukládání: ' + j.error);
+                    blkt_notifikace('Chyba při ukládání: ' + j.error, 'error');
                 }
             })
             .catch(err => {
-                alert('Síťová chyba: ' + err.message);
+                blkt_notifikace('Síťová chyba: ' + err.message, 'error');
             });
     });
 }
@@ -76,13 +76,13 @@ function blkt_openHomepageGallery() {
                     const container = document.getElementById('blkt-galerie-vybrane');
                     const current = container.querySelectorAll('.blkt-galerie-obrazek');
                     if (current.length >= 5) {
-                        alert('Můžeš vybrat maximálně 5 obrázků.');
+                        blkt_notifikace('Můžete vybrat maximálně 5 obrázků.', 'warning');
                         return;
                     }
 
                     // Kontrola duplicity
                     if ([...container.querySelectorAll('input')].some(i => i.value === img.url)) {
-                        alert('Tento obrázek už je vybraný.');
+                        blkt_notifikace('Tento obrázek už je vybraný.', 'info');
                         return;
                     }
 
@@ -100,7 +100,7 @@ function blkt_openHomepageGallery() {
             });
         })
         .catch(() => {
-            alert('Nepodařilo se načíst obrázky z galerie.');
+            blkt_notifikace('Nepodařilo se načíst obrázky z galerie.', 'error');
         });
 
     // Zavření modalu

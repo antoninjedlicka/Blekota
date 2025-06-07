@@ -66,7 +66,9 @@ function initZivotopisSection() {
                         const thumb = document.createElement('img');
                         thumb.src = img.url;
                         thumb.alt = img.alt;
-                        thumb.className = 'blkt-gallery-thumb-modal';
+                        thumb.className = 'blkt-gallery-thumb';
+                        thumb.style.cssText = 'width:100px;height:100px;object-fit:cover;cursor:pointer;margin:5px;border:2px solid transparent;';
+
                         thumb.addEventListener('click', () => {
                             // Nastavení vybrané fotky
                             const preview = document.getElementById('blkt-cv-foto-preview');
@@ -82,7 +84,7 @@ function initZivotopisSection() {
                         gallery.appendChild(thumb);
                     });
                 })
-                .catch(() => alert('Chyba při načítání galerie.'));
+                .catch(() => blkt_notifikace('Chyba při načítání galerie.', 'error'));
 
             // Zavření modalu
             modal.querySelector('.blkt-modal-close').onclick =
@@ -153,13 +155,13 @@ function initZivotopisSection() {
                 .then(r => r.json())
                 .then(response => {
                     if (response.status === 'ok') {
-                        alert('Životopis byl úspěšně uložen.');
+                        blkt_notifikace('Životopis byl úspěšně uložen.', 'success');
                     } else {
-                        alert('Chyba při ukládání: ' + response.error);
+                        blkt_notifikace('Chyba při ukládání: ' + response.error, 'error');
                     }
                 })
                 .catch(err => {
-                    alert('Síťová chyba: ' + err.message);
+                    blkt_notifikace('Síťová chyba: ' + err.message, 'error');
                 });
         });
     }

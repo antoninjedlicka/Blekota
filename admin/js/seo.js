@@ -16,13 +16,13 @@ function initSeoSection() {
             .then(r => r.json())
             .then(j => {
                 if (j.status === 'ok') {
-                    alert('SEO nastavení bylo uloženo.');
+                    blkt_notifikace('SEO nastavení bylo uloženo.', 'success');
                 } else {
-                    alert('Chyba při ukládání: ' + j.error);
+                    blkt_notifikace('Chyba při ukládání: ' + j.error, 'error');
                 }
             })
             .catch(err => {
-                alert('Síťová chyba: ' + err.message);
+                blkt_notifikace('Síťová chyba: ' + err.message, 'error');
             });
     });
 

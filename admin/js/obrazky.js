@@ -19,19 +19,19 @@
 
   function refreshPrehled() {
     fetch('content/obrazky.php')
-      .then(r => r.text())
-      .then(html => {
-        const tmp     = document.createElement('div');
-        tmp.innerHTML = html;
-        const newSec  = tmp.querySelector('#tab-prehled .admin-section');
-        const oldSec  = document.querySelector('#tab-prehled .admin-section');
-        if (newSec && oldSec) {
-          oldSec.replaceWith(newSec);
-          console.log('Přehled obnověn');
-          bindPrehled();
-        }
-      })
-      .catch(console.error);
+        .then(r => r.text())
+        .then(html => {
+          const tmp     = document.createElement('div');
+          tmp.innerHTML = html;
+          const newSec  = tmp.querySelector('#tab-prehled .admin-section');
+          const oldSec  = document.querySelector('#tab-prehled .admin-section');
+          if (newSec && oldSec) {
+            oldSec.replaceWith(newSec);
+            console.log('Přehled obnověn');
+            bindPrehled();
+          }
+        })
+        .catch(console.error);
   }
 
   function bindPrehled() {
@@ -45,36 +45,39 @@
 
     // Upravit
     document.querySelectorAll('.blkt-image-card button[data-action="edit"]')
-      .forEach(btn => btn.onclick = () => {
-        const card = btn.closest('.blkt-image-card');
-        currentData = {
-          id:   card.dataset.id,
-          url:  card.dataset.url,
-          orig: card.dataset.orig,
-          title:card.dataset.title,
-          alt:  card.dataset.alt,
-          desc: card.dataset.desc
-        };
-        activateTab('editor');
-        bindEditor();
-      });
+        .forEach(btn => btn.onclick = () => {
+          const card = btn.closest('.blkt-image-card');
+          currentData = {
+            id:   card.dataset.id,
+            url:  card.dataset.url,
+            orig: card.dataset.orig,
+            title:card.dataset.title,
+            alt:  card.dataset.alt,
+            desc: card.dataset.desc
+          };
+          activateTab('editor');
+          bindEditor();
+        });
 
     // Smazat
     document.querySelectorAll('.blkt-image-card button[data-action="delete"]')
-      .forEach(btn => btn.onclick = () => {
-        const id = btn.closest('.blkt-image-card').dataset.id;
-        if (!confirm('Opravdu smazat?')) return;
-        fetch('action/delete_image.php', {
-          method:'POST',
-          body:new URLSearchParams({blkt_id:id})
-        })
-        .then(r=>r.json())
-        .then(j=>{
-          if (j.status==='ok') refreshPrehled();
-          else alert('Chyba: '+j.error);
-        })
-        .catch(console.error);
-      });
+        .forEach(btn => btn.onclick = () => {
+          const id = btn.closest('.blkt-image-card').dataset.id;
+          if (!confirm('Opravdu smazat?')) return;
+          fetch('action/delete_image.php', {
+            method:'POST',
+            body:new URLSearchParams({blkt_id:id})
+          })
+              .then(r=>r.json())
+              .then(j=>{
+                if (j.status==='ok') {
+                  blkt_notifikace('Obrázek byl smazán', 'success');
+                  refreshPrehled();
+                }
+                else blkt_notifikace('Chyba: '+j.error, 'error');
+              })
+              .catch(console.error);
+        });
 
     // Live search
     const searchIn = document.getElementById('blkt-search');
@@ -117,10 +120,10 @@
     if (zone) {
       zone.onclick = e => { if (e.target===zone) fileIn.click(); };
       ['dragenter','dragover'].forEach(evt=>
-        zone.addEventListener(evt,e=>{ e.preventDefault(); zone.classList.add('blkt-upload-over'); })
+          zone.addEventListener(evt,e=>{ e.preventDefault(); zone.classList.add('blkt-upload-over'); })
       );
       ['dragleave'].forEach(evt=>
-        zone.addEventListener(evt,e=>{ e.preventDefault(); zone.classList.remove('blkt-upload-over'); })
+          zone.addEventListener(evt,e=>{ e.preventDefault(); zone.classList.remove('blkt-upload-over'); })
       );
       zone.addEventListener('drop',e=>{
         e.preventDefault();
@@ -132,14 +135,13 @@
       fileIn.onchange = () => {
         console.log('fileIn onchange', fileIn.files);
         handleFile(fileIn.files[0]);
-        // **NE**: už nevymazáváme fileIn.value, aby se soubor poslal
       };
     }
 
     // Naplnit / reset
     if (currentData.id) {
       document.getElementById('blkt-image-id').value = currentData.id;
-      preview.src    = currentData.url;          // z data-url
+      preview.src    = currentData.url;
       preview.style.display = 'block';
       origIn.value   = currentData.orig;
       titleIn.value  = currentData.title;
@@ -159,21 +161,24 @@
       const action = currentData.id ? 'edit_image.php' : 'add_image.php';
       // Zkontrolujme, že FormData obsahuje soubor:
       if (!currentData.id && !data.get('blkt_file')?.name) {
-        return alert('Vyberte prosím soubor.');
+        return blkt_notifikace('Vyberte prosím soubor.', 'warning');
       }
       fetch(`action/${action}`, { method:'POST', body: data })
-        .then(r => r.json())
-        .then(j => {
-          console.log('save response', j);
-          if (j.status==='ok') {
-            alert('Uloženo');
-            activateTab('prehled');
-            refreshPrehled();
-          } else {
-            alert('Chyba: ' + j.error);
-          }
-        })
-        .catch(err => { console.error(err); alert('Síťová chyba'); });
+          .then(r => r.json())
+          .then(j => {
+            console.log('save response', j);
+            if (j.status==='ok') {
+              blkt_notifikace('Obrázek byl uložen', 'success');
+              activateTab('prehled');
+              refreshPrehled();
+            } else {
+              blkt_notifikace('Chyba: ' + j.error, 'error');
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            blkt_notifikace('Síťová chyba', 'error');
+          });
     };
   }
 

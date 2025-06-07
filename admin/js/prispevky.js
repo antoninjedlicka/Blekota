@@ -6,14 +6,14 @@ console.log('prispevky.js load start, document.readyState =', document.readyStat
 // Pomocná funkce pro generování slug z názvu
 function blkt_convertToSlug(text) {
   return text
-    .toString()
-    .normalize('NFD')                   // rozkládá diakritiku
-    .replace(/\p{Diacritic}/gu, '')    // odstraní diakritiku
-    .toLowerCase()
-    .trim()                             // odstraní mezery na okrajích
-    .replace(/[^a-z0-9 -]/g, '')        // odstranit nepovol. znaky
-    .replace(/\s+/g, '-')              // mezery na pomlčky
-    .replace(/-+/g, '-');               // vícenásobné pomlčky na jednu
+      .toString()
+      .normalize('NFD')                   // rozkládá diakritiku
+      .replace(/\p{Diacritic}/gu, '')    // odstraní diakritiku
+      .toLowerCase()
+      .trim()                             // odstraní mezery na okrajích
+      .replace(/[^a-z0-9 -]/g, '')        // odstranit nepovol. znaky
+      .replace(/\s+/g, '-')              // mezery na pomlčky
+      .replace(/-+/g, '-');               // vícenásobné pomlčky na jednu
 }
 
 // Globální modály pro obrázky
@@ -28,34 +28,34 @@ window.blkt_openGalleryModal = function(editor) {
   btnInsert.disabled = true;
   galleryEl.innerHTML = '<p>Načítám…</p>';
   fetch('action/list_images.php')
-    .then(r => r.json())
-    .then(list => {
-      console.log('[GalleryModal] Loaded', list.length, 'images');
-      galleryEl.innerHTML = '';
-      list.forEach(img => {
-        const thumb = document.createElement('img');
-        thumb.src = img.url; thumb.alt = img.alt; thumb.title = img.title;
-        thumb.className = 'blkt-gallery-thumb';
-        thumb.addEventListener('click', () => {
-          galleryEl.querySelectorAll('.selected').forEach(e => e.classList.remove('selected'));
-          thumb.classList.add('selected');
-          selectedUrl = img.url; selectedAlt = img.alt;
-          btnInsert.disabled = false;
-          console.log('[GalleryModal] Selected', selectedUrl);
+      .then(r => r.json())
+      .then(list => {
+        console.log('[GalleryModal] Loaded', list.length, 'images');
+        galleryEl.innerHTML = '';
+        list.forEach(img => {
+          const thumb = document.createElement('img');
+          thumb.src = img.url; thumb.alt = img.alt; thumb.title = img.title;
+          thumb.className = 'blkt-gallery-thumb';
+          thumb.addEventListener('click', () => {
+            galleryEl.querySelectorAll('.selected').forEach(e => e.classList.remove('selected'));
+            thumb.classList.add('selected');
+            selectedUrl = img.url; selectedAlt = img.alt;
+            btnInsert.disabled = false;
+            console.log('[GalleryModal] Selected', selectedUrl);
+          });
+          galleryEl.append(thumb);
         });
-        galleryEl.append(thumb);
+      })
+      .catch(() => {
+        console.error('[GalleryModal] Error loading images');
+        blkt_notifikace('Nepodařilo se načíst galerii.', 'error');
       });
-    })
-    .catch(() => {
-      console.error('[GalleryModal] Error loading images');
-      alert('Nepodařilo se načíst galerii.');
-    });
   // Zavření
   modal.querySelector('.blkt-modal-close').onclick =
-  document.getElementById('blkt-gallery-cancel').onclick = () => {
-    console.log('[GalleryModal] Closing');
-    overlay.style.display = modal.style.display = 'none';
-  };
+      document.getElementById('blkt-gallery-cancel').onclick = () => {
+        console.log('[GalleryModal] Closing');
+        overlay.style.display = modal.style.display = 'none';
+      };
   // Vložit
   btnInsert.onclick = () => {
     console.log('[GalleryModal] Inserting', selectedUrl);
@@ -211,38 +211,38 @@ function initPrispevky() {
         method: 'POST',
         body:   p
       })
-      .then(r => r.json())
-      .then(j => {
-        console.log('save response', j);
-        if (j.status === 'ok') {
-          alert('Uloženo');
-          refreshPrehled();
-          showPrehled();
-        } else {
-          alert('Chyba: ' + j.error);
-        }
-      })
-      .catch(e => {
-        console.error('Save network error', e);
-        alert('Síťová chyba: ' + e.message);
-      });
+          .then(r => r.json())
+          .then(j => {
+            console.log('save response', j);
+            if (j.status === 'ok') {
+              blkt_notifikace('Příspěvek byl uložen', 'success');
+              refreshPrehled();
+              showPrehled();
+            } else {
+              blkt_notifikace('Chyba: ' + j.error, 'error');
+            }
+          })
+          .catch(e => {
+            console.error('Save network error', e);
+            blkt_notifikace('Síťová chyba: ' + e.message, 'error');
+          });
     };
   }
 
   function refreshPrehled() {
     console.log('refreshPrehled()');
     fetch('content/prispevky.php')
-      .then(r => r.text())
-      .then(html => {
-        const tmp = document.createElement('div');
-        tmp.innerHTML = html;
-        const newBody = tmp.querySelector('#tab-prehled table tbody');
-        const oldBody = document.querySelector('#tab-prehled table tbody');
-        if (newBody && oldBody) {
-          oldBody.replaceWith(newBody);
-          console.log('Table body refreshed');
-        }
-      });
+        .then(r => r.text())
+        .then(html => {
+          const tmp = document.createElement('div');
+          tmp.innerHTML = html;
+          const newBody = tmp.querySelector('#tab-prehled table tbody');
+          const oldBody = document.querySelector('#tab-prehled table tbody');
+          if (newBody && oldBody) {
+            oldBody.replaceWith(newBody);
+            console.log('Table body refreshed');
+          }
+        });
   }
 
   // Spustíme init okamžitě nebo po DOMContentLoaded

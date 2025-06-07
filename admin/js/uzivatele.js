@@ -24,7 +24,7 @@ function initUsersSection() {
       document.getElementById('card-prijmeni').textContent = row.dataset.prijmeni;
       document.getElementById('card-mail').textContent     = row.dataset.mail;
       document.getElementById('card-admin-text').textContent =
-        row.dataset.admin==='1'?'Ano':'Ne';
+          row.dataset.admin==='1'?'Ano':'Ne';
       card.style.display    = 'flex';
       toolbar.style.display = 'flex';
     });
@@ -35,8 +35,8 @@ function initUsersSection() {
     overlay.style.display = 'block';
     modal.style.display   = 'block';
     titleEl.textContent   = mode==='add'?'Přidat uživatele'
-                        : mode==='edit'?'Upravit uživatele'
-                                       :'Potvrďte smazání';
+        : mode==='edit'?'Upravit uživatele'
+            :'Potvrďte smazání';
 
     let html = '';
     if (mode === 'delete') {
@@ -112,18 +112,18 @@ function initUsersSection() {
     form.onsubmit = e => {
       e.preventDefault();
       fetch(form.action, { method:'POST', body:new FormData(form) })
-        .then(r => r.json())
-        .then(j => {
-          if (j.status==='ok') {
-            alert('OK');
-            closeModal();
-            // znovu načteme sekci Uživatelé
-            window.loadSection('uzivatele');
-          } else {
-            alert('Chyba: ' + j.error);
-          }
-        })
-        .catch(err => alert('Síťová chyba: ' + err.message));
+          .then(r => r.json())
+          .then(j => {
+            if (j.status==='ok') {
+              blkt_notifikace(j.message || 'Operace proběhla úspěšně', 'success');
+              closeModal();
+              // znovu načteme sekci Uživatelé
+              window.loadSection('uzivatele');
+            } else {
+              blkt_notifikace(j.error || 'Nastala chyba', 'error');
+            }
+          })
+          .catch(err => blkt_notifikace('Síťová chyba: ' + err.message, 'error'));
     };
   }
 }

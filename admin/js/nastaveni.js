@@ -12,20 +12,20 @@ function initNastaveniSection() {
       method: 'POST',
       body: new FormData(form)
     })
-    .then(r => {
-      // Očekáváme JSON { status:'ok' } nebo { status:'error', error:'...' }
-      return r.json();
-    })
-    .then(j => {
-      if (j.status === 'ok') {
-        alert('Nastavení bylo úspěšně uloženo.');
-      } else {
-        alert('Chyba při ukládání: ' + j.error);
-      }
-    })
-    .catch(err => {
-      alert('Síťová chyba: ' + err.message);
-    });
+        .then(r => {
+          // Očekáváme JSON { status:'ok' } nebo { status:'error', error:'...' }
+          return r.json();
+        })
+        .then(j => {
+          if (j.status === 'ok') {
+            blkt_notifikace('Nastavení bylo úspěšně uloženo.', 'success');
+          } else {
+            blkt_notifikace('Chyba při ukládání: ' + j.error, 'error');
+          }
+        })
+        .catch(err => {
+          blkt_notifikace('Síťová chyba: ' + err.message, 'error');
+        });
   });
 }
 
