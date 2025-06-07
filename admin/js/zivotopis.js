@@ -66,9 +66,7 @@ function initZivotopisSection() {
                         const thumb = document.createElement('img');
                         thumb.src = img.url;
                         thumb.alt = img.alt;
-                        thumb.className = 'blkt-gallery-thumb';
-                        thumb.style.cssText = 'width:100px;height:100px;object-fit:cover;cursor:pointer;margin:5px;border:2px solid transparent;';
-
+                        thumb.className = 'blkt-gallery-thumb-modal';
                         thumb.addEventListener('click', () => {
                             // Nastavení vybrané fotky
                             const preview = document.getElementById('blkt-cv-foto-preview');
