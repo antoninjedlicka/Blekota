@@ -1037,6 +1037,96 @@ p img {
   font-style: italic;
 }
 
+/* === NOTIFIKACE === */
+.blkt-notifikace {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  max-width: 400px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 1rem 1.5rem;
+  z-index: 1000;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.3s ease;
+}
+
+.blkt-notifikace-zobrazena {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.blkt-notifikace-obsah {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.blkt-notifikace-ikona {
+  font-size: 1.5rem;
+  font-weight: bold;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.blkt-notifikace-text {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Typy notifikací */
+.blkt-notifikace-success {
+  border-left: 4px solid #28a745;
+}
+
+.blkt-notifikace-success .blkt-notifikace-ikona {
+  background: #28a745;
+  color: white;
+}
+
+.blkt-notifikace-error {
+  border-left: 4px solid #dc3545;
+}
+
+.blkt-notifikace-error .blkt-notifikace-ikona {
+  background: #dc3545;
+  color: white;
+}
+
+.blkt-notifikace-warning {
+  border-left: 4px solid #ffc107;
+}
+
+.blkt-notifikace-warning .blkt-notifikace-ikona {
+  background: #ffc107;
+  color: #333;
+}
+
+.blkt-notifikace-info {
+  border-left: 4px solid #007bff;
+}
+
+.blkt-notifikace-info .blkt-notifikace-ikona {
+  background: #007bff;
+  color: white;
+}
+
+/* Mobilní responzivita */
+@media (max-width: 600px) {
+  .blkt-notifikace {
+    left: 10px;
+    right: 10px;
+    max-width: none;
+  }
+}
+
 /* Responzivita */
 @media (max-width: 1000px) {
   .admin-menu {
