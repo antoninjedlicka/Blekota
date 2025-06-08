@@ -23,7 +23,7 @@
 .blkt-homepage-nadpis {
     font-size: 1.4em;
     padding: 8px 30px 8px 25px;
-    margin: -20px -20px 20px 0;  /* záporný margin pro vyrovnání s paddingem boxu */
+    margin: 0 50% 0 0;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border-radius: 0 20px 20px 0;
@@ -31,6 +31,11 @@
     box-shadow: 0 4px 16px rgba(102,126,234,0.3);
     position: relative;
     overflow: hidden;
+}
+
+/* Speciální styl jen pro nadpis v boxu "O mně" */
+#blkt-kontejner-omne .blkt-homepage-nadpis {
+    margin: -20px -20px 20px -20px;  /* záporný margin pro vyrovnání s paddingem boxu */
 }
 
 /* Efekt světelného paprsku na nadpisu */
@@ -209,6 +214,15 @@
     position: relative;
     min-height: 200px; /* minimální výška pro případ krátkého obsahu */
     overflow: visible; /* aby nadpis mohl vyčnívat */
+}
+
+#blkt-kontejner-prispevek {
+    overflow: visible; /* aby se nadpis nezořízl */
+}
+
+/* Speciální styl pro nadpis "Poslední z blogu" */
+#blkt-kontejner-prispevek .blkt-homepage-nadpis {
+    margin: -20px 50% 20px -20px; /* zachováváme původní pravý margin */
 }
 
 /* ======= Média - fotka autora ========== */
