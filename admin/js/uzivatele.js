@@ -1,132 +1,235 @@
-// admin/js/uzivatele.js
-// Inicializace tabulky uživatelů, modalu a kartu
+// admin/js/zivotopis.js
+function initZivotopisSection() {
+  console.log('initZivotopisSection()');
 
-function initUsersSection() {
-  const table   = document.getElementById('users-table');
-  const card    = document.getElementById('user-card');
-  const toolbar = document.getElementById('user-toolbar');
-  const addBtn  = document.getElementById('add-user-btn');
-  const editBtn = document.getElementById('edit-user-btn');
-  const delBtn  = document.getElementById('delete-user-btn');
-  const overlay = document.getElementById('blkt-user-overlay');
-  const modal   = document.getElementById('blkt-user-modal');
-  const form    = document.getElementById('blkt-user-form');
-  const titleEl = document.getElementById('blkt-modal-title');
-  const closeEl = document.getElementById('blkt-modal-close');
+  // Přepínání záložek
+  const tabsNav = document.querySelector('.blkt-tabs');
+  if (tabsNav) {
+    const tabs = Array.from(tabsNav.querySelectorAll('button[data-tab]'));
+    const contents = tabs.map(t => document.getElementById('tab-' + t.dataset.tab));
 
-  // Vyplnění karty při kliknutí na řádek tabulky
-  if (table) {
-    table.addEventListener('click', e => {
-      const row = e.target.closest('tr');
-      if (!row) return;
-      document.getElementById('card-id').value         = row.dataset.id;
-      document.getElementById('card-jmeno').textContent    = row.dataset.jmeno;
-      document.getElementById('card-prijmeni').textContent = row.dataset.prijmeni;
-      document.getElementById('card-mail').textContent     = row.dataset.mail;
-      document.getElementById('card-admin-text').textContent =
-          row.dataset.admin==='1'?'Ano':'Ne';
-      card.style.display    = 'flex';
-      toolbar.style.display = 'flex';
-    });
-  }
+    function activateTab(tab) {
+      tabs.forEach(t => t.classList.remove('active'));
+      contents.forEach(c => { if (c) c.style.display = 'none'; });
+      tab.classList.add('active');
+      const pane = document.getElementById('tab-' + tab.dataset.tab);
+      if (pane) pane.style.display = '';
 
-  // Otevření modalu pro add/edit/delete
-  function showModal(mode,data={}) {
-    overlay.style.display = 'block';
-    modal.style.display   = 'block';
-    titleEl.textContent   = mode==='add'?'Přidat uživatele'
-        : mode==='edit'?'Upravit uživatele'
-            :'Potvrďte smazání';
-
-    let html = '';
-    if (mode === 'delete') {
-      html = `
-        <input type="hidden" name="blkt_id" value="${data.id}">
-        <p>Smazat <strong>${data.jmeno} ${data.prijmeni}</strong>?</p>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-cancel" id="blkt-cancel">Ne</button>
-          <button type="submit" class="btn btn-save">Ano</button>
-        </div>`;
-    } else {
-      html = `
-        <input type="hidden" name="blkt_id" value="${data.id || ''}">
-        <div class="blkt-formular-skupina">
-          <input type="text" name="blkt_jmeno" placeholder=" " required value="${data.jmeno || ''}">
-          <label>Jméno</label>
-        </div>
-        <div class="blkt-formular-skupina">
-          <input type="text" name="blkt_prijmeni" placeholder=" " required value="${data.prijmeni || ''}">
-          <label>Příjmení</label>
-        </div>
-        <div class="blkt-formular-skupina">
-          <input type="email" name="blkt_mail" placeholder=" " required value="${data.mail || ''}">
-          <label>E-mail</label>
-        </div>
-        <div class="blkt-formular-skupina">
-          <select name="blkt_admin" required>
-            <option value="0"${data.admin === '0' ? ' selected' : ''}>Ne</option>
-            <option value="1"${data.admin === '1' ? ' selected' : ''}>Ano</option>
-          </select>
-          <label>Admin</label>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-cancel" id="blkt-cancel">Zrušit</button>
-          <button type="submit" class="btn btn-save">${mode === 'add' ? 'Přidat' : 'Uložit'}</button>
-        </div>`;
+      // Pokud je to záložka s profesemi, inicializuj TinyMCE
+      if (tab.dataset.tab === 'profese') {
+        setTimeout(initTinyMCE, 100);
+      }
     }
 
-    form.action = `action/${mode}_user.php`;
-    form.innerHTML = html;
-    document.getElementById('blkt-cancel').onclick = closeModal;
-    closeEl.onclick = closeModal;
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => activateTab(tab));
+    });
   }
 
-  function closeModal() {
-    overlay.style.display = 'none';
-    modal.style.display   = 'none';
+  // Inicializace TinyMCE pro profesní zkušenosti
+  function initTinyMCE() {
+    if (typeof tinymce === 'undefined') {
+      console.log('TinyMCE not loaded yet, waiting...');
+      setTimeout(initTinyMCE, 100);
+      return;
+    }
+
+    tinymce.remove('.blkt-tinymce-editor');
+    tinymce.init({
+      selector: '.blkt-tinymce-editor',
+      height: 300,
+      menubar: false,
+      branding: false,
+      license_key: 'gpl',
+      plugins: [
+        'advlist', 'autolink', 'lists', 'link', 'charmap',
+        'preview', 'anchor', 'searchreplace', 'visualblocks',
+        'code', 'fullscreen', 'insertdatetime', 'media', 'table'
+      ],
+      toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | bullist numlist | removeformat | code',
+      content_style: 'body { font-family: "Signika Negative", sans-serif; font-size: 14px; }'
+    });
   }
 
-  // Tlačítka Add/Edit/Delete
-  if (addBtn)  addBtn.onclick  = () => showModal('add');
-  if (editBtn) editBtn.onclick = () => {
-    const id = document.getElementById('card-id').value;
-    showModal('edit', {
-      id,
-      jmeno:    document.getElementById('card-jmeno').textContent,
-      prijmeni: document.getElementById('card-prijmeni').textContent,
-      mail:     document.getElementById('card-mail').textContent,
-      admin:    document.getElementById('card-admin-text').textContent==='Ano'?'1':'0'
-    });
-  };
-  if (delBtn)  delBtn.onclick  = () => {
-    const id = document.getElementById('card-id').value;
-    showModal('delete', {
-      id,
-      jmeno:    document.getElementById('card-jmeno').textContent,
-      prijmeni: document.getElementById('card-prijmeni').textContent
-    });
-  };
+  // Výběr fotografie
+  const vyberFotoBtn = document.getElementById('blkt-vybrat-foto');
+  if (vyberFotoBtn) {
+    vyberFotoBtn.addEventListener('click', () => {
+      const overlay = document.getElementById('blkt-foto-overlay');
+      const modal = document.getElementById('blkt-foto-modal');
+      const gallery = modal.querySelector('.blkt-gallery-images');
 
-  // Odeslání formuláře
-  if (form) {
-    form.onsubmit = e => {
-      e.preventDefault();
-      fetch(form.action, { method:'POST', body:new FormData(form) })
+      overlay.style.display = 'block';
+      modal.style.display = 'block';
+      gallery.innerHTML = '<p>Načítám galerii...</p>';
+
+      // Načtení obrázků
+      fetch('action/list_images.php')
           .then(r => r.json())
-          .then(j => {
-            if (j.status==='ok') {
-              blkt_notifikace(j.message || 'Operace proběhla úspěšně', 'success');
-              closeModal();
-              // znovu načteme sekci Uživatelé
-              window.loadSection('uzivatele');
+          .then(images => {
+            gallery.innerHTML = '';
+            images.forEach(img => {
+              const thumb = document.createElement('img');
+              thumb.src = img.url;
+              thumb.alt = img.alt;
+              thumb.className = 'blkt-gallery-thumb-modal';
+
+              thumb.addEventListener('click', () => {
+                // Označení vybrané fotky
+                gallery.querySelectorAll('.blkt-gallery-thumb-modal').forEach(t => {
+                  t.classList.remove('blkt-vybrano');
+                });
+                thumb.classList.add('blkt-vybrano');
+
+                // Nastavení vybrané fotky
+                const preview = document.getElementById('blkt-cv-foto-preview');
+                preview.innerHTML = `
+                                <img src="${img.url}" alt="Profilová fotografie" style="max-width: 200px; border-radius: 8px;">
+                                <input type="hidden" name="cv_foto" value="${img.url}">
+                            `;
+
+                // Zavření modalu po výběru
+                setTimeout(() => {
+                  overlay.style.display = 'none';
+                  modal.style.display = 'none';
+                }, 300);
+              });
+
+              gallery.appendChild(thumb);
+            });
+          })
+          .catch((err) => {
+            console.error('Chyba při načítání galerie:', err);
+            blkt_notifikace('Chyba při načítání galerie.', 'error');
+          });
+
+      // Zavření modalu
+      modal.querySelector('.blkt-modal-close').onclick =
+          document.getElementById('blkt-foto-cancel').onclick = () => {
+            overlay.style.display = 'none';
+            modal.style.display = 'none';
+          };
+    });
+  }
+
+  // Přidávání nových položek
+  setupDynamicItems('profese', 'blkt-profese-template', 'blkt-pridat-profesi', 'blkt-profese-container');
+  setupDynamicItems('dovednosti', 'blkt-dovednost-template', 'blkt-pridat-dovednost', 'blkt-dovednosti-container');
+  setupDynamicItems('vlastnosti', 'blkt-vlastnost-template', 'blkt-pridat-vlastnost', 'blkt-vlastnosti-container');
+  setupDynamicItems('jazyky', 'blkt-jazyk-template', 'blkt-pridat-jazyk', 'blkt-jazyky-container');
+  setupDynamicItems('vzdelani', 'blkt-vzdelani-template', 'blkt-pridat-vzdelani', 'blkt-vzdelani-container');
+
+  function setupDynamicItems(type, templateId, addBtnId, containerId) {
+    const template = document.getElementById(templateId);
+    const addBtn = document.getElementById(addBtnId);
+    const container = document.getElementById(containerId);
+
+    if (!template || !addBtn || !container) return;
+
+    addBtn.addEventListener('click', () => {
+      const items = container.querySelectorAll('[data-index]');
+      const newIndex = items.length;
+      const html = template.innerHTML.replace(/{{index}}/g, newIndex);
+
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      container.appendChild(div.firstElementChild);
+
+      // Pro profese znovu inicializovat TinyMCE
+      if (type === 'profese') {
+        setTimeout(initTinyMCE, 100);
+      }
+
+      // Informace o přidání
+      blkt_notifikace(`Nová položka přidána`, 'info');
+    });
+  }
+
+  // Odebírání položek
+  document.addEventListener('click', e => {
+    if (e.target.classList.contains('blkt-odebrat-radek') ||
+        e.target.classList.contains('blkt-odebrat-pozici')) {
+      if (confirm('Opravdu chcete tuto položku odebrat?')) {
+        const item = e.target.closest('[data-index]');
+        if (item) {
+          item.remove();
+          blkt_notifikace('Položka odebrána', 'info');
+        }
+      }
+    }
+  });
+
+  // Uložení formuláře
+  const form = document.getElementById('blkt-form-zivotopis');
+  if (form) {
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      // Pro TinyMCE musíme nejdřív uložit obsah
+      if (typeof tinymce !== 'undefined') {
+        tinymce.triggerSave();
+      }
+
+      const formData = new FormData(form);
+
+      // Zobrazíme loader nebo disabled tlačítko
+      const saveBtn = document.querySelector('.blkt-sticky-save button');
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Ukládám...';
+      }
+
+      fetch(form.action, {
+        method: 'POST',
+        body: formData
+      })
+          .then(r => r.json())
+          .then(response => {
+            if (response.status === 'ok') {
+              blkt_notifikace('Životopis byl úspěšně uložen.', 'success');
             } else {
-              blkt_notifikace(j.error || 'Nastala chyba', 'error');
+              blkt_notifikace('Chyba při ukládání: ' + response.error, 'error');
             }
           })
-          .catch(err => blkt_notifikace('Síťová chyba: ' + err.message, 'error'));
-    };
+          .catch(err => {
+            console.error('Síťová chyba:', err);
+            blkt_notifikace('Síťová chyba: ' + err.message, 'error');
+          })
+          .finally(() => {
+            // Obnovíme tlačítko
+            if (saveBtn) {
+              saveBtn.disabled = false;
+              saveBtn.textContent = 'Uložit všechny změny';
+            }
+          });
+    });
   }
+
+  // Nápověda pro emoji
+  const emojiHints = document.querySelectorAll('input[name*="ikona"]');
+  emojiHints.forEach(input => {
+    input.addEventListener('focus', () => {
+      const isWindows = navigator.platform.indexOf('Win') > -1;
+      const isMac = navigator.platform.indexOf('Mac') > -1;
+
+      let hint = '';
+      if (isWindows) hint = 'Tip: Win + . (tečka) pro emoji';
+      else if (isMac) hint = 'Tip: Cmd + Control + Space pro emoji';
+
+      if (hint && !input.dataset.hintShown) {
+        input.dataset.hintShown = 'true';
+        blkt_notifikace(hint, 'info');
+      }
+    });
+  });
 }
 
-// Spustíme hned po načtení skriptu
-initUsersSection();
+// Zajistíme, že funkce blkt_notifikace existuje
+if (typeof window.blkt_notifikace === 'undefined') {
+  window.blkt_notifikace = function(zprava, typ = 'info') {
+    console.log(`[NOTIFIKACE ${typ}] ${zprava}`);
+  };
+}
+
+// Spustit po načtení
+initZivotopisSection();

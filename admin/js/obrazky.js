@@ -1,17 +1,20 @@
 // admin/js/obrazky.js
-(function(){
+function initObrazkySection() {
   console.log('obrazky.js loaded');
 
   // záložky + panely
   const tabsNav  = document.querySelector('.blkt-tabs');
+  if (!tabsNav) return;
+
   const tabs     = Array.from(tabsNav.querySelectorAll('button[data-tab]'));
-  const contents = tabs.map(t => document.getElementById('tab-' + t.dataset.tab));
+  const contents = tabs.map(t => document.getElementById('tab-' + t.dataset.tab)).filter(Boolean);
   let currentData = {};
 
   function activateTab(name) {
     tabs.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === name));
     contents.forEach(c => c.style.display = (c.id === 'tab-' + name ? '' : 'none'));
   }
+
   tabs.forEach(btn => btn.addEventListener('click', () => {
     activateTab(btn.dataset.tab);
     if (btn.dataset.tab === 'editor') bindEditor();
@@ -31,7 +34,10 @@
             bindPrehled();
           }
         })
-        .catch(console.error);
+        .catch(err => {
+          console.error(err);
+          blkt_notifikace('Chyba při obnovení přehledu', 'error');
+        });
   }
 
   function bindPrehled() {
@@ -63,7 +69,8 @@
     document.querySelectorAll('.blkt-image-card button[data-action="delete"]')
         .forEach(btn => btn.onclick = () => {
           const id = btn.closest('.blkt-image-card').dataset.id;
-          if (!confirm('Opravdu smazat?')) return;
+          if (!confirm('Opravdu chcete smazat tento obrázek?')) return;
+
           fetch('action/delete_image.php', {
             method:'POST',
             body:new URLSearchParams({blkt_id:id})
@@ -76,7 +83,10 @@
                 }
                 else blkt_notifikace('Chyba: '+j.error, 'error');
               })
-              .catch(console.error);
+              .catch(err => {
+                console.error(err);
+                blkt_notifikace('Chyba při mazání obrázku', 'error');
+              });
         });
 
     // Live search
@@ -86,6 +96,15 @@
       document.querySelectorAll('.blkt-image-card').forEach(card=>{
         const hay = Object.values(card.dataset).join(' ').toLowerCase();
         card.style.display = hay.includes(q) ? 'inline-block' : 'none';
+      });
+
+      // Skrýt/zobrazit měsíční rozdělení podle výsledků
+      document.querySelectorAll('.month-divider').forEach(divider => {
+        const nextGallery = divider.nextElementSibling;
+        if (nextGallery && nextGallery.classList.contains('blkt-image-gallery')) {
+          const visibleCards = nextGallery.querySelectorAll('.blkt-image-card[style*="inline-block"]');
+          divider.style.display = visibleCards.length > 0 ? 'flex' : 'none';
+        }
       });
     };
   }
@@ -117,8 +136,10 @@
       };
       reader.readAsDataURL(file);
     }
+
     if (zone) {
-      zone.onclick = e => { if (e.target===zone) fileIn.click(); };
+      zone.onclick = e => { if (e.target===zone || e.target.parentElement===zone) fileIn.click(); };
+
       ['dragenter','dragover'].forEach(evt=>
           zone.addEventListener(evt,e=>{ e.preventDefault(); zone.classList.add('blkt-upload-over'); })
       );
@@ -127,14 +148,20 @@
       );
       zone.addEventListener('drop',e=>{
         e.preventDefault();
-        handleFile(e.dataTransfer.files[0]);
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          handleFile(files[0]);
+        }
         zone.classList.remove('blkt-upload-over');
       });
     }
+
     if (fileIn) {
       fileIn.onchange = () => {
         console.log('fileIn onchange', fileIn.files);
-        handleFile(fileIn.files[0]);
+        if (fileIn.files.length > 0) {
+          handleFile(fileIn.files[0]);
+        }
       };
     }
 
@@ -159,10 +186,15 @@
       e.preventDefault();
       const data = new FormData(form);
       const action = currentData.id ? 'edit_image.php' : 'add_image.php';
-      // Zkontrolujme, že FormData obsahuje soubor:
-      if (!currentData.id && !data.get('blkt_file')?.name) {
-        return blkt_notifikace('Vyberte prosím soubor.', 'warning');
+
+      // Zkontrolujme, že FormData obsahuje soubor při přidávání nového:
+      if (!currentData.id) {
+        const fileInput = form.querySelector('input[type="file"]');
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+          return blkt_notifikace('Vyberte prosím soubor.', 'warning');
+        }
       }
+
       fetch(`action/${action}`, { method:'POST', body: data })
           .then(r => r.json())
           .then(j => {
@@ -185,4 +217,14 @@
   // start
   activateTab('prehled');
   bindPrehled();
-})();
+}
+
+// Zajistíme, že funkce blkt_notifikace existuje
+if (typeof window.blkt_notifikace === 'undefined') {
+  window.blkt_notifikace = function(zprava, typ = 'info') {
+    console.log(`[NOTIFIKACE ${typ}] ${zprava}`);
+  };
+}
+
+// Spustíme inicializaci
+initObrazkySection();

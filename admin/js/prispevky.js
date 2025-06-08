@@ -78,40 +78,47 @@ window.blkt_openImageModal = function(editor, existingImg) {
 function initPrispevky() {
   console.log('initPrispevky() start');
 
-  const btnPrehled = document.querySelector('.blkt-tabs button[data-tab="prehled"]');
-  const btnEditor  = document.querySelector('.blkt-tabs button[data-tab="editor"]');
+  const tabsNav  = document.querySelector('.blkt-tabs');
+  if (!tabsNav) {
+    console.log('Tabs nav not found, exiting');
+    return;
+  }
+
+  const btnPrehled = tabsNav.querySelector('button[data-tab="prehled"]');
+  const btnEditor  = tabsNav.querySelector('button[data-tab="editor"]');
   const cntPrehled = document.getElementById('tab-prehled');
   const cntEditor  = document.getElementById('tab-editor');
   let currentData  = {};
 
   function showPrehled() {
     console.log('showPrehled()');
-    btnPrehled.classList.add('active');
-    btnEditor.classList.remove('active');
-    cntPrehled.style.display = '';
-    cntEditor.style.display  = 'none';
+    if (btnPrehled) btnPrehled.classList.add('active');
+    if (btnEditor) btnEditor.classList.remove('active');
+    if (cntPrehled) cntPrehled.style.display = '';
+    if (cntEditor) cntEditor.style.display  = 'none';
   }
 
   function showEditor(data={}) {
     console.log('showEditor()', data);
     currentData = data;
-    btnEditor.classList.add('active');
-    btnPrehled.classList.remove('active');
-    cntPrehled.style.display = 'none';
-    cntEditor.style.display  = '';
+    if (btnEditor) btnEditor.classList.add('active');
+    if (btnPrehled) btnPrehled.classList.remove('active');
+    if (cntPrehled) cntPrehled.style.display = 'none';
+    if (cntEditor) cntEditor.style.display  = '';
+
     // naplnění polí
     const titleEl = document.getElementById('blkt-post-title');
     const catEl   = document.getElementById('blkt-post-category');
     const slugEl  = document.getElementById('blkt-post-slug');
     const tagsEl  = document.getElementById('blkt-post-tags');
 
-    titleEl.value    = data.nazev    || '';
-    catEl.value      = data.kategorie || '';
-    slugEl.value     = data.slug     || '';
-    tagsEl.value     = data.tags     || '';
+    if (titleEl) titleEl.value    = data.nazev    || '';
+    if (catEl) catEl.value      = data.kategorie || '';
+    if (slugEl) slugEl.value     = data.slug     || '';
+    if (tagsEl) tagsEl.value     = data.tags     || '';
 
     // pokud nový příspěvek, generujeme slug z názvu
-    if (!data.id) {
+    if (!data.id && titleEl && slugEl) {
       titleEl.addEventListener('input', e => {
         slugEl.value = blkt_convertToSlug(e.target.value);
       });
@@ -148,11 +155,27 @@ function initPrispevky() {
       });
     }
 
+    // Přepínání záložek
+    if (btnPrehled) {
+      btnPrehled.addEventListener('click', () => showPrehled());
+    }
+    if (btnEditor) {
+      btnEditor.addEventListener('click', () => showEditor(currentData));
+    }
+
     showPrehled();
   }
 
   function initEditorPrispevku(data={}) {
     console.log('initEditorPrispevku()', data);
+
+    // Počkáme než je TinyMCE k dispozici
+    if (typeof tinymce === 'undefined') {
+      console.log('TinyMCE not loaded yet, waiting...');
+      setTimeout(() => initEditorPrispevku(data), 100);
+      return;
+    }
+
     tinymce.remove('#blkt-editor');
     tinymce.init({
       selector:      '#blkt-editor',
@@ -192,41 +215,48 @@ function initPrispevky() {
       }
     });
 
-    document.getElementById('blkt-post-cancel').onclick = () => {
-      console.log('cancel click → showPrehled');
-      showPrehled();
-    };
+    const cancelBtn = document.getElementById('blkt-post-cancel');
+    const saveBtn = document.getElementById('blkt-post-save');
 
-    document.getElementById('blkt-post-save').onclick = () => {
-      console.log('save click', currentData);
-      const p = new FormData();
-      p.append('blkt_id',        currentData.id || '');
-      p.append('blkt_nazev',     document.getElementById('blkt-post-title').value);
-      p.append('blkt_kategorie', document.getElementById('blkt-post-category').value);
-      p.append('blkt_obsah',     tinymce.get('blkt-editor').getContent());
-      p.append('blkt_slug',      document.getElementById('blkt-post-slug').value);
-      p.append('blkt_tags',      document.getElementById('blkt-post-tags').value);
+    if (cancelBtn) {
+      cancelBtn.onclick = () => {
+        console.log('cancel click → showPrehled');
+        showPrehled();
+      };
+    }
 
-      fetch(`action/${currentData.id?'edit_prispevek':'add_prispevek'}.php`, {
-        method: 'POST',
-        body:   p
-      })
-          .then(r => r.json())
-          .then(j => {
-            console.log('save response', j);
-            if (j.status === 'ok') {
-              blkt_notifikace('Příspěvek byl uložen', 'success');
-              refreshPrehled();
-              showPrehled();
-            } else {
-              blkt_notifikace('Chyba: ' + j.error, 'error');
-            }
-          })
-          .catch(e => {
-            console.error('Save network error', e);
-            blkt_notifikace('Síťová chyba: ' + e.message, 'error');
-          });
-    };
+    if (saveBtn) {
+      saveBtn.onclick = () => {
+        console.log('save click', currentData);
+        const p = new FormData();
+        p.append('blkt_id',        currentData.id || '');
+        p.append('blkt_nazev',     document.getElementById('blkt-post-title').value);
+        p.append('blkt_kategorie', document.getElementById('blkt-post-category').value);
+        p.append('blkt_obsah',     tinymce.get('blkt-editor').getContent());
+        p.append('blkt_slug',      document.getElementById('blkt-post-slug').value);
+        p.append('blkt_tags',      document.getElementById('blkt-post-tags').value);
+
+        fetch(`action/${currentData.id?'edit_prispevek':'add_prispevek'}.php`, {
+          method: 'POST',
+          body:   p
+        })
+            .then(r => r.json())
+            .then(j => {
+              console.log('save response', j);
+              if (j.status === 'ok') {
+                blkt_notifikace('Příspěvek byl uložen', 'success');
+                refreshPrehled();
+                showPrehled();
+              } else {
+                blkt_notifikace('Chyba: ' + j.error, 'error');
+              }
+            })
+            .catch(e => {
+              console.error('Save network error', e);
+              blkt_notifikace('Síťová chyba: ' + e.message, 'error');
+            });
+      };
+    }
   }
 
   function refreshPrehled() {
@@ -245,10 +275,18 @@ function initPrispevky() {
         });
   }
 
-  // Spustíme init okamžitě nebo po DOMContentLoaded
+  // Spustíme init
   initPostsSection();
 }
 
+// Zajistíme, že funkce blkt_notifikace existuje
+if (typeof window.blkt_notifikace === 'undefined') {
+  window.blkt_notifikace = function(zprava, typ = 'info') {
+    console.log(`[NOTIFIKACE ${typ}] ${zprava}`);
+  };
+}
+
+// Spustíme inicializaci
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initPrispevky);
 } else {
