@@ -33,6 +33,9 @@ ob_start();
 if ($requestUri === '/' || $requestUri === '/index.php') {
     include __DIR__ . '/homepage.php';
 
+} elseif ($requestUri === '/cv' || $requestUri === '/cv.php') {
+    include __DIR__ . '/cv.php';
+
 } elseif ($requestUri === '/sitemap.xml') {
     include 'sitemap.php';
 

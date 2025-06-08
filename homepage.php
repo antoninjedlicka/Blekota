@@ -97,6 +97,21 @@ $pageTitle = 'Vítejte na webu blekota.online';
                 <h2 class="blkt-homepage-nadpis">O mně</h2>
                 <img src="/media/autor.png" alt="Autor webu" class="blkt-fotka" loading="lazy">
                 <p><?php echo nl2br(htmlspecialchars($omne)); ?></p>
+
+                <?php
+                // Kontrola existence záznamů v životopisu
+                $stmt = blkt_db_connect()->prepare("SELECT COUNT(*) FROM blkt_zivotopis WHERE blkt_stav = 1");
+                $stmt->execute();
+                $pocet_zaznamu = $stmt->fetchColumn();
+
+                if ($pocet_zaznamu > 0): ?>
+                    <div class="blkt-homepage-tlacitko-kontejner">
+                        <a href="/cv" class="blkt-tlacitko blkt-tlacitko-zivotopis">
+                            <span class="blkt-ikona-zivotopis">📄</span>
+                            Zobrazit životopis
+                        </a>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <!-- POSLEDNÍ PŘÍSPĚVEK -->

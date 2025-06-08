@@ -6,6 +6,8 @@
     overflow-y: auto;
     width: 100%;
 }
+
+/* ======= Hlavička a nadpisy ========== */
 .blkt-homepage-hlavicka {
     display: flex;
     flex-direction: row;
@@ -13,35 +15,89 @@
     justify-content: space-between;
     margin-bottom: 30px;
 }
+
 .blkt-homepage-obrazek {
     height: 60px;
 }
+
 .blkt-homepage-nadpis {
-    font-size: 33px;
-    padding: 0;
-    margin: 0;
+    font-size: 1.4em;
+    padding: 8px 30px 8px 25px;
+    margin: -20px -20px 20px 0;  /* záporný margin pro vyrovnání s paddingem boxu */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 0 20px 20px 0;
     line-height: 1.7;
+    box-shadow: 0 4px 16px rgba(102,126,234,0.3);
+    position: relative;
+    overflow: hidden;
 }
 
-.blkt-homepage-tlacitko-kontejner {
-    text-align: right;
-    margin-top: 40px;
+/* Efekt světelného paprsku na nadpisu */
+.blkt-homepage-nadpis::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
 }
 
+.blkt-kontejner-vstup:hover .blkt-homepage-nadpis::after {
+    left: 100%;
+}
+
+/* ======= Texty ========== */
 .blkt-homepage-text {
     font-size: 1em;
     margin-bottom: 20px;
-    padding: 5px 20px;
-    background: rgba(255, 255, 255, 0.55);
+    padding: 15px 25px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.6));
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-radius: 8px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.1);
+    transition: all 0.3s ease;
+}
+
+.blkt-homepage-text:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(102,126,234,0.2);
 }
 
 .blkt-homepage-linka {
     height: 2px;
     background: #ddd;
     border-radius: 10px;
+}
+
+/* ======= Tlačítka ========== */
+.blkt-homepage-tlacitko-kontejner {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+}
+
+.blkt-tlacitko-zivotopis {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(102,126,234,0.3);
+    text-decoration: none !important;
+}
+
+.blkt-tlacitko-zivotopis:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+}
+
+.blkt-ikona-zivotopis {
+    font-size: 1.2em;
 }
 
 /* ======= Rozložení 2 sloupce ========== */
@@ -67,9 +123,31 @@
     background: rgba(255,255,255,0.9);
     backdrop-filter: blur(8px);
     padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
     opacity: 0;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Hover efekt pro boxy */
+.blkt-kontejner-vstup:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+}
+
+/* Dekorativní gradient v rohu boxu */
+.blkt-kontejner-vstup::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(102,126,234,0.1) 0%, transparent 70%);
+    transform: rotate(45deg);
+    pointer-events: none;
 }
 
 /* ======= Aktivace animace ========== */
@@ -91,23 +169,83 @@
 #blkt-kontejner-omne.blkt-zobrazit       { animation-name: zprava-nahoru; }
 #blkt-kontejner-galerie.blkt-zobrazit    { animation-name: zleva; }
 #blkt-kontejner-prispevek.blkt-zobrazit  { animation-name: zprava; }
-#blkt-kontejner-text2.blkt-zobrazit      { animation-name: zleva-dolu; }
-#blkt-kontejner-text1.blkt-zobrazit      { animation-name: zprava-dolu; }
 
-/* ======= Média ======= */
-.blkt-fotka {
-    width: 30%;
-    border-radius: 6px;
-    margin-top: 10px;
-    float: left;
+/* ======= Speciální styly pro konkrétní boxy ========== */
+#blkt-kontejner-galerie {
+    box-shadow: none;
+    padding: 0;
+    background: none;
+    backdrop-filter: none;
 }
 
+#blkt-kontejner-galerie:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+#blkt-kontejner-galerie::before {
+    display: none;
+}
+
+#blkt-kontejner-uvod {
+    background: none;
+    backdrop-filter: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+#blkt-kontejner-uvod:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+#blkt-kontejner-uvod::before {
+    display: none;
+}
+
+#blkt-kontejner-omne {
+    padding: 20px;
+    padding-bottom: 70px; /* prostor pro tlačítko */
+    position: relative;
+    min-height: 200px; /* minimální výška pro případ krátkého obsahu */
+    overflow: visible; /* aby nadpis mohl vyčnívat */
+}
+
+/* ======= Média - fotka autora ========== */
+.blkt-fotka {
+    width: 30%;
+    border-radius: 12px;
+    margin: 10px 20px 10px 10px;
+    float: left;
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.blkt-fotka:hover {
+    transform: scale(1.05) rotate(-2deg);
+}
+
+/* ======= Slider galerie ========== */
 .blkt-slider {
     position: relative;
     width: 100%;
-    aspect-ratio: 5 / 3; /* šířka:výška = 5:3 => výška je 3/5 šířky */
+    aspect-ratio: 5 / 3;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+
+/* Gradient overlay pro lepší čitelnost indikátorů */
+.blkt-slider::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.3) 100%);
+    z-index: 2;
+    pointer-events: none;
 }
 
 .blkt-slider img {
@@ -127,34 +265,65 @@
     z-index: 1;
 }
 
-#blkt-kontejner-galerie {
-    box-shadow: none;
-    padding: 0;
+/* Slider indikátory */
+.blkt-slider-indikatory {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 3;
 }
-#blkt-kontejner-uvod {
-    background: none;
-    backdrop-filter: none;
-    box-shadow: none;
-    padding: 0;
-}
-.blkt-homepage-nadpis {
-    margin: 0 50% 0 0;
-    padding: 5px 30px 5px 20px;
-    background: #ddd;
-    border-radius: 0 10px 10px 0;
-    font-size: 1.3em;
-}
-#blkt-kontejner-omne {
-    padding: 20px 20px 20px 0;
-}
-#blkt-kontejner-text2 {
-    display: none;
-}
-#blkt-kontejner-text1 {
-    display: none;
-}
-/* Responzivní styl */
 
+.blkt-slider-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.blkt-slider-dot:hover {
+    background: rgba(255,255,255,0.8);
+    transform: scale(1.2);
+}
+
+.blkt-slider-dot.aktivni {
+    background: white;
+    width: 30px;
+    border-radius: 6px;
+}
+
+/* ======= Box posledního příspěvku ========== */
+#blkt-kontejner-prispevek h5 {
+    color: #667eea;
+    font-size: 1.2em;
+    margin-bottom: 15px;
+}
+
+#blkt-kontejner-prispevek p {
+    line-height: 1.6;
+    color: #555;
+}
+
+#blkt-kontejner-prispevek a {
+    color: #667eea;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#blkt-kontejner-prispevek a:hover {
+    gap: 10px;
+    color: #764ba2;
+}
+
+/* ======= Responzivní styly ========== */
 @media (max-width: 768px) {
     .blkt-homepage-sloupce {
         flex-direction: column;
@@ -164,10 +333,25 @@
     .blkt-homepage-sloupec {
         width: 100% !important;
     }
-    .blkt-homepage-nadpis-blog {
+
+    .blkt-homepage-nadpis {
         margin: 0 10% 13px -20px !important;
     }
+
     .blkt-homepage-obsah {
         padding: 170px 0;
+    }
+
+    .blkt-fotka {
+        width: 40%;
+        float: none;
+        margin: 20px auto;
+        display: block;
+    }
+
+    .blkt-homepage-tlacitko-kontejner {
+        position: static;
+        text-align: center;
+        margin-top: 20px;
     }
 }
