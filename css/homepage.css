@@ -21,14 +21,14 @@
 }
 
 .blkt-homepage-nadpis {
-    font-size: 1.4em;
-    padding: 8px 30px 8px 25px;
+    font-size: 1.0em;
+    padding: 8px 30px 8px 20px;
     margin: 0 50% 0 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #3CBBB1 100%);
     color: white;
     border-radius: 0 20px 20px 0;
     line-height: 1.7;
-    box-shadow: 0 4px 16px rgba(102,126,234,0.3);
+    box-shadow: 0 4px 16px rgba(60, 187, 177, 0.3);
     position: relative;
     overflow: hidden;
 }
@@ -63,13 +63,13 @@
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(102,126,234,0.1);
+    box-shadow: 0 2px 8px rgba(60, 187, 177, 0.1);
     transition: all 0.3s ease;
 }
 
 .blkt-homepage-text:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(102,126,234,0.2);
+    box-shadow: 0 4px 16px rgba(255, 107, 53, 0.2);
 }
 
 .blkt-homepage-linka {
@@ -86,19 +86,20 @@
 }
 
 .blkt-tlacitko-zivotopis {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #3CBBB1 0%, #F7931E 100%);
     color: white !important;
     display: inline-flex;
     align-items: center;
     gap: 10px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(102,126,234,0.3);
+    box-shadow: 0 4px 16px rgba(60, 187, 177, 0.3);
     text-decoration: none !important;
 }
 
 .blkt-tlacitko-zivotopis:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+    background: linear-gradient(135deg, #F7931E 0%, #FF6B35 100%);
 }
 
 .blkt-ikona-zivotopis {
@@ -109,7 +110,7 @@
 .blkt-homepage-sloupce {
     display: flex;
     justify-content: center;
-    gap: 40px;
+    gap: 30px;
     max-width: 960px;
     width: 100%;
     margin: 0 auto;
@@ -119,7 +120,7 @@
 .blkt-homepage-sloupec {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 30px;
     width: 50%;
 }
 
@@ -128,7 +129,7 @@
     background: rgba(255,255,255,0.9);
     backdrop-filter: blur(8px);
     padding: 20px;
-    border-radius: 16px;
+    border-radius: 12px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.1);
     opacity: 0;
     position: relative;
@@ -150,7 +151,7 @@
     right: -50%;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(102,126,234,0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(60, 187, 177, 0.1) 0%, transparent 70%);
     transform: rotate(45deg);
     pointer-events: none;
 }
@@ -209,8 +210,7 @@
 }
 
 #blkt-kontejner-omne {
-    padding: 20px;
-    padding-bottom: 70px; /* prostor pro tlačítko */
+    padding: 20px 20px 70px 20px;
     position: relative;
     min-height: 200px; /* minimální výška pro případ krátkého obsahu */
     overflow: visible; /* aby nadpis mohl vyčnívat */
@@ -229,7 +229,7 @@
 .blkt-fotka {
     width: 30%;
     border-radius: 12px;
-    margin: 10px 20px 10px 10px;
+    margin: 0 20px 0 0;
     float: left;
     transition: transform 0.3s ease;
     box-shadow: 0 4px 16px rgba(0,0,0,0.1);
@@ -312,7 +312,7 @@
 
 /* ======= Box posledního příspěvku ========== */
 #blkt-kontejner-prispevek h5 {
-    color: #667eea;
+    color: #3CBBB1;
     font-size: 1.2em;
     margin-bottom: 15px;
 }
@@ -323,7 +323,7 @@
 }
 
 #blkt-kontejner-prispevek a {
-    color: #667eea;
+    color: #3CBBB1;
     font-weight: 600;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -334,7 +334,7 @@
 
 #blkt-kontejner-prispevek a:hover {
     gap: 10px;
-    color: #764ba2;
+    color: #FF6B35;
 }
 
 /* ======= Responzivní styly ========== */

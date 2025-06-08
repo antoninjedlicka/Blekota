@@ -116,7 +116,7 @@ $pageTitle = 'Vítejte na webu blekota.online';
 
             <!-- POSLEDNÍ PŘÍSPĚVEK -->
             <div id="blkt-kontejner-prispevek" class="blkt-kontejner-vstup">
-                <h2 class="blkt-homepage-nadpis" style="margin-left: -20px; margin-bottom: 10px;">Poslední z blogu</h2>
+                <h2 class="blkt-homepage-nadpis">Poslední z blogu</h2>
                 <?php include __DIR__ . '/home/posledni_prispevek.php'; ?>
             </div>
         </div>
