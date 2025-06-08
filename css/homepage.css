@@ -35,7 +35,7 @@
 
 /* Speciální styl jen pro nadpis v boxu "O mně" */
 #blkt-kontejner-omne .blkt-homepage-nadpis {
-    margin: -20px -20px 20px -20px;  /* záporný margin pro vyrovnání s paddingem boxu */
+    margin: 0 50% 20px -20px;  /* pouze levý záporný margin */
 }
 
 /* Efekt světelného paprsku na nadpisu */
@@ -222,7 +222,7 @@
 
 /* Speciální styl pro nadpis "Poslední z blogu" */
 #blkt-kontejner-prispevek .blkt-homepage-nadpis {
-    margin: -20px 50% 20px -20px; /* zachováváme původní pravý margin */
+    margin: 0 50% 20px -20px; /* pouze levý záporný margin */
 }
 
 /* ======= Média - fotka autora ========== */
