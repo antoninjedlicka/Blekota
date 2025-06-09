@@ -10,7 +10,7 @@ $uzivatel = blkt_uzivatel_info();
 
 <div class="blkt-hlavicka-box">
     <div class="blkt-logo">
-        <a style="border: 0" href="/"><img class="blkt-hlavicka-logo" src="/media/logo.svg" alt="Logo webu blekota.online"></a>
+        <a class="blkt-logo-link" href="/"><img class="blkt-hlavicka-logo" src="/media/logo.svg" alt="Logo webu blekota.online"></a>
     </div>
     <nav class="blkt-navigace">
         <a class="blkt-tlacitko blkt-tlacitko-menu" href="/">Domů</a>

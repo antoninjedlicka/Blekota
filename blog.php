@@ -36,8 +36,8 @@ $pageTitle = 'Blog';
 </header>
 
 <main class="blkt-obsah-stranky">
-    <section class="blkt-blog-seznam">
-        <?php foreach ($prispevky as $p): ?>
+    <section class="blkt-blog-masonry">
+        <?php foreach ($prispevky as $index => $p): ?>
             <?php
             // 1) Najít první <img> v obsahu
             preg_match('/<img[^>]+src="([^"]+)"/i', $p['blkt_obsah'], $imgMatch);
@@ -45,27 +45,33 @@ $pageTitle = 'Blog';
 
             // 2) Vytvořit výňatek (text bez HTML, oříznutý)
             $plainText = strip_tags(html_entity_decode($p['blkt_obsah'], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-            $excerpt = mb_substr($plainText, 0, 380) . '…';
+
+            // První příspěvek má delší výňatek
+            if ($index === 0) {
+                $excerpt = mb_substr($plainText, 0, 500) . '…';
+            } else {
+                $excerpt = mb_substr($plainText, 0, 200) . '…';
+            }
 
             // 3) URL příspěvku
             $postUrl = rtrim($blogUrl, '/') . '/' . urlencode($p['blkt_slug']);
+
+            // 4) Přiřazení třídy pro první příspěvek
+            $itemClass = ($index === 0) ? 'blkt-masonry-item blkt-masonry-item-hlavni' : 'blkt-masonry-item';
             ?>
-            <div class="blkt-blog-kontejner">
+            <div class="<?php echo $itemClass; ?>">
                 <?php if ($imgSrc): ?>
-                    <img src="<?php echo htmlspecialchars($imgSrc); ?>" alt="" class="blkt-blog-nahled">
+                    <div class="blkt-masonry-obrazek">
+                        <img src="<?php echo htmlspecialchars($imgSrc); ?>" alt="">
+                    </div>
                 <?php endif; ?>
-                <div class="blkt-blog-text">
-                    <div>
-                        <h2 class="blkt-blog-nadpis"><?php echo htmlspecialchars($p['blkt_nazev']); ?></h2>
-                        <p class="blkt-blog-vynatek"><?php echo htmlspecialchars($excerpt); ?></p>
-                    </div>
-                    <div class="blkt-blog-tlacitko">
-                        <a href="<?php echo $postUrl; ?>">Zobrazit příspěvek</a>
-                    </div>
+                <div class="blkt-masonry-obsah">
+                    <h2 class="blkt-masonry-nadpis"><?php echo htmlspecialchars($p['blkt_nazev']); ?></h2>
+                    <p class="blkt-masonry-vynatek"><?php echo htmlspecialchars($excerpt); ?></p>
+                    <a href="<?php echo $postUrl; ?>" class="blkt-masonry-odkaz">Zobrazit příspěvek</a>
                 </div>
             </div>
         <?php endforeach; ?>
-
     </section>
 </main>
 

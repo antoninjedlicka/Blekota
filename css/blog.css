@@ -1,4 +1,4 @@
-/* CSS pro blog */
+/* CSS pro blog - Masonry layout */
 
 /* Import základních proměnných */
 :root {
@@ -6,6 +6,7 @@
     --blkt-blog-primary-dark: #2980b9;
     --blkt-blog-text: #333;
     --blkt-blog-text-light: #666;
+    --blkt-masonry-gap: 20px;
 }
 
 /* Definování animace */
@@ -20,27 +21,39 @@
     }
 }
 
-/* Stránka s blogem a příspěvky */
-.blkt-blog-kontejner {
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 30px;
-    padding: 20px;
-    gap: 20px;
-    border-radius: 15px;
+/* Masonry kontejner */
+.blkt-blog-masonry {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--blkt-masonry-gap);
+    width: 95%;
+    max-width: 1050px;
+    margin: 130px auto;
+    padding: 0 20px;
+}
+
+/* Masonry položky */
+.blkt-masonry-item {
     background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(10px);
+    border-radius: 15px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
     opacity: 0;
     transform: translateY(50px);
-    animation: zakladnianimace 1s ease-out forwards;
-    position: relative;
-    overflow: hidden;
+    animation: zakladnianimace 0.8s ease-out forwards;
     transition: all 0.3s ease;
+    position: relative;
+}
+
+/* Hlavní (první) příspěvek */
+.blkt-masonry-item-hlavni {
+    grid-row: span 2;
+    grid-column: 1;
 }
 
 /* Efekt světelného odlesku při hoveru */
-.blkt-blog-kontejner::before {
+.blkt-masonry-item::before {
     content: '';
     position: absolute;
     top: -50%;
@@ -52,61 +65,90 @@
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.3s ease;
+    z-index: 1;
 }
 
-.blkt-blog-kontejner:hover {
+.blkt-masonry-item:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
 
-.blkt-blog-kontejner:hover::before {
+.blkt-masonry-item:hover::before {
     opacity: 1;
 }
 
-.blkt-blog-nahled {
-    width: auto;
+/* Obrázky */
+.blkt-masonry-obrazek {
+    width: 100%;
     height: 200px;
+    overflow: hidden;
+    position: relative;
+}
+
+.blkt-masonry-item-hlavni .blkt-masonry-obrazek {
+    height: 300px;
+}
+
+.blkt-masonry-obrazek img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    border-radius: 10px;
+    transition: transform 0.3s ease;
 }
 
-.blkt-blog-text {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+.blkt-masonry-item:hover .blkt-masonry-obrazek img {
+    transform: scale(1.05);
 }
 
-.blkt-blog-nadpis {
-    font-size: 1.5em;
-    margin: 0 0 10px 0;
+/* Obsah */
+.blkt-masonry-obsah {
+    padding: 20px;
+    position: relative;
+    z-index: 2;
+}
+
+.blkt-masonry-item-hlavni .blkt-masonry-obsah {
+    padding: 30px;
+}
+
+.blkt-masonry-nadpis {
+    font-size: 1.3em;
+    margin: 0 0 15px 0;
     color: var(--blkt-blog-text);
+    line-height: 1.3;
 }
 
-.blkt-blog-vynatek {
+.blkt-masonry-item-hlavni .blkt-masonry-nadpis {
+    font-size: 1.8em;
+    margin-bottom: 20px;
+}
+
+.blkt-masonry-vynatek {
     font-size: 0.95em;
     color: var(--blkt-blog-text-light);
+    line-height: 1.6;
+    margin-bottom: 20px;
 }
 
-.blkt-blog-tlacitko {
-    align-self: flex-end;
-    margin-top: 15px;
+.blkt-masonry-item-hlavni .blkt-masonry-vynatek {
+    font-size: 1.05em;
 }
 
-.blkt-blog-tlacitko a {
+.blkt-masonry-odkaz {
+    display: inline-block;
     background: var(--blkt-blog-primary);
     color: white;
-    padding: 8px 14px;
+    padding: 10px 20px;
     border-radius: 8px;
     text-decoration: none;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    display: inline-block;
+    font-size: 0.95em;
 }
 
 /* Efekt světelného paprsku pro tlačítko */
-.blkt-blog-tlacitko a::after {
+.blkt-masonry-odkaz::after {
     content: '';
     position: absolute;
     top: 0;
@@ -117,35 +159,73 @@
     transition: left 0.5s;
 }
 
-.blkt-blog-tlacitko a:hover {
+.blkt-masonry-odkaz:hover {
     background: var(--blkt-blog-primary-dark);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    color: #fff;
 }
 
-.blkt-blog-tlacitko a:hover::after {
+.blkt-masonry-odkaz:hover::after {
     left: 100%;
 }
 
-section.blkt-blog-seznam {
-    display: flex;
-    flex-direction: column;
-    width: 95%;
-    max-width: 800px;
-    margin: 130px auto;
+/* Animace jednotlivých položek se zpožděním */
+.blkt-masonry-item:nth-child(1) { animation-delay: 0.1s; }
+.blkt-masonry-item:nth-child(2) { animation-delay: 0.2s; }
+.blkt-masonry-item:nth-child(3) { animation-delay: 0.3s; }
+.blkt-masonry-item:nth-child(4) { animation-delay: 0.4s; }
+.blkt-masonry-item:nth-child(5) { animation-delay: 0.5s; }
+.blkt-masonry-item:nth-child(6) { animation-delay: 0.6s; }
+.blkt-masonry-item:nth-child(7) { animation-delay: 0.7s; }
+.blkt-masonry-item:nth-child(8) { animation-delay: 0.8s; }
+.blkt-masonry-item:nth-child(n+9) { animation-delay: 0.9s; }
+
+/* Tablet zobrazení */
+@media (max-width: 1024px) {
+    .blkt-blog-masonry {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .blkt-masonry-nadpis {
+        font-size: 1.2em;
+    }
+
+    .blkt-masonry-item-hlavni .blkt-masonry-nadpis {
+        font-size: 1.5em;
+    }
 }
 
 /* Mobilní zobrazení */
 @media (max-width: 768px) {
-    .blkt-blog-kontejner {
-        display: flex;
-        flex-direction: column;
+    .blkt-blog-masonry {
+        grid-template-columns: 1fr;
+        margin: 100px auto;
     }
-    .blkt-blog-nahled {
-        width: 100%;
-        height: auto;
+
+    .blkt-masonry-item-hlavni {
+        grid-row: auto;
+        grid-column: auto;
     }
-    section.blkt-blog-seznam {
-        margin: 150px auto;
+
+    .blkt-masonry-obrazek,
+    .blkt-masonry-item-hlavni .blkt-masonry-obrazek {
+        height: 200px;
+    }
+
+    .blkt-masonry-obsah,
+    .blkt-masonry-item-hlavni .blkt-masonry-obsah {
+        padding: 20px;
+    }
+
+    .blkt-masonry-nadpis,
+    .blkt-masonry-item-hlavni .blkt-masonry-nadpis {
+        font-size: 1.3em;
+    }
+
+    .blkt-masonry-vynatek,
+    .blkt-masonry-item-hlavni .blkt-masonry-vynatek {
+        font-size: 0.95em;
     }
 }

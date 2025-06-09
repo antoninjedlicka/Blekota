@@ -1023,6 +1023,10 @@ figcaption {
   transform: scale(1.05);
 }
 
+a.blkt-logo-link:hover:after {
+  width: 0;
+}
+
 /* Navigace */
 .blkt-navigace {
   display: flex;
