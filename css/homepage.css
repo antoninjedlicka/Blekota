@@ -24,18 +24,18 @@
     font-size: 1.0em;
     padding: 8px 30px 8px 20px;
     margin: 0 50% 0 0;
-    background: linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #3CBBB1 100%);
+    background: var(--blkt-primary);
     color: white;
     border-radius: 0 20px 20px 0;
     line-height: 1.7;
-    box-shadow: 0 4px 16px rgba(60, 187, 177, 0.3);
+    box-shadow: 0 4px 16px rgba(52, 152, 219, 0.2);
     position: relative;
     overflow: hidden;
 }
 
 /* Speciální styl jen pro nadpis v boxu "O mně" */
 #blkt-kontejner-omne .blkt-homepage-nadpis {
-    margin: 0 50% 20px -20px;  /* pouze levý záporný margin */
+    margin: 0 50% 20px -20px;
 }
 
 /* Efekt světelného paprsku na nadpisu */
@@ -59,22 +59,40 @@
     font-size: 1em;
     margin-bottom: 20px;
     padding: 15px 25px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.6));
+    background: rgba(255,255,255,0.8);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(60, 187, 177, 0.1);
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.1);
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Efekt světelného paprsku pro texty */
+.blkt-homepage-text::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(52, 152, 219, 0.1), transparent);
+    transition: left 0.5s;
 }
 
 .blkt-homepage-text:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(255, 107, 53, 0.2);
+    box-shadow: 0 4px 16px rgba(52, 152, 219, 0.2);
+}
+
+.blkt-homepage-text:hover::after {
+    left: 100%;
 }
 
 .blkt-homepage-linka {
     height: 2px;
-    background: #ddd;
+    background: var(--blkt-border);
     border-radius: 10px;
 }
 
@@ -86,20 +104,37 @@
 }
 
 .blkt-tlacitko-zivotopis {
-    background: linear-gradient(135deg, #3CBBB1 0%, #F7931E 100%);
+    background: var(--blkt-primary);
     color: white !important;
     display: inline-flex;
     align-items: center;
     gap: 10px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(60, 187, 177, 0.3);
+    box-shadow: 0 4px 16px rgba(52, 152, 219, 0.3);
     text-decoration: none !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.blkt-tlacitko-zivotopis::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
 }
 
 .blkt-tlacitko-zivotopis:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
-    background: linear-gradient(135deg, #F7931E 0%, #FF6B35 100%);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+    background: var(--blkt-primary-dark);
+}
+
+.blkt-tlacitko-zivotopis:hover::after {
+    left: 100%;
 }
 
 .blkt-ikona-zivotopis {
@@ -143,7 +178,7 @@
     box-shadow: 0 12px 40px rgba(0,0,0,0.15);
 }
 
-/* Dekorativní gradient v rohu boxu */
+/* Efekt světelného odlesku při hoveru */
 .blkt-kontejner-vstup::before {
     content: '';
     position: absolute;
@@ -151,9 +186,15 @@
     right: -50%;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(60, 187, 177, 0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
     transform: rotate(45deg);
     pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.blkt-kontejner-vstup:hover::before {
+    opacity: 1;
 }
 
 /* ======= Aktivace animace ========== */
@@ -163,12 +204,22 @@
 }
 
 /* ======= Keyframes pro nástup ========== */
-@keyframes zleva-nahoru { from { transform: translate(-50%, -50%); opacity: 0; } to { transform: translate(0, 0); opacity: 1; } }
-@keyframes zprava-nahoru { from { transform: translate(50%, -50%); opacity: 0; } to { transform: translate(0, 0); opacity: 1; } }
-@keyframes zleva { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes zprava { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes zleva-dolu { from { transform: translate(-50%, 50%); opacity: 0; } to { transform: translate(0, 0); opacity: 1; } }
-@keyframes zprava-dolu { from { transform: translate(50%, 50%); opacity: 0; } to { transform: translate(0, 0); opacity: 1; } }
+@keyframes zleva-nahoru {
+    from { transform: translate(-50%, -50%); opacity: 0; }
+    to { transform: translate(0, 0); opacity: 1; }
+}
+@keyframes zprava-nahoru {
+    from { transform: translate(50%, -50%); opacity: 0; }
+    to { transform: translate(0, 0); opacity: 1; }
+}
+@keyframes zleva {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+@keyframes zprava {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
 
 /* ======= Každý box má svou animaci podle pozice ========== */
 #blkt-kontejner-uvod.blkt-zobrazit       { animation-name: zleva-nahoru; }
@@ -212,17 +263,17 @@
 #blkt-kontejner-omne {
     padding: 20px 20px 70px 20px;
     position: relative;
-    min-height: 200px; /* minimální výška pro případ krátkého obsahu */
-    overflow: visible; /* aby nadpis mohl vyčnívat */
+    min-height: 200px;
+    overflow: visible;
 }
 
 #blkt-kontejner-prispevek {
-    overflow: visible; /* aby se nadpis nezořízl */
+    overflow: visible;
 }
 
 /* Speciální styl pro nadpis "Poslední z blogu" */
 #blkt-kontejner-prispevek .blkt-homepage-nadpis {
-    margin: 0 50% 20px -20px; /* pouze levý záporný margin */
+    margin: 0 50% 20px -20px;
 }
 
 /* ======= Média - fotka autora ========== */
@@ -312,18 +363,18 @@
 
 /* ======= Box posledního příspěvku ========== */
 #blkt-kontejner-prispevek h5 {
-    color: #3CBBB1;
+    color: var(--blkt-primary);
     font-size: 1.2em;
     margin-bottom: 15px;
 }
 
 #blkt-kontejner-prispevek p {
     line-height: 1.6;
-    color: #555;
+    color: var(--blkt-text-light);
 }
 
 #blkt-kontejner-prispevek a {
-    color: #3CBBB1;
+    color: var(--blkt-primary);
     font-weight: 600;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -334,7 +385,7 @@
 
 #blkt-kontejner-prispevek a:hover {
     gap: 10px;
-    color: #FF6B35;
+    color: var(--blkt-primary-dark);
 }
 
 /* ======= Responzivní styly ========== */

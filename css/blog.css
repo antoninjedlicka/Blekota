@@ -1,14 +1,22 @@
 /* CSS pro blog */
 
+/* Import základních proměnných */
+:root {
+    --blkt-blog-primary: #3498db;
+    --blkt-blog-primary-dark: #2980b9;
+    --blkt-blog-text: #333;
+    --blkt-blog-text-light: #666;
+}
+
 /* Definování animace */
 @keyframes zakladnianimace {
     0% {
-        transform: translateY(50px); /* Začíná pod obrazovkou */
-        opacity: 0; /* Začíná neviditelné */
+        transform: translateY(50px);
+        opacity: 0;
     }
     100% {
-        transform: translateY(0); /* Konec animace - vrací se na původní pozici */
-        opacity: 1; /* Konec animace - plně viditelné */
+        transform: translateY(0);
+        opacity: 1;
     }
 }
 
@@ -23,47 +31,102 @@
     background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(10px);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-    /* 🔽 Výchozí neviditelný stav */
     opacity: 0;
     transform: translateY(50px);
-    /* Pokračuje animace */
-    animation: zakladnianimace 1s ease-out forwards; /* Délka animace, typ zrychlení, 'forwards' aby zůstal v konečné pozici */
+    animation: zakladnianimace 1s ease-out forwards;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
 }
+
+/* Efekt světelného odlesku při hoveru */
+.blkt-blog-kontejner::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+    transform: rotate(45deg);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.blkt-blog-kontejner:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.blkt-blog-kontejner:hover::before {
+    opacity: 1;
+}
+
 .blkt-blog-nahled {
     width: auto;
     height: 200px;
     object-fit: cover;
     border-radius: 10px;
 }
+
 .blkt-blog-text {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
+
 .blkt-blog-nadpis {
     font-size: 1.5em;
     margin: 0 0 10px 0;
+    color: var(--blkt-blog-text);
 }
+
 .blkt-blog-vynatek {
     font-size: 0.95em;
-    color: #333;
+    color: var(--blkt-blog-text-light);
 }
+
 .blkt-blog-tlacitko {
     align-self: flex-end;
     margin-top: 15px;
 }
+
 .blkt-blog-tlacitko a {
-    background: #007b5e;
+    background: var(--blkt-blog-primary);
     color: white;
     padding: 8px 14px;
     border-radius: 8px;
     text-decoration: none;
-    transition: background 0.2s;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
 }
+
+/* Efekt světelného paprsku pro tlačítko */
+.blkt-blog-tlacitko a::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+}
+
 .blkt-blog-tlacitko a:hover {
-    background: #005f48;
+    background: var(--blkt-blog-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
 }
+
+.blkt-blog-tlacitko a:hover::after {
+    left: 100%;
+}
+
 section.blkt-blog-seznam {
     display: flex;
     flex-direction: column;

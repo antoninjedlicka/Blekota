@@ -1,5 +1,13 @@
 /* === CSS pro životopis === */
 
+/* Import základních proměnných */
+:root {
+    --blkt-cv-primary: #667eea;
+    --blkt-cv-secondary: #764ba2;
+    --blkt-cv-text: #333;
+    --blkt-cv-text-light: #666;
+}
+
 article.blkt-cv {
     margin: 130px auto;
     max-width: 900px;
@@ -16,12 +24,30 @@ article.blkt-cv {
 
 /* === HLAVIČKA CV === */
 .blkt-cv-hlavicka {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--blkt-cv-primary);
     color: white;
     padding: 2.5rem 2rem;
     display: flex;
     align-items: center;
     gap: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Efekt světelného odlesku v hlavičce */
+.blkt-cv-hlavicka::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.8s;
+}
+
+article.blkt-cv:hover .blkt-cv-hlavicka::after {
+    left: 100%;
 }
 
 .blkt-cv-avatar {
@@ -85,12 +111,12 @@ article.blkt-cv {
 }
 
 .blkt-cv-sekce h2 {
-    color: #667eea;
+    color: var(--blkt-cv-primary);
     font-size: 1.8em;
     font-weight: 600;
     margin: 0 0 1.5rem 0;
     padding-bottom: 0.5rem;
-    border-bottom: 3px solid #667eea;
+    border-bottom: 3px solid var(--blkt-cv-primary);
     display: inline-block;
 }
 
@@ -99,24 +125,48 @@ article.blkt-cv {
     padding: 1.5rem;
     background: rgba(102, 126, 234, 0.05);
     border-radius: 10px;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid var(--blkt-cv-primary);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Efekt světelného odlesku pro pozice */
+.blkt-cv-pozice::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+    transition: left 0.6s;
+}
+
+.blkt-cv-pozice:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.blkt-cv-pozice:hover::after {
+    left: 100%;
 }
 
 .blkt-cv-pozice h3 {
     margin: 0 0 0.5rem 0;
-    color: #333;
+    color: var(--blkt-cv-text);
     font-size: 1.4em;
     font-weight: 600;
 }
 
 .blkt-cv-pozice .blkt-cv-firma {
-    color: #667eea;
+    color: var(--blkt-cv-primary);
     font-weight: 600;
     margin-bottom: 0.5rem;
 }
 
 .blkt-cv-pozice .blkt-cv-datum {
-    color: #666;
+    color: var(--blkt-cv-text-light);
     font-size: 0.95em;
     margin-bottom: 1rem;
 }
@@ -151,12 +201,35 @@ article.blkt-cv {
     background: rgba(102, 126, 234, 0.05);
     padding: 1.5rem;
     border-radius: 10px;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid var(--blkt-cv-primary);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.blkt-cv-dovednost-skupina::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+    transition: left 0.6s;
+}
+
+.blkt-cv-dovednost-skupina:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.blkt-cv-dovednost-skupina:hover::after {
+    left: 100%;
 }
 
 .blkt-cv-dovednost-skupina h4 {
     margin: 0 0 1rem 0;
-    color: #667eea;
+    color: var(--blkt-cv-primary);
     font-weight: 600;
 }
 
@@ -167,12 +240,18 @@ article.blkt-cv {
 }
 
 .blkt-cv-tag {
-    background: #667eea;
+    background: var(--blkt-cv-primary);
     color: white;
     padding: 0.4rem 0.8rem;
     border-radius: 20px;
     font-size: 0.9em;
     font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.blkt-cv-tag:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
 /* === VLASTNOSTI === */
@@ -183,16 +262,201 @@ article.blkt-cv {
 }
 
 .blkt-cv-vlastnost {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--blkt-cv-primary);
     color: white;
     padding: 1.5rem;
     border-radius: 10px;
     text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.blkt-cv-vlastnost::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.6s;
+}
+
+.blkt-cv-vlastnost:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+}
+
+.blkt-cv-vlastnost:hover::after {
+    left: 100%;
 }
 
 .blkt-cv-vlastnost h4 {
     margin: 0 0 0.5rem 0;
     font-weight: 600;
+}
+
+/* === CV DYNAMICKÉ STYLY === */
+
+/* Tlačítka v pravém dolním rohu */
+.blkt-cv-tlacitka {
+    position: fixed;
+    bottom: 100px;
+    right: 2rem;
+    display: flex;
+    gap: 1rem;
+    z-index: 100;
+}
+
+/* Tlačítko pro tisk */
+.blkt-cv-tlacitko-tisk {
+    background: var(--blkt-cv-primary);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.blkt-cv-tlacitko-tisk::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+}
+
+.blkt-cv-tlacitko-tisk:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.blkt-cv-tlacitko-tisk:hover::after {
+    left: 100%;
+}
+
+/* Tlačítko pro stažení */
+.blkt-cv-tlacitko-stahnout {
+    background: var(--blkt-cv-secondary);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.blkt-cv-tlacitko-stahnout::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+}
+
+.blkt-cv-tlacitko-stahnout:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4);
+}
+
+.blkt-cv-tlacitko-stahnout:hover::after {
+    left: 100%;
+}
+
+/* Počítadlo let praxe */
+.blkt-cv-leta-praxe {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 1.1em;
+    color: white;
+}
+
+/* Mobilní menu */
+.blkt-cv-mobilni-menu {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 30px;
+    padding: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 100;
+}
+
+.blkt-cv-mobilni-menu button {
+    background: var(--blkt-cv-primary);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.blkt-cv-mobilni-menu button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* Animace pro kontakty */
+.blkt-cv-kontakt li {
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: all 0.5s ease;
+}
+
+.blkt-cv-kontakt li.blkt-animovano {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Animace pro tagy */
+.blkt-cv-tag {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+}
+
+.blkt-cv-tag.blkt-animovano {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Animace sekcí - pauza před spuštěním */
+.blkt-cv-sekce {
+    animation-play-state: paused;
+}
+
+.blkt-cv-sekce.blkt-animace-spustena {
+    animation-play-state: running;
 }
 
 /* === RESPONZIVITA === */
@@ -227,125 +491,4 @@ article.blkt-cv {
     article.blkt-cv {
         margin: 160px auto 120px;
     }
-}
-/* === CV DYNAMICKÉ STYLY === */
-
-/* Tlačítka v pravém dolním rohu */
-.blkt-cv-tlacitka {
-    position: fixed;
-    bottom: 100px;
-    right: 2rem;
-    display: flex;
-    gap: 1rem;
-    z-index: 100;
-}
-
-/* Tlačítko pro tisk */
-.blkt-cv-tlacitko-tisk {
-    background: #667eea;
-    color: white;
-    border: none;
-    padding: 0.8rem 1.5rem;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 1em;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-    transition: all 0.3s ease;
-}
-
-.blkt-cv-tlacitko-tisk:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-}
-
-/* Tlačítko pro stažení */
-.blkt-cv-tlacitko-stahnout {
-    background: #764ba2;
-    color: white;
-    border: none;
-    padding: 0.8rem 1.5rem;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 1em;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3);
-    transition: all 0.3s ease;
-}
-
-.blkt-cv-tlacitko-stahnout:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4);
-}
-
-/* Počítadlo let praxe */
-.blkt-cv-leta-praxe {
-    position: absolute;
-    top: 2rem;
-    right: 2rem;
-    background: rgba(255,255,255,0.2);
-    backdrop-filter: blur(10px);
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 1.1em;
-    color: white;
-}
-
-/* Mobilní menu */
-.blkt-cv-mobilni-menu {
-    position: fixed;
-    bottom: 1rem;
-    left: 50%;
-    transform: translateX(-50%);
-    background: white;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    border-radius: 30px;
-    padding: 0.5rem;
-    display: flex;
-    gap: 0.5rem;
-    z-index: 100;
-}
-
-.blkt-cv-mobilni-menu button {
-    background: #667eea;
-    color: white;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-/* Animace pro kontakty */
-.blkt-cv-kontakt li {
-    opacity: 0;
-    transform: translateX(-20px);
-    transition: all 0.5s ease;
-}
-
-.blkt-cv-kontakt li.blkt-animovano {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-/* Animace pro tagy */
-.blkt-cv-tag {
-    opacity: 0;
-    transform: scale(0.8);
-    transition: all 0.3s ease;
-}
-
-.blkt-cv-tag.blkt-animovano {
-    opacity: 1;
-    transform: scale(1);
-}
-
-/* Animace sekcí - pauza před spuštěním */
-.blkt-cv-sekce {
-    animation-play-state: paused;
-}
-
-.blkt-cv-sekce.blkt-animace-spustena {
-    animation-play-state: running;
 }
