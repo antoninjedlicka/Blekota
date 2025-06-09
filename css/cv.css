@@ -24,7 +24,7 @@ article.blkt-cv {
 
 /* === HLAVIČKA CV === */
 .blkt-cv-hlavicka {
-    background: var(--blkt-cv-primary);
+    background: linear-gradient(135deg, var(--blkt-cv-primary) 0%, var(--blkt-cv-secondary) 100%);
     color: white;
     padding: 2.5rem 2rem;
     display: flex;
@@ -63,6 +63,7 @@ article.blkt-cv:hover .blkt-cv-hlavicka::after {
     margin: 0 0 1rem 0;
     font-size: 2.5em;
     font-weight: 600;
+    color: white; /* Explicitní bílá barva */
 }
 
 .blkt-cv-kontakt {
@@ -77,12 +78,13 @@ article.blkt-cv:hover .blkt-cv-hlavicka::after {
     align-items: center;
     gap: 0.75rem;
     font-size: 1.1em;
+    color: white; /* Explicitní bílá barva */
 }
 
 .blkt-cv-kontakt .ikona {
     width: 20px;
     height: 20px;
-    opacity: 0.8;
+    opacity: 0.9;
 }
 
 /* === OBSAH CV === */
@@ -262,7 +264,7 @@ article.blkt-cv:hover .blkt-cv-hlavicka::after {
 }
 
 .blkt-cv-vlastnost {
-    background: var(--blkt-cv-primary);
+    background: linear-gradient(135deg, var(--blkt-cv-primary) 0%, var(--blkt-cv-secondary) 100%);
     color: white;
     padding: 1.5rem;
     border-radius: 10px;
@@ -295,6 +297,11 @@ article.blkt-cv:hover .blkt-cv-hlavicka::after {
 .blkt-cv-vlastnost h4 {
     margin: 0 0 0.5rem 0;
     font-weight: 600;
+    color: white; /* Explicitní bílá barva */
+}
+
+.blkt-cv-vlastnost p {
+    color: rgba(255, 255, 255, 0.9); /* Světlejší text pro lepší čitelnost */
 }
 
 /* === CV DYNAMICKÉ STYLY === */
@@ -304,7 +311,7 @@ article.blkt-cv:hover .blkt-cv-hlavicka::after {
     position: fixed;
     bottom: 100px;
     right: 2rem;
-    display: flex;
+    display: none;
     gap: 1rem;
     z-index: 100;
 }
@@ -491,4 +498,194 @@ article.blkt-cv:hover .blkt-cv-hlavicka::after {
     article.blkt-cv {
         margin: 160px auto 120px;
     }
+}
+
+/* === STYLY PRO TISK === */
+@media print {
+    /* Resetujeme pozadí a stíny */
+    * {
+        animation: none !important;
+        transition: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    html, body {
+        background: white !important;
+        height: auto !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Skryjeme nepotřebné elementy */
+    .blkt-hlavicka,
+    .blkt-paticka,
+    .blkt-cv-tlacitka,
+    .blkt-cv-mobilni-menu,
+    .blkt-loader,
+    .blkt-cv-leta-praxe {
+        display: none !important;
+    }
+
+    /* Hlavní wrapper */
+    .blkt-obsah-stranky {
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        height: auto !important;
+    }
+
+    /* Upravíme hlavní kontejner */
+    article.blkt-cv {
+        margin: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        background: white !important;
+        backdrop-filter: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        animation: none !important;
+        overflow: visible !important;
+        height: auto !important;
+        display: block !important;
+        position: static !important;
+    }
+
+    /* Upravíme hlavičku CV */
+    .blkt-cv-hlavicka {
+        background: #667eea !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+        page-break-inside: avoid;
+        break-inside: avoid;
+        padding: 1.5rem !important;
+        margin-bottom: 1rem !important;
+    }
+
+    /* Avatar v hlavičce */
+    .blkt-cv-avatar {
+        width: 100px !important;
+        height: 100px !important;
+    }
+
+    /* Upravíme obsah */
+    .blkt-cv-telo {
+        padding: 0 1rem !important;
+        overflow: visible !important;
+        height: auto !important;
+    }
+
+    /* Upravíme sekce */
+    .blkt-cv-sekce {
+        opacity: 1 !important;
+        transform: none !important;
+        animation: none !important;
+        page-break-inside: auto;
+        margin-bottom: 2rem !important;
+    }
+
+    /* Nadpisy sekcí */
+    .blkt-cv-sekce h2 {
+        page-break-after: avoid;
+        break-after: avoid;
+        margin-bottom: 1rem !important;
+    }
+
+    /* Upravíme pozice */
+    .blkt-cv-pozice {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        transform: none !important;
+        box-shadow: none !important;
+        margin-bottom: 1rem !important;
+        border: 1px solid #ddd !important;
+        padding: 1rem !important;
+    }
+
+    /* Upravíme hover efekty */
+    .blkt-cv-pozice::after,
+    .blkt-cv-hlavicka::after,
+    .blkt-cv-dovednost-skupina::after,
+    .blkt-cv-vlastnost::after,
+    .blkt-cv-tlacitko-tisk::after,
+    .blkt-cv-tlacitko-stahnout::after {
+        display: none !important;
+    }
+
+    /* Upravíme dovednosti a vlastnosti */
+    .blkt-cv-dovednost-skupina,
+    .blkt-cv-vlastnost {
+        transform: none !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    /* Zajistíme správné barvy */
+    .blkt-cv-vlastnost {
+        background: #667eea !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .blkt-cv-tag {
+        background: #667eea !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    /* Kontaktní informace */
+    .blkt-cv-kontakt li {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    /* Přidáme stránkové okraje */
+    @page {
+        margin: 1.5cm;
+        size: A4;
+    }
+
+    /* První stránka */
+    @page :first {
+        margin-top: 1cm;
+    }
+
+    /* Zabraňme zalomení uvnitř důležitých elementů */
+    h3, h4 {
+        page-break-after: avoid;
+        break-after: avoid;
+    }
+
+    ul, ol {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    /* Zajistíme viditelnost všeho obsahu */
+    .blkt-cv-obsah p,
+    .blkt-cv-obsah ul,
+    .blkt-cv-obsah ol,
+    .blkt-cv-obsah li {
+        display: block !important;
+        visibility: visible !important;
+    }
+}
+
+/* Přídavná třída pro tisk */
+body.blkt-tisk-cv {
+    overflow: visible !important;
+}
+
+body.blkt-tisk-cv .blkt-obsah-stranky {
+    overflow: visible !important;
+    height: auto !important;
+}
+
+body.blkt-tisk-cv article.blkt-cv {
+    overflow: visible !important;
+    height: auto !important;
 }

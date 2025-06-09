@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ========================================
-    // 3. TLAČÍTKO PRO TISK CV
+    // 3. TLAČÍTKO PRO TISK CV - OPRAVENÉ PRO CELÝ DOKUMENT
     // ========================================
     function blkt_vytvor_tlacitko_tisk() {
         const tlacitkoKontejner = document.createElement('div');
@@ -58,7 +58,33 @@ document.addEventListener('DOMContentLoaded', () => {
         tiskBtn.innerHTML = '🖨️ Tisknout CV';
 
         tiskBtn.addEventListener('click', () => {
-            window.print();
+            // Uložíme původní styly
+            const cvElement = document.querySelector('article.blkt-cv');
+            const originalHeight = cvElement.style.height;
+            const originalOverflow = cvElement.style.overflow;
+            const bodyOverflow = document.body.style.overflow;
+
+            // Dočasně změníme styly pro tisk
+            cvElement.style.height = 'auto';
+            cvElement.style.overflow = 'visible';
+            document.body.style.overflow = 'visible';
+
+            // Přidáme třídu pro tisk
+            document.body.classList.add('blkt-tisk-cv');
+
+            // Počkáme na překreslení
+            setTimeout(() => {
+                // Spustíme tisk
+                window.print();
+
+                // Obnovíme původní styly
+                setTimeout(() => {
+                    cvElement.style.height = originalHeight;
+                    cvElement.style.overflow = originalOverflow;
+                    document.body.style.overflow = bodyOverflow;
+                    document.body.classList.remove('blkt-tisk-cv');
+                }, 100);
+            }, 100);
         });
 
         tlacitkoKontejner.appendChild(tiskBtn);
@@ -126,12 +152,58 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ========================================
-    // 7. DYNAMICKÉ POČÍTADLO PRO ROKY ZKUŠENOSTÍ
+    // 7. DYNAMICKÉ POČÍTADLO PRO ROKY ZKUŠENOSTÍ - SPRÁVNÝ VÝPOČET
     // ========================================
     function blkt_spocitej_zkusenosti() {
-        const prvniPrace = new Date('2008-07-01');
+        // Najdeme všechny pracovní pozice
+        const vsechnyPozice = document.querySelectorAll('.blkt-cv-pozice .blkt-cv-datum');
+        let nejstarsiRok = null;
+
+        vsechnyPozice.forEach(pozice => {
+            const text = pozice.textContent;
+            // Hledáme všechny roky ve formátu YYYY
+            const rokyMatch = text.match(/\b(19|20)\d{2}\b/g);
+
+            if (rokyMatch && rokyMatch.length > 0) {
+                rokyMatch.forEach(rok => {
+                    const cisloRoku = parseInt(rok);
+                    if (!nejstarsiRok || cisloRoku < nejstarsiRok) {
+                        nejstarsiRok = cisloRoku;
+                    }
+                });
+            }
+        });
+
+        // Pokud jsme nenašli žádný rok, zkusíme najít měsíc/rok
+        if (!nejstarsiRok) {
+            vsechnyPozice.forEach(pozice => {
+                const text = pozice.textContent;
+                // Hledáme formát MM/YYYY
+                const mesicRokMatch = text.match(/\b\d{1,2}\/(\d{4})\b/g);
+
+                if (mesicRokMatch && mesicRokMatch.length > 0) {
+                    mesicRokMatch.forEach(datum => {
+                        const rok = parseInt(datum.split('/')[1]);
+                        if (!nejstarsiRok || rok < nejstarsiRok) {
+                            nejstarsiRok = rok;
+                        }
+                    });
+                }
+            });
+        }
+
+        // Výchozí hodnota, pokud nic nenajdeme
+        if (!nejstarsiRok) {
+            nejstarsiRok = 2008;
+        }
+
         const dnes = new Date();
-        const roky = Math.floor((dnes - prvniPrace) / (365.25 * 24 * 60 * 60 * 1000));
+        const aktualniRok = dnes.getFullYear();
+        const roky = aktualniRok - nejstarsiRok;
+
+        console.log(`[CV] Nalezené roky:`, vsechnyPozice.length, 'pozic');
+        console.log(`[CV] Nejstarší rok: ${nejstarsiRok}`);
+        console.log(`[CV] Počet let praxe: ${roky}`);
 
         const zkusenostiElement = document.createElement('div');
         zkusenostiElement.className = 'blkt-cv-leta-praxe';
@@ -139,11 +211,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const hlavicka = document.querySelector('.blkt-cv-hlavicka');
         if (hlavicka) {
-            hlavicka.style.position = 'relative';
+            // Zkontrolujeme, jestli už element neexistuje
+            const existujici = hlavicka.querySelector('.blkt-cv-leta-praxe');
+            if (existujici) {
+                existujici.remove();
+            }
             hlavicka.appendChild(zkusenostiElement);
         }
-
-        console.log(`[CV] Počet let praxe: ${roky}`);
     }
 
     // ========================================
@@ -178,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ========================================
-    // 9. STAŽENÍ CV JAKO TEXT
+    // 9. STAŽENÍ CV JAKO TEXT - OPRAVENÉ PRO FUNKČNÍ DOWNLOAD
     // ========================================
     function blkt_vytvor_tlacitko_stazeni() {
         const tlacitkoKontejner = document.querySelector('.blkt-cv-tlacitka');
@@ -188,12 +262,22 @@ document.addEventListener('DOMContentLoaded', () => {
         stahnoutBtn.className = 'blkt-cv-tlacitko-stahnout';
         stahnoutBtn.innerHTML = '⬇️ Stáhnout CV';
 
-        stahnoutBtn.addEventListener('click', blkt_stahni_cv_text);
+        stahnoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            blkt_stahni_cv_text();
+        });
+
         tlacitkoKontejner.appendChild(stahnoutBtn);
     }
 
     function blkt_stahni_cv_text() {
-        let text = 'ANTONÍN JEDLIČKA - ŽIVOTOPIS\n';
+        console.log('[CV] Začínám stahování CV');
+
+        // Získáme jméno z hlavičky
+        const jmenoElement = document.querySelector('.blkt-cv-info h1');
+        const jmeno = jmenoElement ? jmenoElement.textContent.trim() : 'CV';
+
+        let text = `${jmeno.toUpperCase()} - ŽIVOTOPIS\n`;
         text += '='.repeat(40) + '\n\n';
 
         // Kontaktní údaje
@@ -216,15 +300,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     const firma = pozice.querySelector('.blkt-cv-firma');
                     const datum = pozice.querySelector('.blkt-cv-datum');
                     const popis = pozice.querySelector('.blkt-cv-popis');
+                    const obsah = pozice.querySelector('.blkt-cv-obsah');
 
                     if (h3) text += '\n' + h3.textContent + '\n';
                     if (firma) text += firma.textContent + '\n';
                     if (datum) text += datum.textContent + '\n';
                     if (popis) text += popis.textContent + '\n';
 
-                    pozice.querySelectorAll('ul li').forEach(li => {
-                        text += '  - ' + li.textContent.trim() + '\n';
-                    });
+                    // Zpracování obsahu s HTML
+                    if (obsah) {
+                        // Převedeme HTML na text
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = obsah.innerHTML;
+
+                        // Zpracujeme seznamy
+                        tempDiv.querySelectorAll('ul li, ol li').forEach(li => {
+                            text += '  - ' + li.textContent.trim() + '\n';
+                        });
+
+                        // Zpracujeme odstavce
+                        tempDiv.querySelectorAll('p').forEach(p => {
+                            const pText = p.textContent.trim();
+                            if (pText && !p.closest('li')) {
+                                text += pText + '\n';
+                            }
+                        });
+                    }
                 });
 
                 // Dovednosti
@@ -233,9 +334,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (h4) {
                         text += '\n' + h4.textContent + ': ';
                         const tags = Array.from(skupina.querySelectorAll('.blkt-cv-tag'))
-                            .map(tag => tag.textContent)
+                            .map(tag => tag.textContent.trim())
                             .join(', ');
                         text += tags + '\n';
+                    }
+
+                    // Pro jazyky
+                    const uroven = skupina.querySelector('p');
+                    if (uroven) {
+                        text += '  Úroveň: ' + uroven.textContent.trim() + '\n';
+                    }
+                });
+
+                // Vlastnosti
+                sekce.querySelectorAll('.blkt-cv-vlastnost').forEach(vlastnost => {
+                    const h4 = vlastnost.querySelector('h4');
+                    const p = vlastnost.querySelector('p');
+
+                    if (h4) {
+                        text += '\n• ' + h4.textContent.trim();
+                        if (p) {
+                            text += ': ' + p.textContent.trim();
+                        }
+                        text += '\n';
                     }
                 });
 
@@ -243,18 +364,60 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Stažení
-        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'antonin_jedlicka_cv.txt';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        // Přidáme datum vygenerování
+        const dnes = new Date();
+        text += '\n\n---\n';
+        text += `Vygenerováno: ${dnes.toLocaleDateString('cs-CZ')} v ${dnes.toLocaleTimeString('cs-CZ')}\n`;
 
-        console.log('[CV] CV staženo jako text');
+        console.log('[CV] Text připraven, délka:', text.length);
+
+        try {
+            // Vytvoření Blob s BOM pro správné UTF-8 kódování
+            const BOM = '\uFEFF';
+            const blob = new Blob([BOM + text], { type: 'text/plain;charset=utf-8' });
+
+            // Vytvoření názvu souboru
+            const safeJmeno = jmeno.toLowerCase()
+                .normalize('NFD')
+                .replace(/\p{Diacritic}/gu, '')
+                .replace(/[^a-z0-9]/g, '_')
+                .replace(/_+/g, '_')
+                .replace(/^_|_$/g, '');
+
+            const nazevSouboru = `${safeJmeno}_zivotopis.txt`;
+
+            // Pokud prohlížeč podporuje download API
+            if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                // Pro IE/Edge
+                window.navigator.msSaveOrOpenBlob(blob, nazevSouboru);
+            } else {
+                // Pro ostatní prohlížeče
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = nazevSouboru;
+                link.style.display = 'none';
+
+                // Přidáme do dokumentu
+                document.body.appendChild(link);
+
+                // Simulujeme kliknutí
+                link.click();
+
+                // Počkáme a pak uklidíme
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                    console.log('[CV] Úklid dokončen');
+                }, 100);
+            }
+
+            console.log('[CV] Stažení spuštěno:', nazevSouboru);
+
+        } catch (error) {
+            console.error('[CV] Chyba při stahování:', error);
+            alert('Nepodařilo se stáhnout CV. Zkuste to prosím znovu.');
+        }
     }
 
     // ========================================
