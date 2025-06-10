@@ -1,5 +1,5 @@
 // admin/js/admin.js
-// Kompletní administrační sekce s AJAX + Tabs + Notifikace
+// Kompletní administrační sekce s AJAX + Tabs + Notifikace + Responsivní záložky
 // Sloučená verze všech funkcí
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -53,6 +53,150 @@ document.addEventListener('DOMContentLoaded', () => {
   // Aktualizace URL bez refreshe
   function blkt_aktualizuj_url(sekce) {
     history.pushState({ sekce }, '', `#${sekce}`);
+  }
+
+  // ============================================
+  // RESPONSIVNÍ ZÁLOŽKY
+  // ============================================
+  function initResponsiveTabs() {
+    const tabsContainer = document.querySelector('.blkt-tabs');
+    if (!tabsContainer) {
+      console.log('initResponsiveTabs() - nenalezen .blkt-tabs');
+      return;
+    }
+
+    console.log('initResponsiveTabs() - začátek');
+
+    // Pokud už existuje wrapper, odstraníme ho (pro případ reinicializace)
+    const existingWrapper = tabsContainer.querySelector('.blkt-tabs-wrapper');
+    if (existingWrapper) {
+      console.log('Odstraňuji existující wrapper');
+      // Přesuneme záložky zpět do kontejneru
+      const tabs = Array.from(existingWrapper.querySelectorAll('button[data-tab]'));
+      tabs.forEach(tab => tabsContainer.appendChild(tab));
+      existingWrapper.remove();
+    }
+
+    // Odstraníme existující more button a dropdown
+    const existingMore = tabsContainer.querySelector('.blkt-tabs-more');
+    const existingDropdown = tabsContainer.querySelector('.blkt-tabs-dropdown');
+    if (existingMore) existingMore.remove();
+    if (existingDropdown) existingDropdown.remove();
+
+    // Vytvoříme wrapper a tlačítko pro více možností
+    const wrapper = document.createElement('div');
+    wrapper.className = 'blkt-tabs-wrapper';
+
+    const moreBtn = document.createElement('button');
+    moreBtn.className = 'blkt-tabs-more';
+    moreBtn.innerHTML = '⋯'; // Tři tečky
+    moreBtn.style.display = 'none';
+
+    const dropdown = document.createElement('div');
+    dropdown.className = 'blkt-tabs-dropdown';
+
+    // Přesuneme všechny záložky do wrapperu
+    const tabs = Array.from(tabsContainer.querySelectorAll('button[data-tab]'));
+    console.log('Počet záložek:', tabs.length);
+
+    tabs.forEach(tab => wrapper.appendChild(tab));
+
+    tabsContainer.appendChild(wrapper);
+    tabsContainer.appendChild(moreBtn);
+    tabsContainer.appendChild(dropdown);
+
+    // Funkce pro kontrolu, které záložky se vejdou
+    function checkTabsOverflow() {
+      console.log('checkTabsOverflow() - začátek');
+
+      if (window.innerWidth <= 500) {
+        // Na mobilu necháme horizontální scroll
+        moreBtn.style.display = 'none';
+        tabs.forEach(tab => tab.style.display = '');
+        return;
+      }
+
+      // Resetujeme zobrazení všech záložek
+      tabs.forEach(tab => {
+        tab.style.display = '';
+      });
+
+      // Počkáme na překreslení
+      requestAnimationFrame(() => {
+        // Získáme skutečnou dostupnou šířku z parent elementu
+        const adminContent = document.querySelector('.admin-content');
+        const contentWidth = adminContent ? adminContent.offsetWidth : window.innerWidth - 220;
+        const containerWidth = contentWidth - 48; // Odečteme padding záložek (2x24px)
+        console.log('Šířka admin-content:', contentWidth, 'Dostupná šířka:', containerWidth);
+
+        let totalWidth = 0;
+        dropdown.innerHTML = '';
+        let hasHiddenTabs = false;
+
+        // Nejdřív všechny záložky odskryjeme
+        tabs.forEach(tab => {
+          tab.style.display = '';
+          tab.classList.remove('blkt-tab-hidden');
+        });
+
+        tabs.forEach((tab, index) => {
+          const tabWidth = tab.offsetWidth;
+          totalWidth += tabWidth + 2; // +2 pro gap
+
+          console.log(`Tab ${index}: šířka=${tabWidth}, celkem=${totalWidth}`);
+
+          if (totalWidth > containerWidth - 60) { // -60 pro tlačítko more
+            // Schováme záložku
+            tab.style.display = 'none';
+            tab.classList.add('blkt-tab-hidden');
+
+            // Přidáme do dropdown
+            const dropdownTab = tab.cloneNode(true);
+            dropdownTab.style.display = 'block';
+            dropdownTab.classList.remove('blkt-tab-hidden');
+
+            // Zkopírujeme třídy včetně active
+            if (tab.classList.contains('active')) {
+              dropdownTab.classList.add('active');
+            }
+
+            dropdownTab.addEventListener('click', () => {
+              tab.click();
+              dropdown.classList.remove('active');
+            });
+
+            dropdown.appendChild(dropdownTab);
+            hasHiddenTabs = true;
+          }
+        });
+
+        moreBtn.style.display = hasHiddenTabs ? 'block' : 'none';
+        console.log('Skryté záložky:', hasHiddenTabs);
+      });
+    }
+
+    // Event listenery
+    moreBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdown.classList.toggle('active');
+    });
+
+    document.addEventListener('click', () => {
+      dropdown.classList.remove('active');
+    });
+
+    // Spustíme kontrolu při načtení
+    checkTabsOverflow();
+
+    // A při změně velikosti okna
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(checkTabsOverflow, 100);
+    });
+
+    // Uložíme funkci pro pozdější použití
+    tabsContainer._checkOverflow = checkTabsOverflow;
   }
 
   // ============================================
@@ -210,6 +354,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabsNav = document.querySelector('.blkt-tabs');
     if (!tabsNav) return;
 
+    console.log('initTabs() - začátek');
+
     const tabs     = Array.from(tabsNav.querySelectorAll('button[data-tab]'));
     const contents = tabs
         .map(t => document.getElementById(`tab-${t.dataset.tab}`))
@@ -221,12 +367,27 @@ document.addEventListener('DOMContentLoaded', () => {
       tab.classList.add('active');
       const pane = document.getElementById(`tab-${tab.dataset.tab}`);
       if (pane) pane.style.display = '';
+
+      // Aktualizujeme i dropdown, pokud existuje
+      const dropdown = tabsNav.querySelector('.blkt-tabs-dropdown');
+      if (dropdown) {
+        dropdown.querySelectorAll('button').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.tab === tab.dataset.tab);
+        });
+      }
     }
 
     tabs.forEach(tab => {
       tab.addEventListener('click', () => activateTab(tab));
     });
+
     if (tabs.length) activateTab(tabs[0]);
+
+    // Inicializujeme responsivní záložky s malým zpožděním pro správné měření
+    setTimeout(() => {
+      console.log('Volám initResponsiveTabs()');
+      initResponsiveTabs();
+    }, 100);
   }
 
   // ============================================
