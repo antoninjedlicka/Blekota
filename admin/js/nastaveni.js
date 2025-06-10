@@ -5,50 +5,67 @@ function initNastaveniSection() {
     console.log('Inicializace sekce nastavení');
 
     const form = document.getElementById('blkt-form-nastaveni');
-    if (!form) return;
+    if (!form) {
+        console.log('Formulář nastavení nenalezen');
+        return;
+    }
+
+    // Odstraníme případné existující event listenery
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
 
     // AJAX odeslání formuláře
-    form.addEventListener('submit', e => {
+    newForm.addEventListener('submit', function(e) {
         e.preventDefault();
+        e.stopPropagation();
 
-        // Zobrazíme indikátor načítání
-        const saveBtn = document.querySelector('.blkt-sticky-save button');
-        const originalText = saveBtn.textContent;
-        saveBtn.textContent = 'Ukládám...';
-        saveBtn.disabled = true;
+        console.log('Odesílám formulář přes AJAX');
+
+        // Sestavíme FormData
+        const formData = new FormData(this);
 
         // Odešleme data
-        fetch(form.action, {
+        fetch(this.action, {
             method: 'POST',
-            body: new FormData(form)
+            body: formData
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Síťová chyba');
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Odpověď serveru:', data);
                 if (data.status === 'ok') {
                     blkt_notifikace('Nastavení bylo úspěšně uloženo.', 'success');
                 } else {
-                    blkt_notifikace('Chyba při ukládání: ' + data.error, 'error');
+                    blkt_notifikace('Chyba při ukládání: ' + (data.error || 'Neznámá chyba'), 'error');
                 }
             })
             .catch(error => {
+                console.error('Chyba:', error);
                 blkt_notifikace('Síťová chyba: ' + error.message, 'error');
-            })
-            .finally(() => {
-                // Obnovíme tlačítko
-                saveBtn.textContent = originalText;
-                saveBtn.disabled = false;
             });
+
+        return false;
     });
 
     // Live náhled barevného schématu (volitelné)
-    const themeSelect = form.querySelector('select[name="THEME"]');
+    const themeSelect = newForm.querySelector('select[name="THEME"]');
     if (themeSelect) {
         themeSelect.addEventListener('change', function() {
-            // Můžete zde přidat náhled barvy
             console.log('Vybrané téma:', this.value);
+            // Zde můžete přidat vizuální náhled tématu
+            // Například změna barvy nějakého elementu na stránce
         });
     }
 }
 
-// Spustíme inicializaci
-initNastaveniSection();
+// Zajistíme, že se funkce spustí až po načtení DOM
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNastaveniSection);
+} else {
+    // DOM je již načten
+    initNastaveniSection();
+}

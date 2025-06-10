@@ -1,7 +1,5 @@
 <?php
 // admin/content/nastaveni.php
-// Hlavní soubor sekce nastavení
-
 require_once __DIR__ . '/../databaze.php';
 ?>
 
@@ -14,7 +12,7 @@ require_once __DIR__ . '/../databaze.php';
 </div>
 
 <div class="blkt-sticky-save">
-    <button type="submit" form="blkt-form-nastaveni" class="btn btn-save">Uložit změny</button>
+    <button type="submit" form="blkt-form-nastaveni" class="btn btn-save">Uložit všechny změny</button>
 </div>
 
 <script defer src="js/nastaveni.js"></script>

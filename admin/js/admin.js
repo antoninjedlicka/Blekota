@@ -423,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (prev) prev.remove();
 
     // Pro některé sekce nepotřebujeme speciální JS
-    const sectionsWithoutJS = ['nastaveni'];
+    const sectionsWithoutJS = []; // Odstraníme 'nastaveni' z tohoto pole
     if (sectionsWithoutJS.includes(section)) {
       console.log(`Sekce ${section} nemá vlastní JS`);
       return;
@@ -436,7 +436,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     script.onload = () => {
       console.log(`Script ${section}.js načten`);
+
+      // Pro sekci nastavení zavoláme inicializaci manuálně
+      if (section === 'nastaveni' && typeof initNastaveniSection === 'function') {
+        initNastaveniSection();
+      }
     };
+
     script.onerror = () => {
       console.warn(`Soubor js/${section}.js neexistuje nebo se nepodařilo načíst`);
     };
