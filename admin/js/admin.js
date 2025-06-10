@@ -1,19 +1,16 @@
 // admin/js/admin.js
-// Kompletní administrační sekce s AJAX + Tabs + Notifikace + Responsivní záložky
+// Kompletní administrační sekce s AJAX + Tabs + Notifikace + Responsivní záložky + LOADER
 // Sloučená verze všech funkcí
 
 document.addEventListener('DOMContentLoaded', () => {
-  // ====================
-// Admin Loader - JS
-// ====================
-// Přidej tento kód na začátek admin/js/admin.js (hned za DOMContentLoaded)
-
-// Loader systém
+  // ============================================
+  // LOADER SYSTÉM - HNED NA ZAČÁTKU
+  // ============================================
   const AdminLoader = {
     element: null,
     progressBar: null,
     progress: 0,
-    isActive: true,
+    isActive: false,
 
     init() {
       this.element = document.getElementById('blkt-admin-loader');
@@ -29,22 +26,17 @@ document.addEventListener('DOMContentLoaded', () => {
     },
 
     simulateProgress() {
-      // Rychlý start
+      // Pomalejší průběh pro lepší viditelnost
       this.setProgress(20);
 
-      // Postupné načítání
-      setTimeout(() => this.setProgress(40), 300);
-      setTimeout(() => this.setProgress(60), 600);
-      setTimeout(() => this.setProgress(80), 900);
+      // Postupné načítání rozložené do 1 sekundy
+      setTimeout(() => this.setProgress(40), 200);
+      setTimeout(() => this.setProgress(60), 400);
+      setTimeout(() => this.setProgress(80), 600);
+      setTimeout(() => this.setProgress(95), 800);
 
-      // Dokončení po načtení DOM
-      if (document.readyState === 'complete') {
-        setTimeout(() => this.complete(), 1200);
-      } else {
-        window.addEventListener('load', () => {
-          setTimeout(() => this.complete(), 500);
-        });
-      }
+      // Dokončení vždy po 1 sekundě
+      setTimeout(() => this.complete(), 1000);
     },
 
     setProgress(percent) {
@@ -57,9 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
     complete() {
       this.setProgress(100);
 
+      // Počkáme chvilku na 100% než skryjeme
       setTimeout(() => {
         this.hide();
-      }, 300);
+      }, 200);
     },
 
     show() {
@@ -88,36 +81,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-// Inicializace loaderu
+  // Inicializace loaderu
   AdminLoader.init();
 
-// Upravená funkce loadSection pro zobrazení loaderu
-  const originalLoadSection = window.loadSection || function() {};
-
-  window.loadSection = function(section, updateUrl = true) {
-    // Zobrazíme loader před načtením sekce
-    AdminLoader.show();
-
-    // Zavoláme původní funkci
-    const result = originalLoadSection.call(this, section, updateUrl);
-
-    // Skryjeme loader po načtení
-    setTimeout(() => {
-      AdminLoader.hide();
-    }, 1000);
-
-    return result;
-  };
-
-// Při AJAX operacích můžeme loader použít také
+  // Globální funkce pro loader
   window.showAdminLoader = () => AdminLoader.show();
   window.hideAdminLoader = () => AdminLoader.hide();
 
-// Příklad použití pro AJAX operace:
-// showAdminLoader();
-// fetch(url).then(() => {
-//   hideAdminLoader();
-// });
+  // ============================================
+  // PROMĚNNÉ A INICIALIZACE
+  // ============================================
   const menuItems    = document.querySelectorAll('.menu-item');
   const adminSection = document.getElementById('admin-section');
   let currentSection = 'dashboard';
@@ -310,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
       dropdown.classList.remove('active');
     });
 
-// Spustíme kontrolu s malým zpožděním pro jistotu správného vykreslení
+    // Spustíme kontrolu s malým zpožděním pro jistotu správného vykreslení
     setTimeout(() => {
       checkTabsOverflow();
       // Ještě jednou po delší době pro jistotu
@@ -538,7 +511,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (prev) prev.remove();
 
     // Pro některé sekce nepotřebujeme speciální JS
-    const sectionsWithoutJS = []; // Odstraníme 'nastaveni' z tohoto pole
+    const sectionsWithoutJS = ['nastaveni'];
     if (sectionsWithoutJS.includes(section)) {
       console.log(`Sekce ${section} nemá vlastní JS`);
       return;
@@ -551,13 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     script.onload = () => {
       console.log(`Script ${section}.js načten`);
-
-      // Pro sekci nastavení zavoláme inicializaci manuálně
-      if (section === 'nastaveni' && typeof initNastaveniSection === 'function') {
-        initNastaveniSection();
-      }
     };
-
     script.onerror = () => {
       console.warn(`Soubor js/${section}.js neexistuje nebo se nepodařilo načíst`);
     };
@@ -566,10 +533,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================
-  // 5) Načtení a vykreslení sekce
+  // 5) Načtení a vykreslení sekce S LOADEREM
   // ============================================
   function loadSection(section, updateUrl = true) {
     currentSection = section;
+
+    // Zobrazíme loader
+    AdminLoader.show();
 
     // Aktualizuj URL pouze pokud je to žádoucí
     if (updateUrl) {
@@ -581,7 +551,12 @@ document.addEventListener('DOMContentLoaded', () => {
       item.classList.toggle('active', item.dataset.section === section);
     });
 
-    adminSection.innerHTML = '<p style="text-align: center; padding: 60px 20px;">Načítám obsah zvolené sekce... momentíček!</p>';
+    // Nejdřív skryjeme obsah
+    adminSection.style.opacity = '0';
+
+    // Minimální doba zobrazení loaderu (1 sekunda)
+    const minLoaderTime = 1000;
+    const startTime = Date.now();
 
     fetch(`content/${section}.php`)
         .then(r => {
@@ -589,26 +564,37 @@ document.addEventListener('DOMContentLoaded', () => {
           return r.text();
         })
         .then(html => {
-          adminSection.innerHTML = html;
-          initTabs();
-          loadSectionScript(section);
+          // Počkáme na minimální dobu loaderu
+          const elapsedTime = Date.now() - startTime;
+          const remainingTime = Math.max(0, minLoaderTime - elapsedTime);
 
-          // Speciální inicializace pro příspěvky
-          if (section === 'prispevky') {
-            initPostsSection();
-          }
-          // Speciální inicializace pro uživatele
-          else if (section === 'uzivatele') {
-            initUsersSection();
-          }
-          // Speciální inicializace pro obrázky
-          else if (section === 'obrazky') {
-            initImagesSection();
-          }
+          setTimeout(() => {
+            adminSection.innerHTML = html;
+            adminSection.style.opacity = '1';
+            initTabs();
+            loadSectionScript(section);
+
+            // Speciální inicializace pro příspěvky
+            if (section === 'prispevky') {
+              initPostsSection();
+            }
+            // Speciální inicializace pro uživatele
+            else if (section === 'uzivatele') {
+              initUsersSection();
+            }
+            // Speciální inicializace pro obrázky
+            else if (section === 'obrazky') {
+              initImagesSection();
+            }
+
+            // Loader se skryje automaticky po dokončení simulace
+          }, remainingTime);
         })
         .catch(e => {
           adminSection.innerHTML = `<p class="error-message">Chyba: ${e.message}</p>`;
+          adminSection.style.opacity = '1';
           blkt_notifikace('Nepodařilo se načíst sekci', 'error');
+          AdminLoader.hide();
         });
   }
 
