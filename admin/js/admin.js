@@ -3,6 +3,121 @@
 // Sloučená verze všech funkcí
 
 document.addEventListener('DOMContentLoaded', () => {
+  // ====================
+// Admin Loader - JS
+// ====================
+// Přidej tento kód na začátek admin/js/admin.js (hned za DOMContentLoaded)
+
+// Loader systém
+  const AdminLoader = {
+    element: null,
+    progressBar: null,
+    progress: 0,
+    isActive: true,
+
+    init() {
+      this.element = document.getElementById('blkt-admin-loader');
+      this.progressBar = document.querySelector('.blkt-loader-progress-bar');
+
+      if (!this.element) {
+        console.warn('Admin loader element not found');
+        return;
+      }
+
+      // Skryjeme loader po inicializaci (zobrazí se jen při přepínání sekcí)
+      this.hide();
+    },
+
+    simulateProgress() {
+      // Rychlý start
+      this.setProgress(20);
+
+      // Postupné načítání
+      setTimeout(() => this.setProgress(40), 300);
+      setTimeout(() => this.setProgress(60), 600);
+      setTimeout(() => this.setProgress(80), 900);
+
+      // Dokončení po načtení DOM
+      if (document.readyState === 'complete') {
+        setTimeout(() => this.complete(), 1200);
+      } else {
+        window.addEventListener('load', () => {
+          setTimeout(() => this.complete(), 500);
+        });
+      }
+    },
+
+    setProgress(percent) {
+      this.progress = percent;
+      if (this.progressBar) {
+        this.progressBar.style.width = percent + '%';
+      }
+    },
+
+    complete() {
+      this.setProgress(100);
+
+      setTimeout(() => {
+        this.hide();
+      }, 300);
+    },
+
+    show() {
+      if (!this.element) return;
+
+      this.isActive = true;
+      this.element.classList.remove('hidden');
+      this.setProgress(0);
+
+      // Reset animace
+      setTimeout(() => {
+        this.simulateProgress();
+      }, 100);
+    },
+
+    hide() {
+      if (!this.element || !this.isActive) return;
+
+      this.isActive = false;
+      this.element.classList.add('hidden');
+
+      // Reset progress po skrytí
+      setTimeout(() => {
+        this.setProgress(0);
+      }, 500);
+    }
+  };
+
+// Inicializace loaderu
+  AdminLoader.init();
+
+// Upravená funkce loadSection pro zobrazení loaderu
+  const originalLoadSection = window.loadSection || function() {};
+
+  window.loadSection = function(section, updateUrl = true) {
+    // Zobrazíme loader před načtením sekce
+    AdminLoader.show();
+
+    // Zavoláme původní funkci
+    const result = originalLoadSection.call(this, section, updateUrl);
+
+    // Skryjeme loader po načtení
+    setTimeout(() => {
+      AdminLoader.hide();
+    }, 1000);
+
+    return result;
+  };
+
+// Při AJAX operacích můžeme loader použít také
+  window.showAdminLoader = () => AdminLoader.show();
+  window.hideAdminLoader = () => AdminLoader.hide();
+
+// Příklad použití pro AJAX operace:
+// showAdminLoader();
+// fetch(url).then(() => {
+//   hideAdminLoader();
+// });
   const menuItems    = document.querySelectorAll('.menu-item');
   const adminSection = document.getElementById('admin-section');
   let currentSection = 'dashboard';
