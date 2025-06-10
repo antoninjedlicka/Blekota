@@ -34,7 +34,7 @@ foreach ($vsechny_polozky as $polozka) {
 </nav>
 
 <!-- WRAPPER PRO SPRÁVNÉ ROZLOŽENÍ -->
-<div class="blkt-zivotopis-wrapper">
+<!--<div class="blkt-zivotopis-wrapper">-->
 
     <!-- FORMULÁŘ -->
     <form id="blkt-form-zivotopis" method="post" action="action/save_zivotopis.php">
@@ -74,6 +74,6 @@ foreach ($vsechny_polozky as $polozka) {
         <button type="submit" form="blkt-form-zivotopis" class="btn btn-save">Uložit všechny změny</button>
     </div>
 
-</div>
+<!--</div>-->
 
 <script defer src="js/zivotopis.js"></script>

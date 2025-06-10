@@ -123,29 +123,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Počkáme na překreslení
       requestAnimationFrame(() => {
-        // Získáme skutečnou dostupnou šířku z parent elementu
-        const adminContent = document.querySelector('.admin-content');
-        const contentWidth = adminContent ? adminContent.offsetWidth : window.innerWidth - 220;
-        const containerWidth = contentWidth - 48; // Odečteme padding záložek (2x24px)
-        console.log('Šířka admin-content:', contentWidth, 'Dostupná šířka:', containerWidth);
+        // OPRAVA: Získáme skutečnou šířku přímo z tabs kontejneru
+        const tabsRect = tabsContainer.getBoundingClientRect();
+        const containerWidth = tabsRect.width - 48; // Odečteme padding záložek (2x24px)
+
+        console.log('Šířka tabs kontejneru:', tabsRect.width, 'Dostupná šířka:', containerWidth);
 
         let totalWidth = 0;
         dropdown.innerHTML = '';
         let hasHiddenTabs = false;
 
-        // Nejdřív všechny záložky odskryjeme
+        // Nejdřív všechny záložky zobrazíme pro správné měření
         tabs.forEach(tab => {
           tab.style.display = '';
           tab.classList.remove('blkt-tab-hidden');
         });
 
+        // Změříme skutečné rozměry každé záložky
+        const tabSizes = tabs.map(tab => {
+          const rect = tab.getBoundingClientRect();
+          return rect.width;
+        });
+
+        // DŮLEŽITÁ ZMĚNA: Přidáme větší rezervu pro tlačítko more a bezpečnostní prostor
+        const moreButtonReserve = 100; // Zvýšíme z 60 na 100px
+
+        // Teď procházíme a schovávame ty, které se nevejdou
         tabs.forEach((tab, index) => {
-          const tabWidth = tab.offsetWidth;
+          const tabWidth = tabSizes[index];
           totalWidth += tabWidth + 2; // +2 pro gap
 
           console.log(`Tab ${index}: šířka=${tabWidth}, celkem=${totalWidth}`);
 
-          if (totalWidth > containerWidth - 60) { // -60 pro tlačítko more
+          if (totalWidth > containerWidth - moreButtonReserve) { // Použijeme větší rezervu
             // Schováme záložku
             tab.style.display = 'none';
             tab.classList.add('blkt-tab-hidden');
@@ -185,8 +195,14 @@ document.addEventListener('DOMContentLoaded', () => {
       dropdown.classList.remove('active');
     });
 
-    // Spustíme kontrolu při načtení
-    checkTabsOverflow();
+// Spustíme kontrolu s malým zpožděním pro jistotu správného vykreslení
+    setTimeout(() => {
+      checkTabsOverflow();
+      // Ještě jednou po delší době pro jistotu
+      setTimeout(() => {
+        checkTabsOverflow();
+      }, 200);
+    }, 50);
 
     // A při změně velikosti okna
     let resizeTimeout;
@@ -387,6 +403,15 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
       console.log('Volám initResponsiveTabs()');
       initResponsiveTabs();
+
+      // Ještě jednou zavoláme kontrolu po delším čase pro jistotu
+      setTimeout(() => {
+        const tabsContainer = document.querySelector('.blkt-tabs');
+        if (tabsContainer && tabsContainer._checkOverflow) {
+          console.log('Dodatečná kontrola záložek');
+          tabsContainer._checkOverflow();
+        }
+      }, 300);
     }, 100);
   }
 
