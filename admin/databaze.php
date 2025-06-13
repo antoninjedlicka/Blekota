@@ -37,33 +37,6 @@ function blkt_drop_table_uzivatele(): void {
 }
 
 /**
- * Vloží nového uživatele.
- *
- * @param array $data ['jmeno','prijmeni','mail','heslo','stav','admin']
- * @param array $data
- * @return int ID vloženého záznamu
- *
-* function blkt_insert_uzivatel(array $data): int {
-    * $pdo = blkt_db_connect();
-    * $stmt = $pdo->prepare("
-      * INSERT INTO blkt_uzivatele
-        * (blkt_jmeno, blkt_prijmeni, blkt_mail, blkt_heslo, blkt_stav, blkt_admin)
-      * VALUES
-        * (:jmeno, :prijmeni, :mail, :heslo, :stav, :admin)
-    * ");
-    * $stmt->execute([
-        * ':jmeno'    => $data['jmeno'],
-        * ':prijmeni' => $data['prijmeni'],
-        * ':mail'     => $data['mail'],
-        * ':heslo'    => password_hash($data['heslo'], PASSWORD_DEFAULT),
-        * ':stav'     => $data['stav'] ? 1 : 0,
-        * ':admin'    => $data['admin'] ? 1 : 0,
- * ]);
- * return (int)$pdo->lastInsertId();
-* }
- * /
- *
-* /**
  * Bezpečné vložení uživatele s validací
  * @return int
  * @throws Exception
@@ -133,6 +106,7 @@ function blkt_create_indexes(): void {
     // Index pro obrázky
     $pdo->exec("CREATE INDEX IF NOT EXISTS idx_created ON blkt_images(blkt_created_at DESC)");
 }
+
 /**
  * Aktualizuje existujícího uživatele podle ID.
  *
@@ -323,6 +297,7 @@ function blkt_vytvor_tabku_obrazku(): void {
 
 /**
  * Vloží nový obrázek do databáze a nahraje soubor
+ * NOVÁ VERZE: Automaticky konvertuje všechny obrázky na WebP
  */
 function blkt_vloz_obrazek(array $file, string $title = '', string $alt = '', string $description = ''): int {
     $pdo = blkt_db_connect();
@@ -368,11 +343,11 @@ function blkt_vloz_obrazek(array $file, string $title = '', string $alt = '', st
         throw new Exception('Nepodporovaný formát obrázku. Povolené jsou pouze JPG, PNG, GIF, WebP a SVG.');
     }
 
-    // Získání správné přípony podle MIME typu
-    $ext = $allowedMimes[$mimeType];
+    // SVG necháme tak jak jsou (nekonvertujeme na WebP)
+    $isSvg = in_array($mimeType, ['image/svg+xml', 'image/svg', 'text/xml', 'application/svg+xml', 'application/xml']);
 
-    // Další kontrola - ověření, že jde skutečně o obrázek (kromě SVG)
-    if (!in_array($mimeType, ['image/svg+xml', 'image/svg', 'text/xml', 'application/svg+xml', 'application/xml'])) {
+    if (!$isSvg) {
+        // Další kontrola - ověření, že jde skutečně o obrázek
         $imageInfo = @getimagesize($file['tmp_name']);
         if ($imageInfo === false) {
             throw new Exception('Nahraný soubor není platný obrázek.');
@@ -408,8 +383,8 @@ function blkt_vloz_obrazek(array $file, string $title = '', string $alt = '', st
         }
     }
 
-    // Cesty - OPRAVA: správná cesta
-    $baseDir = dirname(__DIR__) . '/media/upload'; // Jdeme o 1 úroveň nahoru z admin/databaze.php
+    // Cesty
+    $baseDir = dirname(__DIR__) . '/media/upload';
     $year = date('Y');
     $month = date('m');
     $yearDir = "$baseDir/$year";
@@ -443,6 +418,9 @@ function blkt_vloz_obrazek(array $file, string $title = '', string $alt = '', st
         throw new Exception("Cílová složka není zapisovatelná.");
     }
 
+    // Pro SVG použijeme původní příponu, pro ostatní WebP
+    $ext = $isSvg ? $allowedMimes[$mimeType] : 'webp';
+
     // Generování bezpečného názvu souboru
     $filename = bin2hex(random_bytes(16)) . '.' . $ext;
     $dest = $monthDir . '/' . $filename;
@@ -457,21 +435,20 @@ function blkt_vloz_obrazek(array $file, string $title = '', string $alt = '', st
         throw new Exception("Neplatný dočasný soubor.");
     }
 
-    // Přesun souboru
-    if (!move_uploaded_file($file['tmp_name'], $dest)) {
-        throw new Exception("Nepodařilo se uložit soubor.");
+    // Pro SVG jen přesuneme soubor
+    if ($isSvg) {
+        if (!move_uploaded_file($file['tmp_name'], $dest)) {
+            throw new Exception("Nepodařilo se uložit soubor.");
+        }
+    } else {
+        // Pro ostatní obrázky provedeme konverzi na WebP
+        if (!blkt_konvertuj_na_webp($file['tmp_name'], $dest, $mimeType)) {
+            throw new Exception("Nepodařilo se převést obrázek na WebP formát.");
+        }
     }
 
     // Nastavení správných práv
     chmod($dest, 0644);
-
-    // Optimalizace obrázku (volitelné)
-    try {
-        blkt_optimalizuj_obrazek($dest, $mimeType);
-    } catch (Exception $e) {
-        // Pokud optimalizace selže, pokračujeme bez ní
-        error_log("Image optimization failed: " . $e->getMessage());
-    }
 
     // Sanitizace vstupních dat
     $title = substr(trim($title), 0, 255);
@@ -498,36 +475,33 @@ function blkt_vloz_obrazek(array $file, string $title = '', string $alt = '', st
 }
 
 /**
- * Optimalizace obrázku
- * @param string $path Cesta k obrázku
- * @param string $mimeType MIME typ
+ * Konvertuje obrázek na WebP formát s optimalizací
+ * @param string $source Cesta ke zdrojovému souboru
+ * @param string $destination Cílová cesta pro WebP
+ * @param string $mimeType MIME typ zdrojového souboru
+ * @return bool
  */
-function blkt_optimalizuj_obrazek(string $path, string $mimeType): void {
-    // SVG nepotřebuje optimalizaci
-    if (in_array($mimeType, ['image/svg+xml', 'image/svg', 'text/xml', 'application/svg+xml', 'application/xml'])) {
-        return;
-    }
-
-    // Načtení obrázku
+function blkt_konvertuj_na_webp(string $source, string $destination, string $mimeType): bool {
+    // Načtení obrázku podle typu
     switch ($mimeType) {
         case 'image/jpeg':
-            $image = imagecreatefromjpeg($path);
+            $image = imagecreatefromjpeg($source);
             break;
         case 'image/png':
-            $image = imagecreatefrompng($path);
+            $image = imagecreatefrompng($source);
             break;
         case 'image/gif':
-            $image = imagecreatefromgif($path);
+            $image = imagecreatefromgif($source);
             break;
         case 'image/webp':
-            $image = imagecreatefromwebp($path);
-            break;
+            // Pokud je už WebP, jen zkopírujeme
+            return copy($source, $destination);
         default:
-            return;
+            return false;
     }
 
     if (!$image) {
-        return;
+        return false;
     }
 
     // Získání rozměrů
@@ -543,8 +517,9 @@ function blkt_optimalizuj_obrazek(string $path, string $mimeType): void {
 
         $newImage = imagecreatetruecolor($newWidth, $newHeight);
 
-        // Zachování průhlednosti pro PNG a WebP
-        if ($mimeType === 'image/png' || $mimeType === 'image/webp') {
+        // Zachování průhlednosti pro PNG
+        if ($mimeType === 'image/png' || $mimeType === 'image/gif') {
+            imagepalettetotruecolor($image);
             imagealphablending($newImage, false);
             imagesavealpha($newImage, true);
             $transparent = imagecolorallocatealpha($newImage, 255, 255, 255, 127);
@@ -554,29 +529,28 @@ function blkt_optimalizuj_obrazek(string $path, string $mimeType): void {
         imagecopyresampled($newImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
         imagedestroy($image);
         $image = $newImage;
+    } else {
+        // I když nezmenšujeme, zajistíme správnou práci s průhledností
+        if ($mimeType === 'image/png' || $mimeType === 'image/gif') {
+            imagepalettetotruecolor($image);
+            imagealphablending($image, false);
+            imagesavealpha($image, true);
+        }
     }
 
-    // Uložení optimalizovaného obrázku
-    switch ($mimeType) {
-        case 'image/jpeg':
-            imagejpeg($image, $path, 85); // 85% kvalita
-            break;
-        case 'image/png':
-            imagepng($image, $path, 6); // Komprese 6
-            break;
-        case 'image/gif':
-            imagegif($image, $path);
-            break;
-        case 'image/webp':
-            imagewebp($image, $path, 85); // 85% kvalita
-            break;
-    }
+    // Uložení jako WebP
+    // Kvalita 85 je dobrý kompromis mezi velikostí a kvalitou
+    $quality = 85;
+    $result = imagewebp($image, $destination, $quality);
 
     imagedestroy($image);
+
+    return $result;
 }
 
 /**
  * Aktualizuje metadata obrázku a volitelně nahradí soubor
+ * UPRAVENÁ VERZE: Podporuje konverzi na WebP při aktualizaci
  */
 function blkt_uprav_obrazek(int $id, string $title = '', string $alt = '', string $description = '', ?array $file = null): bool {
     $pdo = blkt_db_connect();
@@ -594,7 +568,6 @@ function blkt_uprav_obrazek(int $id, string $title = '', string $alt = '', strin
         $stmt0->execute([':id' => $id]);
         $old = $stmt0->fetchColumn();
 
-        // Použijeme stejnou logiku jako u vložení
         // Kontrola MIME typu
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->file($file['tmp_name']);
@@ -615,7 +588,8 @@ function blkt_uprav_obrazek(int $id, string $title = '', string $alt = '', strin
             throw new Exception('Nepodporovaný formát obrázku.');
         }
 
-        $ext = $allowedMimes[$mimeType];
+        $isSvg = in_array($mimeType, ['image/svg+xml', 'image/svg', 'text/xml', 'application/svg+xml', 'application/xml']);
+        $ext = $isSvg ? $allowedMimes[$mimeType] : 'webp';
 
         // Cesty
         $baseDir = dirname(__DIR__) . '/media/upload';
@@ -634,18 +608,17 @@ function blkt_uprav_obrazek(int $id, string $title = '', string $alt = '', strin
         $filename = bin2hex(random_bytes(16)) . '.' . $ext;
         $dest = $monthDir . '/' . $filename;
 
-        if (!move_uploaded_file($file['tmp_name'], $dest)) {
-            throw new Exception('Nepodařilo se uložit nový soubor.');
+        if ($isSvg) {
+            if (!move_uploaded_file($file['tmp_name'], $dest)) {
+                throw new Exception('Nepodařilo se uložit nový soubor.');
+            }
+        } else {
+            if (!blkt_konvertuj_na_webp($file['tmp_name'], $dest, $mimeType)) {
+                throw new Exception('Nepodařilo se převést obrázek na WebP formát.');
+            }
         }
 
         chmod($dest, 0644);
-
-        // Optimalizace
-        try {
-            blkt_optimalizuj_obrazek($dest, $mimeType);
-        } catch (Exception $e) {
-            error_log("Image optimization failed: " . $e->getMessage());
-        }
 
         // Smažeme starý soubor
         if ($old) {
@@ -671,6 +644,15 @@ function blkt_uprav_obrazek(int $id, string $title = '', string $alt = '', strin
 
     $stmt = $pdo->prepare($sql);
     return $stmt->execute($params);
+}
+
+/**
+ * Původní funkce optimalizace obrázku - již není potřeba, ale ponecháváme pro zpětnou kompatibilitu
+ * @deprecated Použijte blkt_konvertuj_na_webp místo této funkce
+ */
+function blkt_optimalizuj_obrazek(string $path, string $mimeType): void {
+    // Tato funkce už není potřeba, protože optimalizaci provádíme přímo při konverzi na WebP
+    return;
 }
 
 /**
@@ -1011,3 +993,4 @@ function blkt_delete_zivotopis_typ(string $typ): bool {
         ->prepare("DELETE FROM blkt_zivotopis WHERE blkt_typ = :typ")
         ->execute([':typ' => $typ]);
 }
+?>

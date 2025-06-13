@@ -77,7 +77,6 @@ $pageTitle = 'Blog';
 
 <footer class="blkt-paticka">
     <?php include __DIR__ . '/includes/footer.php'; ?>
-    <script src="/js/blog.js"></script>
 </footer>
 <?php include 'includes/loader.php'; ?>
 </body>

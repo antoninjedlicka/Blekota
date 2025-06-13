@@ -228,7 +228,6 @@ $pageTitle = ($zakladni['cv_jmeno'] ?: 'Životopis') . ' - CV';
 </footer>
 
 <?php include __DIR__ . '/includes/loader.php'; ?>
-<script src="/js/cv.js"></script>
 
 </body>
 </html>

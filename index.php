@@ -86,7 +86,6 @@ $pageContent = ob_get_clean();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blekota</title>
-    <link rel="stylesheet" href="/css/loader.css">
     <!-- Preconnect pro fonty -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -98,7 +97,12 @@ $pageContent = ob_get_clean();
 
 <?= $pageContent; ?>
 
-<script src="/js/loader.js"></script>
+<!-- SPA navigace -->
+<script src="/js/main.js"></script>
 
+<!-- Přidej data atribut na body pro detekci SPA -->
+<script>
+    document.body.setAttribute('data-spa-enabled', 'true');
+</script>
 </body>
 </html>
