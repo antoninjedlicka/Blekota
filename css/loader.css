@@ -261,28 +261,3 @@
 .blkt-loader-spinner {
     display: none;
 }
-
-/* Přidej tyto styly do svého css/loader.css */
-
-/* Ujisti se, že loader má správné blur pozadí */
-.blkt-loader {
-    background: rgba(255, 255, 255, 0.4) !important; /* Průhledné bílé pozadí */
-    backdrop-filter: blur(20px) !important; /* Silný blur efekt */
-    -webkit-backdrop-filter: blur(20px) !important;
-    transition: opacity 0.3s ease !important; /* Rychlá transition */
-}
-
-/* Wrapper má vlastní transition pro fade-in */
-.blkt-loader-wrapper {
-    transition: opacity 0.5s ease;
-}
-
-/* Když je wrapper skrytý pomocí display: none, žádná transition */
-.blkt-loader-wrapper[style*="display: none"] {
-    transition: none !important;
-}
-
-/* Pro jistotu - skryjeme vše uvnitř wrapperu když je skrytý */
-.blkt-loader-wrapper[style*="display: none"] * {
-    display: none !important;
-}

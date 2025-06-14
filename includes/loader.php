@@ -73,4 +73,5 @@
     </div>
 </div>
 
-<script src="/js/main.js" defer></script>
+<script src="/js/loader.js" defer></script>
+<script src="/js/intro.js" defer></script>
