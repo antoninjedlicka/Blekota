@@ -43,13 +43,11 @@ function initObrazkySection() {
   function bindPrehled() {
     // Přidat nový
     const addBtn = document.getElementById('blkt-add-image-btn');
-    if (addBtn) {
-      addBtn.onclick = () => {
-        currentData = {};
-        activateTab('editor');
-        bindEditor();
-      };
-    }
+    if (addBtn) addBtn.onclick = () => {
+      currentData = {};
+      activateTab('editor');
+      bindEditor();
+    };
 
     // Upravit
     document.querySelectorAll('.blkt-image-card button[data-action="edit"]')
@@ -123,30 +121,8 @@ function initObrazkySection() {
     const descIn    = document.getElementById('blkt-description');
     const cancelBtn = document.getElementById('blkt-image-cancel');
 
-    // Kontrola existence elementů
-    if (!form || !fileIn || !zone) {
-      console.error('Chybí potřebné elementy pro editor');
-      return;
-    }
-
-    // DŮLEŽITÉ: Odstraníme všechny existující event listenery pomocí klonování
-    // To je nejspolehlivější způsob
-    const newZone = zone.cloneNode(true);
-    zone.parentNode.replaceChild(newZone, zone);
-
-    const newForm = form.cloneNode(true);
-    form.parentNode.replaceChild(newForm, form);
-
-    // Znovu získáme reference po klonování
-    const zoneElement = document.getElementById('blkt-upload-zone');
-    const formElement = document.getElementById('blkt-image-form');
-    const fileInput = document.getElementById('blkt-file-input');
-    const cancelButton = document.getElementById('blkt-image-cancel');
-
     // Zrušit → Přehled
-    if (cancelButton) {
-      cancelButton.onclick = () => activateTab('prehled');
-    }
+    if (cancelBtn) cancelBtn.onclick = () => activateTab('prehled');
 
     // Drag&Drop + click
     function handleFile(file) {
@@ -155,50 +131,46 @@ function initObrazkySection() {
       reader.onload = e => {
         preview.src           = e.target.result;
         preview.style.display = 'block';
-        zoneElement.style.display    = 'none';
+        zone.style.display    = 'none';
         origIn.value          = file.name;
       };
       reader.readAsDataURL(file);
     }
 
-    // Click handler pro zónu - jednoduchý a přímý
-    zoneElement.onclick = (e) => {
-      e.preventDefault();
-      console.log('Zone clicked, opening file dialog');
-      fileInput.click();
-    };
+    if (zone) {
+      zone.onclick = e => {
+        e.preventDefault();
+        fileIn.click();
+      };
 
-    // Drag events
-    zoneElement.ondragenter = zoneElement.ondragover = (e) => {
-      e.preventDefault();
-      zoneElement.classList.add('blkt-upload-over');
-    };
+      ['dragenter','dragover'].forEach(evt=>
+          zone.addEventListener(evt,e=>{ e.preventDefault(); zone.classList.add('blkt-upload-over'); })
+      );
+      ['dragleave'].forEach(evt=>
+          zone.addEventListener(evt,e=>{ e.preventDefault(); zone.classList.remove('blkt-upload-over'); })
+      );
+      zone.addEventListener('drop',e=>{
+        e.preventDefault();
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          handleFile(files[0]);
+          // Nastavíme soubor do file inputu pomocí DataTransfer
+          const dt = new DataTransfer();
+          dt.items.add(files[0]);
+          fileIn.files = dt.files;
+        }
+        zone.classList.remove('blkt-upload-over');
+      });
+    }
 
-    zoneElement.ondragleave = (e) => {
-      e.preventDefault();
-      zoneElement.classList.remove('blkt-upload-over');
-    };
-
-    zoneElement.ondrop = (e) => {
-      e.preventDefault();
-      zoneElement.classList.remove('blkt-upload-over');
-      const files = e.dataTransfer.files;
-      if (files.length > 0) {
-        handleFile(files[0]);
-        // Nastavíme soubor do file inputu
-        const dt = new DataTransfer();
-        dt.items.add(files[0]);
-        fileInput.files = dt.files;
-      }
-    };
-
-    // File input change - jednoduchý handler
-    fileInput.onchange = function() {
-      console.log('fileIn onchange', this.files);
-      if (this.files && this.files.length > 0) {
-        handleFile(this.files[0]);
-      }
-    };
+    if (fileIn) {
+      fileIn.onchange = () => {
+        console.log('fileIn onchange', fileIn.files);
+        if (fileIn.files.length > 0) {
+          handleFile(fileIn.files[0]);
+        }
+      };
+    }
 
     // Naplnit / reset
     if (currentData.id) {
@@ -209,36 +181,23 @@ function initObrazkySection() {
       titleIn.value  = currentData.title;
       altIn.value    = currentData.alt;
       descIn.value   = currentData.desc;
-      zoneElement.style.display    = 'none';
+      zone.style.display    = 'none';
     } else {
-      formElement.reset();
+      form.reset();
       preview.style.display = 'none';
-      zoneElement.style.display    = 'block';
+      zone.style.display    = 'flex';
     }
 
     // Odeslání formu
-    formElement.onsubmit = function(e) {
+    if (form) form.onsubmit = e => {
       e.preventDefault();
-
-      // Kontrola dvojitého odeslání
-      if (this.dataset.submitting === 'true') {
-        console.log('Formulář se již odesílá');
-        return false;
-      }
-
-      this.dataset.submitting = 'true';
-      const submitBtn = this.querySelector('button[type="submit"]');
-      if (submitBtn) submitBtn.disabled = true;
-
-      const data = new FormData(this);
+      const data = new FormData(form);
       const action = currentData.id ? 'edit_image.php' : 'add_image.php';
 
-      // Kontrola souboru
+      // Zkontrolujme, že FormData obsahuje soubor při přidávání nového:
       if (!currentData.id) {
-        const files = fileInput.files;
-        if (!files || files.length === 0) {
-          this.dataset.submitting = 'false';
-          if (submitBtn) submitBtn.disabled = false;
+        const fileInput = form.querySelector('input[type="file"]');
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
           return blkt_notifikace('Vyberte prosím soubor.', 'warning');
         }
       }
@@ -258,10 +217,6 @@ function initObrazkySection() {
           .catch(err => {
             console.error(err);
             blkt_notifikace('Síťová chyba', 'error');
-          })
-          .finally(() => {
-            this.dataset.submitting = 'false';
-            if (submitBtn) submitBtn.disabled = false;
           });
     };
   }
