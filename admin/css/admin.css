@@ -1052,7 +1052,6 @@ button.blkt-tabs-more {
 .blkt-upload-zone:hover {
   border-color: var(--blkt-primary-dark);
   background: linear-gradient(135deg, rgba(52,152,219,0.1), rgba(52,152,219,0.05));
-  transform: scale(1.02);
 }
 
 .blkt-upload-zone.blkt-upload-over {
