@@ -4,6 +4,342 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   // ============================================
+  // FUNKCE PRO PRÁCI S BARVAMI - PŘIDAT NA ZAČÁTEK
+  // ============================================
+
+  // Funkce pro aplikaci barevného schématu na administraci
+  window.blkt_aplikuj_barevne_schema = function(color) {
+    console.log('Aplikuji barevné schéma:', color);
+
+    // Vytvoříme nebo aktualizujeme style tag
+    let styleTag = document.getElementById('blkt-dynamic-theme');
+    if (!styleTag) {
+      styleTag = document.createElement('style');
+      styleTag.id = 'blkt-dynamic-theme';
+      document.head.appendChild(styleTag);
+    }
+
+    // Generujeme odstíny barvy
+    const shades = blkt_generuj_odstiny(color);
+
+    // CSS proměnné pro dynamické téma
+    styleTag.textContent = `
+      :root {
+        --blkt-primary: ${shades.primary};
+        --blkt-primary-dark: ${shades.dark};
+        --blkt-primary-light: ${shades.light};
+        --blkt-primary-lighter: ${shades.lighter};
+        --blkt-primary-shadow: ${shades.shadow};
+      }
+      
+      /* Přepsání výchozích barev */
+      .menu-item.active,
+      .blkt-tabs button.active::after,
+      .dashboard-stats li,
+      h2, h3, h4, h5, h6,
+      .blkt-cv-pozice-header h4,
+      .month-divider,
+      .month-divider span,
+      a {
+        color: var(--blkt-primary) !important;
+      }
+      
+      .menu-item.active {
+        background: linear-gradient(135deg, var(--blkt-primary), var(--blkt-primary-light)) !important;
+      }
+      
+      .btn-new-user, .btn-edit-user, .btn-new-post,
+      .blkt-tlacitko-novy,
+      #blkt-vybrat-obrazky,
+      #blkt-pridat-uvitani,
+      #blkt-vybrat-foto,
+      #blkt-pridat-jazyk,
+      #blkt-pridat-vzdelani,
+      #blkt-pridat-vlastnost,
+      #blkt-pridat-dovednost,
+      #blkt-pridat-profesi,
+      button:not(.btn-cancel):not(.btn-delete-user):not(.blkt-tlacitko-smazat):not(.blkt-odebrat-radek):not(.blkt-galerie-odebrat):not(.blkt-modal-close):not(.blkt-tabs button):not(.blkt-color-preset):not(.blkt-palette-close):not(#blkt-color-picker-btn) {
+        background: linear-gradient(135deg, var(--blkt-primary), var(--blkt-primary-light)) !important;
+      }
+      
+      button:not(.btn-cancel):not(.btn-delete-user):not(.blkt-tlacitko-smazat):not(.blkt-odebrat-radek):not(.blkt-galerie-odebrat):not(.blkt-modal-close):not(.blkt-tabs button):not(.blkt-color-preset):not(.blkt-palette-close):not(#blkt-color-picker-btn):hover {
+        background: linear-gradient(135deg, var(--blkt-primary-dark), var(--blkt-primary)) !important;
+        box-shadow: 0 6px 20px var(--blkt-primary-shadow) !important;
+      }
+      
+      input:focus, select:focus, textarea:focus {
+        border-color: var(--blkt-primary) !important;
+        box-shadow: 0 0 0 4px ${shades.lighter} !important;
+      }
+      
+      input:focus + label,
+      select:focus + label,
+      textarea:focus + label,
+      input:not(:placeholder-shown) + label,
+      textarea:not(:placeholder-shown) + label {
+        color: var(--blkt-primary) !important;
+      }
+      
+      .blkt-tabs button.active {
+        color: var(--blkt-primary) !important;
+        background: linear-gradient(135deg, ${shades.lighter}, transparent) !important;
+      }
+      
+      .blkt-tabs button::after,
+      .blkt-tabs button.active::after {
+        background: linear-gradient(90deg, var(--blkt-primary), var(--blkt-primary-light)) !important;
+      }
+      
+      .blkt-tabs button:hover:not(.active) {
+        background: linear-gradient(135deg, ${shades.lighter}, transparent) !important;
+      }
+      
+      .blkt-upload-zone {
+        border-color: var(--blkt-primary) !important;
+        background: linear-gradient(135deg, ${shades.lighter}, transparent) !important;
+      }
+      
+      .blkt-upload-zone:hover {
+        border-color: var(--blkt-primary-dark) !important;
+        background: linear-gradient(135deg, ${shades.light}30, ${shades.lighter}) !important;
+      }
+      
+      .blkt-gallery-thumb:hover,
+      .blkt-gallery-thumb-modal:hover {
+        border-color: var(--blkt-primary) !important;
+      }
+      
+      .blkt-gallery-thumb.selected,
+      .blkt-gallery-thumb-modal.blkt-vybrano {
+        border-color: var(--blkt-primary) !important;
+        box-shadow: 0 0 0 4px ${shades.lighter} !important;
+      }
+      
+      .menu-item::before {
+        background: var(--blkt-primary) !important;
+      }
+      
+      .menu-item:hover {
+        background: linear-gradient(90deg, ${shades.lighter}, transparent) !important;
+      }
+      
+      .dashboard-stats li {
+        border-left-color: var(--blkt-primary) !important;
+      }
+      
+      .dashboard-stats li:hover {
+        background: ${shades.lighter} !important;
+      }
+      
+      .blkt-admin-box h2::after {
+        content: '';
+        display: block;
+        width: 50px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--blkt-primary), var(--blkt-primary-light));
+        margin-top: 0.5rem;
+      }
+      
+      .blkt-notifikace-info {
+        border-left-color: var(--blkt-primary) !important;
+      }
+      
+      .blkt-notifikace-info .blkt-notifikace-ikona {
+        background: linear-gradient(135deg, var(--blkt-primary), var(--blkt-primary-light)) !important;
+      }
+      
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, var(--blkt-primary), var(--blkt-primary-light)) !important;
+      }
+      
+      ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, var(--blkt-primary-dark), var(--blkt-primary)) !important;
+      }
+      
+      ::selection {
+        background: var(--blkt-primary) !important;
+      }
+      
+      ::-moz-selection {
+        background: var(--blkt-primary) !important;
+      }
+      
+      thead {
+        background: linear-gradient(135deg, var(--blkt-primary), var(--blkt-primary-light)) !important;
+      }
+      
+      tbody tr:hover {
+        background: ${shades.lighter} !important;
+      }
+      
+      .blkt-color-picker-btn:hover {
+        border-color: var(--blkt-primary) !important;
+      }
+      
+      .btn-save:not(.btn-cancel) {
+        background: linear-gradient(135deg, var(--blkt-success), var(--blkt-success-light)) !important;
+      }
+      
+      .btn-save:not(.btn-cancel):hover {
+        background: linear-gradient(135deg, var(--blkt-success-dark), var(--blkt-success)) !important;
+        box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4) !important;
+      }
+      
+      .month-divider::before,
+      .month-divider::after {
+        background: linear-gradient(90deg, transparent, var(--blkt-primary), transparent) !important;
+      }
+      
+      .blkt-admin-box::before {
+        background: radial-gradient(circle at 70% 30%, ${shades.lighter}, transparent 50%) !important;
+      }
+      
+      .blkt-loader-logo svg stop:first-child {
+        stop-color: var(--blkt-primary) !important;
+      }
+      
+      .blkt-loader-logo svg stop:last-child {
+        stop-color: var(--blkt-primary-light) !important;
+      }
+      
+      .blkt-loading-text {
+        background: linear-gradient(90deg, var(--blkt-primary), var(--blkt-primary-light)) !important;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      
+      .blkt-loading-dots span {
+        color: var(--blkt-primary) !important;
+      }
+      
+      .blkt-loader-progress-bar {
+        background: linear-gradient(90deg, var(--blkt-primary), var(--blkt-primary-light)) !important;
+      }
+      
+      .blkt-admin-loader::before {
+        background: radial-gradient(circle, ${shades.lighter} 0%, transparent 70%) !important;
+      }
+      
+      a::after {
+        background: linear-gradient(90deg, var(--blkt-primary), var(--blkt-primary-light)) !important;
+      }
+      
+      blockquote {
+        border-left-color: var(--blkt-primary) !important;
+      }
+      
+      .blkt-modal-header {
+        background: linear-gradient(135deg, ${shades.lighter}, transparent) !important;
+      }
+      
+      .blkt-palette-header {
+        background: linear-gradient(135deg, ${shades.lighter}, transparent) !important;
+      }
+      
+      .blkt-palette-header h4 {
+        color: var(--blkt-primary) !important;
+      }
+      
+      .dashboard-section h3 {
+        color: var(--blkt-primary) !important;
+      }
+      
+      .dashboard-stats strong {
+        color: var(--blkt-primary) !important;
+      }
+      
+      .user-card-left strong {
+        color: var(--blkt-primary) !important;
+      }
+      
+      .user-avatar {
+        border-color: var(--blkt-primary) !important;
+      }
+      
+      .blkt-cv-stats h4 {
+        color: var(--blkt-primary) !important;
+      }
+      
+      .blkt-cv-stats li {
+        background: linear-gradient(135deg, ${shades.lighter}, transparent) !important;
+      }
+      
+      .blkt-cv-stats li:hover {
+        background: linear-gradient(135deg, ${shades.light}30, ${shades.lighter}) !important;
+      }
+    `;
+  };
+
+  // Pomocné funkce pro práci s barvami
+  window.blkt_generuj_odstiny = function(color) {
+    // Převod hex na RGB
+    const hex2rgb = (hex) => {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+      } : null;
+    };
+
+    // Převod RGB na hex
+    const rgb2hex = (r, g, b) => {
+      return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    };
+
+    const rgb = hex2rgb(color);
+    if (!rgb) return {
+      primary: color,
+      dark: color,
+      light: color,
+      lighter: color,
+      shadow: 'rgba(0,0,0,0.3)'
+    };
+
+    // Tmavší odstín (80% původní barvy)
+    const dark = rgb2hex(
+        Math.floor(rgb.r * 0.8),
+        Math.floor(rgb.g * 0.8),
+        Math.floor(rgb.b * 0.8)
+    );
+
+    // Světlejší odstín (směs s bílou)
+    const light = rgb2hex(
+        Math.min(255, Math.floor(rgb.r + (255 - rgb.r) * 0.3)),
+        Math.min(255, Math.floor(rgb.g + (255 - rgb.g) * 0.3)),
+        Math.min(255, Math.floor(rgb.b + (255 - rgb.b) * 0.3))
+    );
+
+    // Ještě světlejší pro pozadí
+    const lighter = rgb2hex(
+        Math.min(255, Math.floor(rgb.r + (255 - rgb.r) * 0.9)),
+        Math.min(255, Math.floor(rgb.g + (255 - rgb.g) * 0.9)),
+        Math.min(255, Math.floor(rgb.b + (255 - rgb.b) * 0.9))
+    );
+
+    // Stín
+    const shadow = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4)`;
+
+    return {
+      primary: color,
+      dark: dark,
+      light: light,
+      lighter: lighter,
+      shadow: shadow
+    };
+  };
+
+  // Funkce pro získání kontrastní barvy (černá/bílá)
+  window.blkt_ziskej_kontrastni_barvu = function(color) {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance > 0.5 ? '#000000' : '#ffffff';
+  };
+  // ============================================
   // LOADER SYSTÉM - HNED NA ZAČÁTKU
   // ============================================
   const AdminLoader = {
@@ -916,7 +1252,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const pocatecniSekce = blkt_ziskej_sekci_z_url();
   loadSection(pocatecniSekce, false);
 
-  // ============================================
+// ============================================
   // 13) Načtení a aplikace uloženého barevného schématu
   // ============================================
   // Načteme barvu hned při startu
