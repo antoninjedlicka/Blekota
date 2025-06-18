@@ -2048,15 +2048,8 @@ p img:hover {
   position: relative;
 }
 
-.blkt-barva-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+.blkt-barva-container {
   position: relative;
-}
-
-.blkt-barva-wrapper select {
-  flex: 1;
 }
 
 .blkt-color-picker-btn {
@@ -2099,16 +2092,20 @@ p img:hover {
   stroke-width: 2;
 }
 
+.blkt-barva-skupina select {
+  padding-right: 60px; /* Místo pro tlačítko */
+}
+
 /* Barevná paleta */
 .blkt-color-palette {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 0.5rem;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   background: white;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-  z-index: 100;
+  z-index: 1000;
   width: 320px;
   animation: slideInDown 0.3s ease;
 }

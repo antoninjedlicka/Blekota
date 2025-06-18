@@ -16,6 +16,11 @@ foreach ($kody as $kod) {
     $nastaveni[$kod] = $hodnota ?: '';
 }
 
+// Pokud není nastavená barva, použijeme výchozí modrou
+if (empty($nastaveni['THEME'])) {
+    $nastaveni['THEME'] = '#3498db';
+}
+
 // Přednastavené barvy
 $blkt_prednastavene_barvy = [
     '#3498db' => 'Modrá (výchozí)',
@@ -49,10 +54,12 @@ $je_vlastni_barva = !array_key_exists($nastaveni['THEME'], $blkt_prednastavene_b
         </div>
 
         <div class="blkt-formular-skupina blkt-barva-skupina">
-            <div class="blkt-barva-wrapper">
+            <div class="blkt-barva-container">
                 <select name="THEME_SELECT" id="blkt-theme-select" required>
                     <?php foreach ($blkt_prednastavene_barvy as $hex => $nazev): ?>
-                        <option value="<?= $hex ?>" <?= (!$je_vlastni_barva && $nastaveni['THEME'] === $hex) ? 'selected' : '' ?>>
+                        <option value="<?= $hex ?>"
+                                data-color="<?= $hex ?>"
+                            <?= (!$je_vlastni_barva && $nastaveni['THEME'] === $hex) ? 'selected' : '' ?>>
                             <?= $nazev ?>
                         </option>
                     <?php endforeach; ?>
@@ -62,7 +69,7 @@ $je_vlastni_barva = !array_key_exists($nastaveni['THEME'], $blkt_prednastavene_b
 
                 <!-- Tlačítko pro výběr barvy -->
                 <button type="button" id="blkt-color-picker-btn" class="blkt-color-picker-btn" title="Vybrat barvu z palety">
-                    <span class="blkt-color-preview" style="background-color: <?= htmlspecialchars($nastaveni['THEME'] ?: '#3498db') ?>"></span>
+                    <span class="blkt-color-preview" id="blkt-color-preview" style="background-color: <?= htmlspecialchars($nastaveni['THEME']) ?>"></span>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <circle cx="12" cy="12" r="10"></circle>
                         <path d="M12 2a10 10 0 0 0 0 20 5 5 0 0 0 0-20"></path>
@@ -74,46 +81,46 @@ $je_vlastni_barva = !array_key_exists($nastaveni['THEME'], $blkt_prednastavene_b
             </div>
 
             <!-- Skrytý input pro skutečnou hodnotu barvy -->
-            <input type="hidden" name="THEME" id="blkt-theme-value" value="<?= htmlspecialchars($nastaveni['THEME'] ?: '#3498db') ?>">
-
-            <!-- Barevná paleta (skrytá) -->
-            <div id="blkt-color-palette" class="blkt-color-palette" style="display: none;">
-                <div class="blkt-palette-header">
-                    <h4>Vyberte barvu</h4>
-                    <button type="button" class="blkt-palette-close">&times;</button>
-                </div>
-
-                <!-- Přednastavené barvy -->
-                <div class="blkt-palette-presets">
-                    <?php foreach ($blkt_prednastavene_barvy as $hex => $nazev): ?>
-                        <button type="button"
-                                class="blkt-color-preset"
-                                data-color="<?= $hex ?>"
-                                style="background-color: <?= $hex ?>"
-                                title="<?= $nazev ?>">
-                        </button>
-                    <?php endforeach; ?>
-                </div>
-
-                <!-- HTML5 color picker -->
-                <div class="blkt-palette-custom">
-                    <label>Vlastní barva:</label>
-                    <input type="color" id="blkt-html-color-picker" value="<?= htmlspecialchars($nastaveni['THEME'] ?: '#3498db') ?>">
-                    <input type="text" id="blkt-color-hex-input" value="<?= htmlspecialchars($nastaveni['THEME'] ?: '#3498db') ?>" placeholder="#000000" maxlength="7">
-                </div>
-
-                <!-- Náhled -->
-                <div class="blkt-palette-preview">
-                    <div class="blkt-preview-box" id="blkt-color-preview-box">
-                        <p>Náhled vybrané barvy</p>
-                    </div>
-                </div>
-
-                <div class="blkt-palette-actions">
-                    <button type="button" class="btn btn-cancel" id="blkt-palette-cancel">Zrušit</button>
-                    <button type="button" class="btn btn-save" id="blkt-palette-apply">Použít</button>
-                </div>
-            </div>
+            <input type="hidden" name="THEME" id="blkt-theme-value" value="<?= htmlspecialchars($nastaveni['THEME']) ?>">
         </div>
     </div>
 </form>
+
+<!-- Barevná paleta (mimo formulář) -->
+<div id="blkt-color-palette" class="blkt-color-palette" style="display: none;">
+    <div class="blkt-palette-header">
+        <h4>Vyberte barvu</h4>
+        <button type="button" class="blkt-palette-close">&times;</button>
+    </div>
+
+    <!-- Přednastavené barvy -->
+    <div class="blkt-palette-presets">
+        <?php foreach ($blkt_prednastavene_barvy as $hex => $nazev): ?>
+            <button type="button"
+                    class="blkt-color-preset"
+                    data-color="<?= $hex ?>"
+                    style="background-color: <?= $hex ?>"
+                    title="<?= $nazev ?>">
+            </button>
+        <?php endforeach; ?>
+    </div>
+
+    <!-- HTML5 color picker -->
+    <div class="blkt-palette-custom">
+        <label>Vlastní barva:</label>
+        <input type="color" id="blkt-html-color-picker" value="<?= htmlspecialchars($nastaveni['THEME']) ?>">
+        <input type="text" id="blkt-color-hex-input" value="<?= htmlspecialchars($nastaveni['THEME']) ?>" placeholder="#000000" maxlength="7">
+    </div>
+
+    <!-- Náhled -->
+    <div class="blkt-palette-preview">
+        <div class="blkt-preview-box" id="blkt-color-preview-box" style="background-color: <?= htmlspecialchars($nastaveni['THEME']) ?>">
+            <p>Náhled vybrané barvy</p>
+        </div>
+    </div>
+
+    <div class="blkt-palette-actions">
+        <button type="button" class="btn btn-cancel" id="blkt-palette-cancel">Zrušit</button>
+        <button type="button" class="btn btn-save" id="blkt-palette-apply">Použít</button>
+    </div>
+</div>
