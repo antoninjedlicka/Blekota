@@ -916,4 +916,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const pocatecniSekce = blkt_ziskej_sekci_z_url();
   loadSection(pocatecniSekce, false);
 
+  // ============================================
+  // 13) Načtení a aplikace uloženého barevného schématu
+  // ============================================
+  fetch('action/get_theme_color.php')
+      .then(r => r.json())
+      .then(data => {
+        if (data.status === 'ok' && data.color) {
+          blkt_aplikuj_barevne_schema(data.color);
+        }
+      })
+      .catch(err => console.log('Nepodařilo se načíst barevné schéma'));
+
 }); // konec DOMContentLoaded

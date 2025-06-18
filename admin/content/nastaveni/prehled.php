@@ -15,6 +15,23 @@ foreach ($kody as $kod) {
     $hodnota = $stmt->fetchColumn();
     $nastaveni[$kod] = $hodnota ?: '';
 }
+
+// Přednastavené barvy
+$blkt_prednastavene_barvy = [
+    '#3498db' => 'Modrá (výchozí)',
+    '#e74c3c' => 'Červená',
+    '#27ae60' => 'Zelená',
+    '#f39c12' => 'Oranžová',
+    '#9b59b6' => 'Fialová',
+    '#1abc9c' => 'Tyrkysová',
+    '#34495e' => 'Tmavě šedá',
+    '#e67e22' => 'Mrkvová',
+    '#16a085' => 'Zelený smaragd',
+    '#2980b9' => 'Tmavě modrá'
+];
+
+// Zjistíme, jestli je aktuální barva mezi přednastaveným
+$je_vlastni_barva = !array_key_exists($nastaveni['THEME'], $blkt_prednastavene_barvy);
 ?>
 
 <form id="blkt-form-nastaveni" action="action/save_nastaveni.php" method="post" class="nastaveni-form">
@@ -31,13 +48,72 @@ foreach ($kody as $kod) {
             <label for="BLOG">Adresa blogu</label>
         </div>
 
-        <div class="blkt-formular-skupina">
-            <select name="THEME" required>
-                <option value="#ff0000" <?php echo $nastaveni['THEME'] === '#ff0000' ? 'selected' : ''; ?>>Červená</option>
-                <option value="#0000ff" <?php echo $nastaveni['THEME'] === '#0000ff' ? 'selected' : ''; ?>>Modrá</option>
-                <option value="#00ff00" <?php echo $nastaveni['THEME'] === '#00ff00' ? 'selected' : ''; ?>>Zelená</option>
-            </select>
-            <label for="THEME">Barevné schéma</label>
+        <div class="blkt-formular-skupina blkt-barva-skupina">
+            <div class="blkt-barva-wrapper">
+                <select name="THEME_SELECT" id="blkt-theme-select" required>
+                    <?php foreach ($blkt_prednastavene_barvy as $hex => $nazev): ?>
+                        <option value="<?= $hex ?>" <?= (!$je_vlastni_barva && $nastaveni['THEME'] === $hex) ? 'selected' : '' ?>>
+                            <?= $nazev ?>
+                        </option>
+                    <?php endforeach; ?>
+                    <option value="custom" <?= $je_vlastni_barva ? 'selected' : '' ?>>Vlastní barva</option>
+                </select>
+                <label for="THEME_SELECT">Barevné schéma</label>
+
+                <!-- Tlačítko pro výběr barvy -->
+                <button type="button" id="blkt-color-picker-btn" class="blkt-color-picker-btn" title="Vybrat barvu z palety">
+                    <span class="blkt-color-preview" style="background-color: <?= htmlspecialchars($nastaveni['THEME'] ?: '#3498db') ?>"></span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 2a10 10 0 0 0 0 20 5 5 0 0 0 0-20"></path>
+                        <circle cx="12" cy="8" r="2"></circle>
+                        <circle cx="8.5" cy="12.5" r="2"></circle>
+                        <circle cx="15.5" cy="12.5" r="2"></circle>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Skrytý input pro skutečnou hodnotu barvy -->
+            <input type="hidden" name="THEME" id="blkt-theme-value" value="<?= htmlspecialchars($nastaveni['THEME'] ?: '#3498db') ?>">
+
+            <!-- Barevná paleta (skrytá) -->
+            <div id="blkt-color-palette" class="blkt-color-palette" style="display: none;">
+                <div class="blkt-palette-header">
+                    <h4>Vyberte barvu</h4>
+                    <button type="button" class="blkt-palette-close">&times;</button>
+                </div>
+
+                <!-- Přednastavené barvy -->
+                <div class="blkt-palette-presets">
+                    <?php foreach ($blkt_prednastavene_barvy as $hex => $nazev): ?>
+                        <button type="button"
+                                class="blkt-color-preset"
+                                data-color="<?= $hex ?>"
+                                style="background-color: <?= $hex ?>"
+                                title="<?= $nazev ?>">
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+
+                <!-- HTML5 color picker -->
+                <div class="blkt-palette-custom">
+                    <label>Vlastní barva:</label>
+                    <input type="color" id="blkt-html-color-picker" value="<?= htmlspecialchars($nastaveni['THEME'] ?: '#3498db') ?>">
+                    <input type="text" id="blkt-color-hex-input" value="<?= htmlspecialchars($nastaveni['THEME'] ?: '#3498db') ?>" placeholder="#000000" maxlength="7">
+                </div>
+
+                <!-- Náhled -->
+                <div class="blkt-palette-preview">
+                    <div class="blkt-preview-box" id="blkt-color-preview-box">
+                        <p>Náhled vybrané barvy</p>
+                    </div>
+                </div>
+
+                <div class="blkt-palette-actions">
+                    <button type="button" class="btn btn-cancel" id="blkt-palette-cancel">Zrušit</button>
+                    <button type="button" class="btn btn-save" id="blkt-palette-apply">Použít</button>
+                </div>
+            </div>
         </div>
     </div>
 </form>

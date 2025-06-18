@@ -2040,3 +2040,237 @@ p img:hover {
   }
 }
 
+/* ==================== */
+/* Výběr barvy - CSS   */
+/* ==================== */
+
+.blkt-barva-skupina {
+  position: relative;
+}
+
+.blkt-barva-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.blkt-barva-wrapper select {
+  flex: 1;
+}
+
+.blkt-color-picker-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: white !important;
+  border: 2px solid var(--blkt-border);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.blkt-color-picker-btn:hover {
+  border-color: var(--blkt-primary);
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 4px 12px var(--blkt-shadow);
+}
+
+.blkt-color-preview {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+
+.blkt-color-picker-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--blkt-text-light);
+  stroke-width: 2;
+}
+
+/* Barevná paleta */
+.blkt-color-palette {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  z-index: 100;
+  width: 320px;
+  animation: slideInDown 0.3s ease;
+}
+
+.blkt-palette-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--blkt-border);
+}
+
+.blkt-palette-header h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.blkt-palette-close {
+  background: none !important;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--blkt-text-light);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.blkt-palette-close:hover {
+  background: var(--blkt-danger-light) !important;
+  color: white;
+  transform: rotate(90deg);
+}
+
+/* Přednastavené barvy */
+.blkt-palette-presets {
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+}
+
+.blkt-color-preset {
+  width: 45px;
+  height: 45px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.blkt-color-preset::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.3), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.blkt-color-preset:hover {
+  transform: scale(1.1);
+  border-color: rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.blkt-color-preset:hover::after {
+  opacity: 1;
+}
+
+.blkt-color-preset.active {
+  border-color: var(--blkt-primary);
+  transform: scale(1.1);
+  box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.2);
+}
+
+/* Vlastní barva */
+.blkt-palette-custom {
+  padding: 0 1rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.blkt-palette-custom label {
+  position: static;
+  font-weight: 500;
+  color: var(--blkt-text);
+  background: none;
+  padding: 0;
+  margin-right: 0.5rem;
+}
+
+.blkt-palette-custom input[type="color"] {
+  width: 50px;
+  height: 40px;
+  border: 2px solid var(--blkt-border);
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.blkt-palette-custom input[type="text"] {
+  flex: 1;
+  height: 40px;
+  padding: 0 0.75rem;
+  font-family: monospace;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+/* Náhled */
+.blkt-palette-preview {
+  padding: 0 1rem 1rem;
+}
+
+.blkt-preview-box {
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: 1px solid var(--blkt-border);
+}
+
+/* Akce */
+.blkt-palette-actions {
+  padding: 1rem;
+  border-top: 1px solid var(--blkt-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.blkt-palette-actions button {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+/* Responzivita */
+@media (max-width: 600px) {
+  .blkt-color-palette {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    right: auto;
+    margin-top: 0;
+    width: 90%;
+    max-width: 320px;
+  }
+
+  .blkt-palette-presets {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
