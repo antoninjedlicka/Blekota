@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // FUNKCE PRO PRÁCI S BARVAMI - PŘIDAT NA ZAČÁTEK
   // ============================================
 
-  // Funkce pro aplikaci barevného schématu na administraci
+// Funkce pro aplikaci barevného schématu na administraci
   window.blkt_aplikuj_barevne_schema = function(color) {
     console.log('Aplikuji barevné schéma:', color);
 
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Generujeme odstíny barvy
     const shades = blkt_generuj_odstiny(color);
 
-    // CSS proměnné pro dynamické téma
+    // CSS proměnné pro dynamické téma - OPRAVENÉ, aby neměnily pozadí kde nemají
     styleTag.textContent = `
       :root {
         --blkt-primary: ${shades.primary};
@@ -32,22 +32,24 @@ document.addEventListener('DOMContentLoaded', () => {
         --blkt-primary-shadow: ${shades.shadow};
       }
       
-      /* Přepsání výchozích barev */
+      /* Pouze barvy textu */
       .menu-item.active,
-      .blkt-tabs button.active::after,
-      .dashboard-stats li,
+      .blkt-tabs button.active,
+      .dashboard-stats li strong,
       h2, h3, h4, h5, h6,
       .blkt-cv-pozice-header h4,
-      .month-divider,
       .month-divider span,
       a {
         color: var(--blkt-primary) !important;
       }
       
+      /* Menu item active - pouze gradient */
       .menu-item.active {
         background: linear-gradient(135deg, var(--blkt-primary), var(--blkt-primary-light)) !important;
+        color: white !important;
       }
       
+      /* Tlačítka - zachovat původní definice */
       .btn-new-user, .btn-edit-user, .btn-new-post,
       .blkt-tlacitko-novy,
       #blkt-vybrat-obrazky,
@@ -57,16 +59,11 @@ document.addEventListener('DOMContentLoaded', () => {
       #blkt-pridat-vzdelani,
       #blkt-pridat-vlastnost,
       #blkt-pridat-dovednost,
-      #blkt-pridat-profesi,
-      button:not(.btn-cancel):not(.btn-delete-user):not(.blkt-tlacitko-smazat):not(.blkt-odebrat-radek):not(.blkt-galerie-odebrat):not(.blkt-modal-close):not(.blkt-tabs button):not(.blkt-color-preset):not(.blkt-palette-close):not(#blkt-color-picker-btn) {
+      #blkt-pridat-profesi {
         background: linear-gradient(135deg, var(--blkt-primary), var(--blkt-primary-light)) !important;
       }
       
-      button:not(.btn-cancel):not(.btn-delete-user):not(.blkt-tlacitko-smazat):not(.blkt-odebrat-radek):not(.blkt-galerie-odebrat):not(.blkt-modal-close):not(.blkt-tabs button):not(.blkt-color-preset):not(.blkt-palette-close):not(#blkt-color-picker-btn):hover {
-        background: linear-gradient(135deg, var(--blkt-primary-dark), var(--blkt-primary)) !important;
-        box-shadow: 0 6px 20px var(--blkt-primary-shadow) !important;
-      }
-      
+      /* Focus stavy */
       input:focus, select:focus, textarea:focus {
         border-color: var(--blkt-primary) !important;
         box-shadow: 0 0 0 4px ${shades.lighter} !important;
@@ -76,13 +73,14 @@ document.addEventListener('DOMContentLoaded', () => {
       select:focus + label,
       textarea:focus + label,
       input:not(:placeholder-shown) + label,
-      textarea:not(:placeholder-shown) + label {
+      textarea:not(:placeholder-shown) + label,
+      .blkt-formular-skupina select + label {
         color: var(--blkt-primary) !important;
       }
       
+      /* Záložky - pouze aktivní */
       .blkt-tabs button.active {
         color: var(--blkt-primary) !important;
-        background: linear-gradient(135deg, ${shades.lighter}, transparent) !important;
       }
       
       .blkt-tabs button::after,
@@ -90,20 +88,12 @@ document.addEventListener('DOMContentLoaded', () => {
         background: linear-gradient(90deg, var(--blkt-primary), var(--blkt-primary-light)) !important;
       }
       
-      .blkt-tabs button:hover:not(.active) {
-        background: linear-gradient(135deg, ${shades.lighter}, transparent) !important;
-      }
-      
+      /* Upload zóna */
       .blkt-upload-zone {
         border-color: var(--blkt-primary) !important;
-        background: linear-gradient(135deg, ${shades.lighter}, transparent) !important;
       }
       
-      .blkt-upload-zone:hover {
-        border-color: var(--blkt-primary-dark) !important;
-        background: linear-gradient(135deg, ${shades.light}30, ${shades.lighter}) !important;
-      }
-      
+      /* Galerie thumby */
       .blkt-gallery-thumb:hover,
       .blkt-gallery-thumb-modal:hover {
         border-color: var(--blkt-primary) !important;
@@ -115,22 +105,17 @@ document.addEventListener('DOMContentLoaded', () => {
         box-shadow: 0 0 0 4px ${shades.lighter} !important;
       }
       
+      /* Menu item hover - pouze levý pruh */
       .menu-item::before {
         background: var(--blkt-primary) !important;
       }
       
-      .menu-item:hover {
-        background: linear-gradient(90deg, ${shades.lighter}, transparent) !important;
-      }
-      
+      /* Dashboard stats */
       .dashboard-stats li {
         border-left-color: var(--blkt-primary) !important;
       }
       
-      .dashboard-stats li:hover {
-        background: ${shades.lighter} !important;
-      }
-      
+      /* Admin box h2 podtržení */
       .blkt-admin-box h2::after {
         content: '';
         display: block;
@@ -140,6 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         margin-top: 0.5rem;
       }
       
+      /* Notifikace info */
       .blkt-notifikace-info {
         border-left-color: var(--blkt-primary) !important;
       }
@@ -148,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         background: linear-gradient(135deg, var(--blkt-primary), var(--blkt-primary-light)) !important;
       }
       
+      /* Scrollbar */
       ::-webkit-scrollbar-thumb {
         background: linear-gradient(135deg, var(--blkt-primary), var(--blkt-primary-light)) !important;
       }
@@ -156,44 +143,34 @@ document.addEventListener('DOMContentLoaded', () => {
         background: linear-gradient(135deg, var(--blkt-primary-dark), var(--blkt-primary)) !important;
       }
       
+      /* Výběr textu */
       ::selection {
         background: var(--blkt-primary) !important;
+        color: white !important;
       }
       
       ::-moz-selection {
         background: var(--blkt-primary) !important;
+        color: white !important;
       }
       
+      /* Tabulka hlavička */
       thead {
         background: linear-gradient(135deg, var(--blkt-primary), var(--blkt-primary-light)) !important;
       }
       
-      tbody tr:hover {
-        background: ${shades.lighter} !important;
-      }
-      
+      /* Color picker tlačítko */
       .blkt-color-picker-btn:hover {
         border-color: var(--blkt-primary) !important;
       }
       
-      .btn-save:not(.btn-cancel) {
-        background: linear-gradient(135deg, var(--blkt-success), var(--blkt-success-light)) !important;
-      }
-      
-      .btn-save:not(.btn-cancel):hover {
-        background: linear-gradient(135deg, var(--blkt-success-dark), var(--blkt-success)) !important;
-        box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4) !important;
-      }
-      
+      /* Měsíční rozdělení čáry */
       .month-divider::before,
       .month-divider::after {
         background: linear-gradient(90deg, transparent, var(--blkt-primary), transparent) !important;
       }
       
-      .blkt-admin-box::before {
-        background: radial-gradient(circle at 70% 30%, ${shades.lighter}, transparent 50%) !important;
-      }
-      
+      /* Loader barvy */
       .blkt-loader-logo svg stop:first-child {
         stop-color: var(--blkt-primary) !important;
       }
@@ -217,56 +194,19 @@ document.addEventListener('DOMContentLoaded', () => {
         background: linear-gradient(90deg, var(--blkt-primary), var(--blkt-primary-light)) !important;
       }
       
-      .blkt-admin-loader::before {
-        background: radial-gradient(circle, ${shades.lighter} 0%, transparent 70%) !important;
-      }
-      
+      /* Odkazy podtržení */
       a::after {
         background: linear-gradient(90deg, var(--blkt-primary), var(--blkt-primary-light)) !important;
       }
       
+      /* Citace */
       blockquote {
         border-left-color: var(--blkt-primary) !important;
       }
       
-      .blkt-modal-header {
-        background: linear-gradient(135deg, ${shades.lighter}, transparent) !important;
-      }
-      
-      .blkt-palette-header {
-        background: linear-gradient(135deg, ${shades.lighter}, transparent) !important;
-      }
-      
-      .blkt-palette-header h4 {
-        color: var(--blkt-primary) !important;
-      }
-      
-      .dashboard-section h3 {
-        color: var(--blkt-primary) !important;
-      }
-      
-      .dashboard-stats strong {
-        color: var(--blkt-primary) !important;
-      }
-      
-      .user-card-left strong {
-        color: var(--blkt-primary) !important;
-      }
-      
+      /* User avatar */
       .user-avatar {
         border-color: var(--blkt-primary) !important;
-      }
-      
-      .blkt-cv-stats h4 {
-        color: var(--blkt-primary) !important;
-      }
-      
-      .blkt-cv-stats li {
-        background: linear-gradient(135deg, ${shades.lighter}, transparent) !important;
-      }
-      
-      .blkt-cv-stats li:hover {
-        background: linear-gradient(135deg, ${shades.light}30, ${shades.lighter}) !important;
       }
     `;
   };

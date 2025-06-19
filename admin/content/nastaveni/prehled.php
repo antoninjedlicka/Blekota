@@ -54,7 +54,6 @@ $je_vlastni_barva = !array_key_exists($nastaveni['THEME'], $blkt_prednastavene_b
         </div>
 
         <div class="blkt-formular-skupina blkt-barva-skupina">
-            <label class="blkt-barva-label">Barevné schéma</label>
             <div class="blkt-barva-container">
                 <!-- Levá polovina - výběr přednastavených barev -->
                 <div class="blkt-barva-select-wrapper">
@@ -68,6 +67,7 @@ $je_vlastni_barva = !array_key_exists($nastaveni['THEME'], $blkt_prednastavene_b
                         <?php endforeach; ?>
                         <option value="custom" <?= $je_vlastni_barva ? 'selected' : '' ?>>Vlastní barva</option>
                     </select>
+                    <label for="blkt-theme-select">Barevné schéma</label>
                 </div>
 
                 <!-- Pravá polovina - hex input a tlačítko -->

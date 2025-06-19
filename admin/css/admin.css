@@ -2331,6 +2331,41 @@ p img:hover {
   font-size: 0.9rem;
 }
 
+/* Přidat do admin/css/admin.css */
+
+/* Oprava labelu pro select v barevném schématu */
+.blkt-barva-select-wrapper {
+  position: relative;
+}
+
+.blkt-barva-select-wrapper label {
+  position: absolute;
+  top: -0.75rem;
+  left: 0.75rem;
+  transform: translateY(0);
+  font-size: 0.85rem;
+  color: var(--blkt-text-light);
+  background: white;
+  border-radius: 4px;
+  padding: 0 0.5rem;
+  pointer-events: none;
+  transition: all 0.2s ease-out;
+  font-weight: 600;
+}
+
+.blkt-barva-select-wrapper select:focus + label {
+  color: var(--blkt-primary);
+}
+
+/* Speciální styl pro skupinu barev */
+.blkt-barva-skupina {
+  margin-top: 2rem;
+}
+
+.blkt-barva-skupina .blkt-barva-label {
+  display: none; /* Skryjeme původní label */
+}
+
 /* Responzivita */
 @media (max-width: 768px) {
   .blkt-barva-container {
@@ -2359,4 +2394,17 @@ p img:hover {
     width: 45px;
     height: 45px;
   }
+}
+/* Barevná paleta - fixní pozice */
+.blkt-color-palette {
+  position: fixed !important;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  z-index: 1000;
+  width: 360px;
+  animation: slideInDown 0.3s ease;
 }

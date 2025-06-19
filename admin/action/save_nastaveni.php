@@ -4,6 +4,16 @@
 
 require_once __DIR__ . '/../databaze.php';
 
+// Kontrola AJAX požadavku
+$is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+    strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+
+// Pokud není AJAX, přesměrujeme
+if (!$is_ajax) {
+    header('Location: ../index.php#nastaveni');
+    exit;
+}
+
 header('Content-Type: application/json');
 
 $response = ['status' => 'ok'];
