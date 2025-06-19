@@ -2408,3 +2408,154 @@ p img:hover {
   width: 360px;
   animation: slideInDown 0.3s ease;
 }
+/* Barevná paleta */
+.blkt-color-palette {
+  position: fixed !important;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  z-index: 1000;
+  width: 360px;
+  animation: slideInDown 0.3s ease;
+  display: none;
+}
+
+.blkt-palette-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.blkt-palette-header h4 {
+  margin: 0;
+  color: var(--blkt-primary);
+}
+
+.blkt-palette-close {
+  background: none !important;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+}
+
+.blkt-palette-close:hover {
+  color: var(--blkt-danger);
+}
+
+.blkt-palette-presets {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75rem;
+  padding: 1.5rem;
+}
+
+.blkt-color-preset {
+  width: 50px;
+  height: 50px;
+  border: 3px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.blkt-color-preset:hover {
+  transform: scale(1.1);
+  border-color: rgba(0,0,0,0.2);
+}
+
+.blkt-color-preset.active {
+  border-color: #333;
+  transform: scale(1.1);
+}
+
+.blkt-color-preset.active::after {
+  content: '✓';
+  position: absolute;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.blkt-palette-custom {
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.blkt-palette-custom label {
+  position: static !important;
+  background: none !important;
+  padding: 0 !important;
+  transform: none !important;
+  color: #333 !important;
+}
+
+.blkt-palette-preview {
+  padding: 1.5rem;
+}
+
+.blkt-preview-box {
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+  border: 2px solid #ddd;
+}
+
+.blkt-palette-actions {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+/* Oprava pro color preset tlačítka */
+.blkt-color-preset {
+  width: 50px;
+  height: 50px;
+  border: 3px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+.blkt-color-preset.active::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+/* Oprava náhledu */
+.blkt-preview-box {
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+  border: 2px solid #ddd;
+  transition: all 0.3s ease;
+}
+
+.blkt-preview-box p {
+  margin: 0;
+}

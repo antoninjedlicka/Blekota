@@ -1,6 +1,6 @@
 <?php
 // admin/action/save_nastaveni.php
-// Ukládání nastavení do databáze
+session_start(); // TOTO MŮŽE CHYBĚT!
 
 require_once __DIR__ . '/../databaze.php';
 
@@ -53,3 +53,4 @@ try {
 }
 
 echo json_encode($response);
+exit; // Důležité pro ukončení

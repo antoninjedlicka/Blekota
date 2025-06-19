@@ -45,12 +45,12 @@ $je_vlastni_barva = !array_key_exists($nastaveni['THEME'], $blkt_prednastavene_b
 
         <div class="blkt-formular-skupina">
             <input type="text" name="WWW" value="<?php echo htmlspecialchars($nastaveni['WWW']); ?>" placeholder=" " required>
-            <label for="WWW">Webová adresa</label>
+            <label>Webová adresa</label>
         </div>
 
         <div class="blkt-formular-skupina">
             <input type="text" name="BLOG" value="<?php echo htmlspecialchars($nastaveni['BLOG']); ?>" placeholder=" " required>
-            <label for="BLOG">Adresa blogu</label>
+            <label>Adresa blogu</label>
         </div>
 
         <div class="blkt-formular-skupina blkt-barva-skupina">
@@ -67,7 +67,7 @@ $je_vlastni_barva = !array_key_exists($nastaveni['THEME'], $blkt_prednastavene_b
                         <?php endforeach; ?>
                         <option value="custom" <?= $je_vlastni_barva ? 'selected' : '' ?>>Vlastní barva</option>
                     </select>
-                    <label for="blkt-theme-select">Barevné schéma</label>
+                    <label>Barevné schéma</label>
                 </div>
 
                 <!-- Pravá polovina - hex input a tlačítko -->
@@ -100,7 +100,7 @@ $je_vlastni_barva = !array_key_exists($nastaveni['THEME'], $blkt_prednastavene_b
     </div>
 </form>
 
-<!-- Barevná paleta (mimo formulář) -->
+<!-- Barevná paleta -->
 <div id="blkt-color-palette" class="blkt-color-palette" style="display: none;">
     <div class="blkt-palette-header">
         <h4>Vyberte barvu</h4>
@@ -137,3 +137,27 @@ $je_vlastni_barva = !array_key_exists($nastaveni['THEME'], $blkt_prednastavene_b
         <button type="button" class="btn btn-save" id="blkt-palette-apply">Použít</button>
     </div>
 </div>
+
+<script>
+    // Dočasná inline inicializace pro jistotu
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Nastavení: DOMContentLoaded');
+
+        // Test, zda existují elementy
+        console.log('Form:', document.getElementById('blkt-form-nastaveni'));
+        console.log('Picker button:', document.getElementById('blkt-color-picker-btn'));
+        console.log('Palette:', document.getElementById('blkt-color-palette'));
+
+        // Jednoduchý test palety
+        const btn = document.getElementById('blkt-color-picker-btn');
+        const palette = document.getElementById('blkt-color-palette');
+
+        if (btn && palette) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Otevírám paletu');
+                palette.style.display = 'block';
+            });
+        }
+    });
+</script>

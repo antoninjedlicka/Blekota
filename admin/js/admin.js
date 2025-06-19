@@ -786,21 +786,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const prev = document.getElementById('section-script');
     if (prev) prev.remove();
 
-    // Pro některé sekce nepotřebujeme speciální JS
-    const sectionsWithoutJS = ['nastaveni'];
-    if (sectionsWithoutJS.includes(section)) {
-      console.log(`Sekce ${section} nemá vlastní JS`);
-      return;
-    }
+    // ODSTRAŇTE TUTO PODMÍNKU - nastaveni POTŘEBUJE svůj JS
+    // const sectionsWithoutJS = ['nastaveni'];
+    // if (sectionsWithoutJS.includes(section)) {
+    //     console.log(`Sekce ${section} nemá vlastní JS`);
+    //     return;
+    // }
 
     const script = document.createElement('script');
     script.id    = 'section-script';
     script.defer = true;
-    script.src   = `js/${section}.js?v=${Date.now()}`; // Cache busting
+    script.src   = `js/${section}.js?v=${Date.now()}`;
 
     script.onload = () => {
       console.log(`Script ${section}.js načten`);
+
+      // Pro nastavení zavoláme init funkci
+      if (section === 'nastaveni' && typeof initNastaveniSection === 'function') {
+        initNastaveniSection();
+      }
     };
+
     script.onerror = () => {
       console.warn(`Soubor js/${section}.js neexistuje nebo se nepodařilo načíst`);
     };
@@ -858,18 +864,27 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (section === 'uzivatele') {
               initUsersSection();
             }
+            // PŘIDAT - Speciální inicializace pro nastavení
+            else if (section === 'nastaveni') {
+              setTimeout(() => {
+                if (typeof initNastaveniSection === 'function') {
+                  initNastaveniSection();
+                }
+              }, 100);
+            }
 
-            // Loader se skryje automaticky po dokončení simulace
+            // DŮLEŽITÉ - Skrýt loader až po načtení
+            AdminLoader.hide();
           }, remainingTime);
         })
         .catch(e => {
           adminSection.innerHTML = `<p class="error-message">Chyba: ${e.message}</p>`;
           adminSection.style.opacity = '1';
           blkt_notifikace('Nepodařilo se načíst sekci', 'error');
+          // DŮLEŽITÉ - Skrýt loader i při chybě
           AdminLoader.hide();
         });
   }
-
   // ============================================
   // 6) Sekce PŘÍSPĚVKY - Přehled
   // ============================================
