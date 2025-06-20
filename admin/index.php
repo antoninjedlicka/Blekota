@@ -158,7 +158,5 @@ $uzivatel = blkt_uzivatel_info();
 <footer class="blkt-paticka">
     <?php include __DIR__ . '/includes/footer.php'; ?>
 </footer>
-<?php include __DIR__ . '/../includes/loader.php'; ?>
-
 </body>
 </html>
