@@ -99,8 +99,19 @@ function blkt_insert_uzivatel(array $data): int {
  * @param array $data ['jmeno','prijmeni','mail','stav','admin','idskupiny']
  * @return bool
  */
+/**
+ * Aktualizuje existujícího uživatele podle ID.
+ * UPRAVENO: Přidána podpora pro změnu hesla
+ *
+ * @param int   $id
+ * @param array $data ['jmeno','prijmeni','mail','stav','admin','idskupiny','heslo']
+ * @return bool
+ */
 function blkt_update_uzivatel(int $id, array $data): bool {
-    $stmt = blkt_db_connect()->prepare("
+    $pdo = blkt_db_connect();
+
+    // Základní SQL bez hesla
+    $sql = "
       UPDATE blkt_uzivatele SET
         blkt_jmeno      = :jmeno,
         blkt_prijmeni   = :prijmeni,
@@ -108,9 +119,9 @@ function blkt_update_uzivatel(int $id, array $data): bool {
         blkt_stav       = :stav,
         blkt_admin      = :admin,
         blkt_idskupiny  = :idskupiny
-      WHERE blkt_id = :id
-    ");
-    return $stmt->execute([
+    ";
+
+    $params = [
         ':jmeno'      => $data['jmeno'],
         ':prijmeni'   => $data['prijmeni'],
         ':mail'       => $data['mail'],
@@ -118,7 +129,22 @@ function blkt_update_uzivatel(int $id, array $data): bool {
         ':admin'      => $data['admin'] ? 1 : 0,
         ':idskupiny'  => isset($data['idskupiny']) ? (int)$data['idskupiny'] : null,
         ':id'         => $id,
-    ]);
+    ];
+
+    // Pokud je zadané nové heslo, přidáme ho do SQL
+    if (!empty($data['heslo'])) {
+        $sql .= ", blkt_heslo = :heslo";
+        $params[':heslo'] = password_hash($data['heslo'], PASSWORD_ARGON2ID, [
+            'memory_cost' => 65536,
+            'time_cost' => 4,
+            'threads' => 1
+        ]);
+    }
+
+    $sql .= " WHERE blkt_id = :id";
+
+    $stmt = $pdo->prepare($sql);
+    return $stmt->execute($params);
 }
 
 /**
