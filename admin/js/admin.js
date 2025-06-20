@@ -179,13 +179,6 @@ document.addEventListener('DOMContentLoaded', () => {
         stop-color: var(--blkt-primary-light) !important;
       }
       
-      .blkt-loading-text {
-        background: linear-gradient(90deg, var(--blkt-primary), var(--blkt-primary-light)) !important;
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-      
       .blkt-loading-dots span {
         color: var(--blkt-primary) !important;
       }
@@ -1230,16 +1223,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Vystavíme loadSection globálně pro použití v jiných skriptech
   window.loadSection = loadSection;
 
-// ============================================
-  // 12) Načtení výchozí sekce podle URL
   // ============================================
-  const pocatecniSekce = blkt_ziskaj_sekci_z_url();
-  loadSection(pocatecniSekce, false);
-
-// ============================================
-  // 13) Načtení a aplikace uloženého barevného schématu
+  // 12) Načtení a aplikace uloženého barevného schématu PŘED načtením sekce
   // ============================================
-  // Načteme barvu hned při startu
+  // Načteme barvu HNED při startu a počkáme na ni
   fetch('action/get_theme_color.php')
       .then(r => r.json())
       .then(data => {
@@ -1248,6 +1235,13 @@ document.addEventListener('DOMContentLoaded', () => {
           blkt_aplikuj_barevne_schema(data.color);
         }
       })
-      .catch(err => console.log('Nepodařilo se načíst barevné schéma:', err));
+      .catch(err => console.log('Nepodařilo se načíst barevné schéma:', err))
+      .finally(() => {
+        // ============================================
+        // 13) Načtení výchozí sekce podle URL - AŽ PO načtení barvy
+        // ============================================
+        const pocatecniSekce = blkt_ziskej_sekci_z_url();
+        loadSection(pocatecniSekce, false);
+      });
 
 }); // konec DOMContentLoaded

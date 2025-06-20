@@ -41,7 +41,7 @@
 
 /* Hlavička modalu */
 .blkt-modal-header {
-    padding: 1.5rem;
+    padding: 10px 1.5rem;
     border-bottom: 1px solid var(--blkt-border);
     display: flex;
     justify-content: space-between;

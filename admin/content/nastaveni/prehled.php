@@ -53,10 +53,11 @@ $je_vlastni_barva = !array_key_exists($nastaveni['THEME'], $blkt_prednastavene_b
             <label>Adresa blogu</label>
         </div>
 
-        <div class="blkt-formular-skupina blkt-barva-skupina">
+        <div class="blkt-barva-skupina">
             <div class="blkt-barva-container">
                 <!-- Levá polovina - výběr přednastavených barev -->
                 <div class="blkt-barva-select-wrapper">
+                    <div class="blkt-formular-skupina">
                     <select name="THEME_SELECT" id="blkt-theme-select">
                         <?php foreach ($blkt_prednastavene_barvy as $hex => $nazev): ?>
                             <option value="<?= $hex ?>"
@@ -68,10 +69,13 @@ $je_vlastni_barva = !array_key_exists($nastaveni['THEME'], $blkt_prednastavene_b
                         <option value="custom" <?= $je_vlastni_barva ? 'selected' : '' ?>>Vlastní barva</option>
                     </select>
                     <label>Barevné schéma</label>
+                    </div>
                 </div>
 
                 <!-- Pravá polovina - hex input a tlačítko -->
                 <div class="blkt-barva-input-wrapper">
+                    <div class="blkt-formular-skupina">
+
                     <input type="text"
                            id="blkt-color-hex-input"
                            name="THEME"
@@ -80,6 +84,8 @@ $je_vlastni_barva = !array_key_exists($nastaveni['THEME'], $blkt_prednastavene_b
                            maxlength="7"
                            pattern="^#[0-9A-Fa-f]{6}$"
                            required>
+                        <label>Barevné schéma</label>
+                    </div>
 
                     <button type="button"
                             id="blkt-color-picker-btn"
