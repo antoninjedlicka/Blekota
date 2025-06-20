@@ -5,18 +5,37 @@
 require_once __DIR__ . '/../../databaze.php';
 
 $pdo = blkt_db_connect();
+
+// Načteme uživatele
 $stmt = $pdo->query("
-    SELECT blkt_id, blkt_jmeno, blkt_prijmeni, blkt_mail, blkt_admin
-    FROM blkt_uzivatele
-    ORDER BY blkt_jmeno, blkt_prijmeni
+    SELECT 
+        u.blkt_id, 
+        u.blkt_jmeno, 
+        u.blkt_prijmeni, 
+        u.blkt_mail, 
+        u.blkt_admin,
+        u.blkt_idskupiny,
+        s.blkt_nazev as skupina_nazev
+    FROM blkt_uzivatele u
+    LEFT JOIN blkt_skupiny s ON u.blkt_idskupiny = s.blkt_idskupiny
+    ORDER BY u.blkt_jmeno, u.blkt_prijmeni
 ");
 $uzivatele = $stmt->fetchAll();
+
+// Načteme skupiny a role pro druhou záložku
+$skupiny = blkt_get_skupiny();
+$role = blkt_get_role();
 ?>
 
 <nav class="blkt-tabs">
-  <button class="active" data-tab="prehled">Přehled</button>
+    <button class="active" data-tab="prehled">Přehled</button>
+    <button data-tab="skupiny">Skupiny a role</button>
 </nav>
 
 <div id="tab-prehled" class="tab-content">
-  <?php include __DIR__ . '/uzivatele/prehled.php'; ?>
+    <?php include __DIR__ . '/uzivatele/prehled.php'; ?>
+</div>
+
+<div id="tab-skupiny" class="tab-content" style="display:none">
+    <?php include __DIR__ . '/uzivatele/skupiny.php'; ?>
 </div>

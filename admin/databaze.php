@@ -1,6 +1,6 @@
 <?php
 // databaze.php
-// Všechny funkce pro CRUD operace nad tabulkami blkt_uzivatele, blkt_konfigurace a blkt_prispevky.
+// Všechny funkce pro CRUD operace nad tabulkami blkt_uzivatele, blkt_konfigurace, blkt_prispevky, blkt_skupiny a blkt_role.
 // Přímý přístup není povolen.
 if (basename(__FILE__) === basename($_SERVER['SCRIPT_FILENAME'])) {
     http_response_code(403);
@@ -14,6 +14,7 @@ require_once __DIR__ . '/../databaze.php';
 
 /**
  * Vytvoří tabulku blkt_uzivatele.
+ * UPRAVENO: Přidán sloupec blkt_idskupiny
  */
 function blkt_create_table_uzivatele(): void {
     $sql = "
@@ -24,7 +25,9 @@ function blkt_create_table_uzivatele(): void {
       blkt_mail VARCHAR(255) NOT NULL UNIQUE,
       blkt_heslo VARCHAR(255) NOT NULL,
       blkt_stav TINYINT(1) NOT NULL DEFAULT 1,
-      blkt_admin TINYINT(1) NOT NULL DEFAULT 0
+      blkt_admin TINYINT(1) NOT NULL DEFAULT 0,
+      blkt_idskupiny INT DEFAULT NULL,
+      FOREIGN KEY (blkt_idskupiny) REFERENCES blkt_skupiny(blkt_idskupiny) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
     blkt_db_connect()->exec($sql);
 }
@@ -38,6 +41,7 @@ function blkt_drop_table_uzivatele(): void {
 
 /**
  * Bezpečné vložení uživatele s validací
+ * UPRAVENO: Přidán parametr idskupiny
  * @return int
  * @throws Exception
  */
@@ -69,68 +73,51 @@ function blkt_insert_uzivatel(array $data): int {
 
     $stmt = $pdo->prepare("
         INSERT INTO blkt_uzivatele
-        (blkt_jmeno, blkt_prijmeni, blkt_mail, blkt_heslo, blkt_stav, blkt_admin)
+        (blkt_jmeno, blkt_prijmeni, blkt_mail, blkt_heslo, blkt_stav, blkt_admin, blkt_idskupiny)
         VALUES
-        (:jmeno, :prijmeni, :mail, :heslo, :stav, :admin)
+        (:jmeno, :prijmeni, :mail, :heslo, :stav, :admin, :idskupiny)
     ");
 
     $stmt->execute([
-        ':jmeno'    => $data['jmeno'],
-        ':prijmeni' => $data['prijmeni'],
-        ':mail'     => $data['mail'],
-        ':heslo'    => $hashedPassword,
-        ':stav'     => isset($data['stav']) ? (int)$data['stav'] : 1,
-        ':admin'    => isset($data['admin']) ? (int)$data['admin'] : 0,
+        ':jmeno'      => $data['jmeno'],
+        ':prijmeni'   => $data['prijmeni'],
+        ':mail'       => $data['mail'],
+        ':heslo'      => $hashedPassword,
+        ':stav'       => isset($data['stav']) ? (int)$data['stav'] : 1,
+        ':admin'      => isset($data['admin']) ? (int)$data['admin'] : 0,
+        ':idskupiny'  => isset($data['idskupiny']) ? (int)$data['idskupiny'] : null,
     ]);
 
     return (int)$pdo->lastInsertId();
 }
 
-// Přidání indexů pro lepší výkon (spustit jednou při instalaci)
-function blkt_create_indexes(): void {
-    $pdo = blkt_db_connect();
-
-    // Index pro rychlé vyhledávání uživatelů
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_mail ON blkt_uzivatele(blkt_mail)");
-
-    // Index pro konfigurace
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_kod ON blkt_konfigurace(blkt_kod)");
-
-    // Index pro příspěvky
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_kategorie ON blkt_prispevky(blkt_kategorie)");
-
-    // Index pro detaily obsahu
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_slug ON blkt_obsah_detaily(blkt_slug)");
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_parent_type ON blkt_obsah_detaily(blkt_parent_id, blkt_type)");
-
-    // Index pro obrázky
-    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_created ON blkt_images(blkt_created_at DESC)");
-}
-
 /**
  * Aktualizuje existujícího uživatele podle ID.
+ * UPRAVENO: Přidán parametr idskupiny
  *
  * @param int   $id
- * @param array $data ['jmeno','prijmeni','mail','stav','admin']
+ * @param array $data ['jmeno','prijmeni','mail','stav','admin','idskupiny']
  * @return bool
  */
 function blkt_update_uzivatel(int $id, array $data): bool {
     $stmt = blkt_db_connect()->prepare("
       UPDATE blkt_uzivatele SET
-        blkt_jmeno    = :jmeno,
-        blkt_prijmeni = :prijmeni,
-        blkt_mail     = :mail,
-        blkt_stav     = :stav,
-        blkt_admin    = :admin
+        blkt_jmeno      = :jmeno,
+        blkt_prijmeni   = :prijmeni,
+        blkt_mail       = :mail,
+        blkt_stav       = :stav,
+        blkt_admin      = :admin,
+        blkt_idskupiny  = :idskupiny
       WHERE blkt_id = :id
     ");
     return $stmt->execute([
-        ':jmeno'    => $data['jmeno'],
-        ':prijmeni' => $data['prijmeni'],
-        ':mail'     => $data['mail'],
-        ':stav'     => $data['stav'] ? 1 : 0,
-        ':admin'    => $data['admin'] ? 1 : 0,
-        ':id'       => $id,
+        ':jmeno'      => $data['jmeno'],
+        ':prijmeni'   => $data['prijmeni'],
+        ':mail'       => $data['mail'],
+        ':stav'       => $data['stav'] ? 1 : 0,
+        ':admin'      => $data['admin'] ? 1 : 0,
+        ':idskupiny'  => isset($data['idskupiny']) ? (int)$data['idskupiny'] : null,
+        ':id'         => $id,
     ]);
 }
 
@@ -144,6 +131,396 @@ function blkt_delete_uzivatel(int $id): bool {
     return blkt_db_connect()
         ->prepare("DELETE FROM blkt_uzivatele WHERE blkt_id = :id")
         ->execute([':id' => $id]);
+}
+
+/* === TABULKA blkt_skupiny === */
+
+/**
+ * Vytvoří tabulku blkt_skupiny.
+ */
+function blkt_create_table_skupiny(): void {
+    $sql = "
+    CREATE TABLE IF NOT EXISTS blkt_skupiny (
+      blkt_idskupiny INT AUTO_INCREMENT PRIMARY KEY,
+      blkt_nazev VARCHAR(100) NOT NULL UNIQUE,
+      blkt_popis TEXT,
+      blkt_role TEXT COMMENT 'Čárkami oddělená ID rolí'
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+    blkt_db_connect()->exec($sql);
+}
+
+/**
+ * Smaže tabulku blkt_skupiny.
+ */
+function blkt_drop_table_skupiny(): void {
+    // Nejprve musíme odstranit cizí klíč z tabulky uživatelů
+    $pdo = blkt_db_connect();
+    try {
+        // Najdeme název cizího klíče
+        $stmt = $pdo->prepare("
+            SELECT CONSTRAINT_NAME 
+            FROM information_schema.KEY_COLUMN_USAGE 
+            WHERE TABLE_NAME = 'blkt_uzivatele' 
+            AND COLUMN_NAME = 'blkt_idskupiny' 
+            AND REFERENCED_TABLE_NAME = 'blkt_skupiny'
+        ");
+        $stmt->execute();
+        $constraint = $stmt->fetchColumn();
+
+        if ($constraint) {
+            $pdo->exec("ALTER TABLE blkt_uzivatele DROP FOREIGN KEY $constraint");
+        }
+
+        // Odstraníme sloupec
+        $pdo->exec("ALTER TABLE blkt_uzivatele DROP COLUMN IF EXISTS blkt_idskupiny");
+    } catch (Exception $e) {
+        // Pokud se nepodaří, pokračujeme
+    }
+
+    // Smažeme tabulku
+    $pdo->exec("DROP TABLE IF EXISTS blkt_skupiny;");
+}
+
+/**
+ * Vloží novou skupinu.
+ *
+ * @param array $data ['nazev','popis','role']
+ * @return int ID vložené skupiny
+ * @throws Exception
+ */
+function blkt_insert_skupina(array $data): int {
+    if (empty($data['nazev'])) {
+        throw new Exception('Název skupiny je povinný.');
+    }
+
+    $pdo = blkt_db_connect();
+
+    // Kontrola duplicity názvu
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM blkt_skupiny WHERE blkt_nazev = :nazev");
+    $stmt->execute([':nazev' => $data['nazev']]);
+    if ($stmt->fetchColumn() > 0) {
+        throw new Exception('Skupina s tímto názvem již existuje.');
+    }
+
+    $stmt = $pdo->prepare("
+        INSERT INTO blkt_skupiny (blkt_nazev, blkt_popis, blkt_role)
+        VALUES (:nazev, :popis, :role)
+    ");
+
+    $stmt->execute([
+        ':nazev' => $data['nazev'],
+        ':popis' => $data['popis'] ?? '',
+        ':role'  => $data['role'] ?? '',
+    ]);
+
+    return (int)$pdo->lastInsertId();
+}
+
+/**
+ * Aktualizuje existující skupinu podle ID.
+ *
+ * @param int   $id
+ * @param array $data ['nazev','popis','role']
+ * @return bool
+ * @throws Exception
+ */
+function blkt_update_skupina(int $id, array $data): bool {
+    if (empty($data['nazev'])) {
+        throw new Exception('Název skupiny je povinný.');
+    }
+
+    $pdo = blkt_db_connect();
+
+    // Kontrola duplicity názvu (kromě aktuální skupiny)
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM blkt_skupiny WHERE blkt_nazev = :nazev AND blkt_idskupiny != :id");
+    $stmt->execute([':nazev' => $data['nazev'], ':id' => $id]);
+    if ($stmt->fetchColumn() > 0) {
+        throw new Exception('Skupina s tímto názvem již existuje.');
+    }
+
+    $stmt = $pdo->prepare("
+        UPDATE blkt_skupiny SET
+            blkt_nazev = :nazev,
+            blkt_popis = :popis,
+            blkt_role = :role
+        WHERE blkt_idskupiny = :id
+    ");
+
+    return $stmt->execute([
+        ':nazev' => $data['nazev'],
+        ':popis' => $data['popis'] ?? '',
+        ':role'  => $data['role'] ?? '',
+        ':id'    => $id,
+    ]);
+}
+
+/**
+ * Smaže skupinu podle ID.
+ *
+ * @param int $id
+ * @return bool
+ */
+function blkt_delete_skupina(int $id): bool {
+    // Při smazání skupiny se automaticky nastaví NULL všem uživatelům díky ON DELETE SET NULL
+    return blkt_db_connect()
+        ->prepare("DELETE FROM blkt_skupiny WHERE blkt_idskupiny = :id")
+        ->execute([':id' => $id]);
+}
+
+/**
+ * Získá všechny skupiny.
+ *
+ * @return array
+ */
+function blkt_get_skupiny(): array {
+    $stmt = blkt_db_connect()->query("
+        SELECT * FROM blkt_skupiny 
+        ORDER BY blkt_nazev
+    ");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Získá skupinu podle ID.
+ *
+ * @param int $id
+ * @return array|null
+ */
+function blkt_get_skupina(int $id): ?array {
+    $stmt = blkt_db_connect()->prepare("
+        SELECT * FROM blkt_skupiny 
+        WHERE blkt_idskupiny = :id
+    ");
+    $stmt->execute([':id' => $id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $result ?: null;
+}
+
+/**
+ * Získá počet uživatelů ve skupině.
+ *
+ * @param int $id
+ * @return int
+ */
+function blkt_pocet_uzivatelu_ve_skupine(int $id): int {
+    $stmt = blkt_db_connect()->prepare("
+        SELECT COUNT(*) FROM blkt_uzivatele 
+        WHERE blkt_idskupiny = :id
+    ");
+    $stmt->execute([':id' => $id]);
+    return (int)$stmt->fetchColumn();
+}
+
+/* === TABULKA blkt_role === */
+
+/**
+ * Vytvoří tabulku blkt_role.
+ */
+function blkt_create_table_role(): void {
+    $sql = "
+    CREATE TABLE IF NOT EXISTS blkt_role (
+      blkt_idrole INT AUTO_INCREMENT PRIMARY KEY,
+      blkt_nazev VARCHAR(100) NOT NULL UNIQUE,
+      blkt_popis TEXT,
+      blkt_obsahrole TEXT COMMENT 'JSON nebo serialized data s oprávněními'
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+    blkt_db_connect()->exec($sql);
+}
+
+/**
+ * Smaže tabulku blkt_role.
+ */
+function blkt_drop_table_role(): void {
+    blkt_db_connect()->exec("DROP TABLE IF EXISTS blkt_role;");
+}
+
+/**
+ * Vloží novou roli.
+ *
+ * @param array $data ['nazev','popis','obsahrole']
+ * @return int ID vložené role
+ * @throws Exception
+ */
+function blkt_insert_role(array $data): int {
+    if (empty($data['nazev'])) {
+        throw new Exception('Název role je povinný.');
+    }
+
+    $pdo = blkt_db_connect();
+
+    // Kontrola duplicity názvu
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM blkt_role WHERE blkt_nazev = :nazev");
+    $stmt->execute([':nazev' => $data['nazev']]);
+    if ($stmt->fetchColumn() > 0) {
+        throw new Exception('Role s tímto názvem již existuje.');
+    }
+
+    $stmt = $pdo->prepare("
+        INSERT INTO blkt_role (blkt_nazev, blkt_popis, blkt_obsahrole)
+        VALUES (:nazev, :popis, :obsahrole)
+    ");
+
+    // Pokud je obsahrole pole, převedeme na JSON
+    $obsahrole = $data['obsahrole'] ?? '';
+    if (is_array($obsahrole)) {
+        $obsahrole = json_encode($obsahrole, JSON_UNESCAPED_UNICODE);
+    }
+
+    $stmt->execute([
+        ':nazev'      => $data['nazev'],
+        ':popis'      => $data['popis'] ?? '',
+        ':obsahrole'  => $obsahrole,
+    ]);
+
+    return (int)$pdo->lastInsertId();
+}
+
+/**
+ * Aktualizuje existující roli podle ID.
+ *
+ * @param int   $id
+ * @param array $data ['nazev','popis','obsahrole']
+ * @return bool
+ * @throws Exception
+ */
+function blkt_update_role(int $id, array $data): bool {
+    if (empty($data['nazev'])) {
+        throw new Exception('Název role je povinný.');
+    }
+
+    $pdo = blkt_db_connect();
+
+    // Kontrola duplicity názvu (kromě aktuální role)
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM blkt_role WHERE blkt_nazev = :nazev AND blkt_idrole != :id");
+    $stmt->execute([':nazev' => $data['nazev'], ':id' => $id]);
+    if ($stmt->fetchColumn() > 0) {
+        throw new Exception('Role s tímto názvem již existuje.');
+    }
+
+    // Pokud je obsahrole pole, převedeme na JSON
+    $obsahrole = $data['obsahrole'] ?? '';
+    if (is_array($obsahrole)) {
+        $obsahrole = json_encode($obsahrole, JSON_UNESCAPED_UNICODE);
+    }
+
+    $stmt = $pdo->prepare("
+        UPDATE blkt_role SET
+            blkt_nazev = :nazev,
+            blkt_popis = :popis,
+            blkt_obsahrole = :obsahrole
+        WHERE blkt_idrole = :id
+    ");
+
+    return $stmt->execute([
+        ':nazev'      => $data['nazev'],
+        ':popis'      => $data['popis'] ?? '',
+        ':obsahrole'  => $obsahrole,
+        ':id'         => $id,
+    ]);
+}
+
+/**
+ * Smaže roli podle ID.
+ *
+ * @param int $id
+ * @return bool
+ */
+function blkt_delete_role(int $id): bool {
+    return blkt_db_connect()
+        ->prepare("DELETE FROM blkt_role WHERE blkt_idrole = :id")
+        ->execute([':id' => $id]);
+}
+
+/**
+ * Získá všechny role.
+ *
+ * @return array
+ */
+function blkt_get_role(): array {
+    $stmt = blkt_db_connect()->query("
+        SELECT * FROM blkt_role 
+        ORDER BY blkt_nazev
+    ");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Získá roli podle ID.
+ *
+ * @param int $id
+ * @return array|null
+ */
+function blkt_get_role_by_id(int $id): ?array {
+    $stmt = blkt_db_connect()->prepare("
+        SELECT * FROM blkt_role 
+        WHERE blkt_idrole = :id
+    ");
+    $stmt->execute([':id' => $id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Pokud obsahrole je JSON, dekódujeme ho
+    if ($result && !empty($result['blkt_obsahrole'])) {
+        $decoded = json_decode($result['blkt_obsahrole'], true);
+        if ($decoded !== null) {
+            $result['blkt_obsahrole'] = $decoded;
+        }
+    }
+
+    return $result ?: null;
+}
+
+/**
+ * Získá role podle seznamu ID.
+ *
+ * @param array $ids Pole ID rolí
+ * @return array
+ */
+function blkt_get_role_by_ids(array $ids): array {
+    if (empty($ids)) {
+        return [];
+    }
+
+    $pdo = blkt_db_connect();
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    $stmt = $pdo->prepare("
+        SELECT * FROM blkt_role 
+        WHERE blkt_idrole IN ($placeholders)
+        ORDER BY blkt_nazev
+    ");
+    $stmt->execute($ids);
+
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Dekódujeme JSON v obsahrole
+    foreach ($result as &$role) {
+        if (!empty($role['blkt_obsahrole'])) {
+            $decoded = json_decode($role['blkt_obsahrole'], true);
+            if ($decoded !== null) {
+                $role['blkt_obsahrole'] = $decoded;
+            }
+        }
+    }
+
+    return $result;
+}
+
+/**
+ * Zkontroluje, zda je role použita v nějaké skupině.
+ *
+ * @param int $id
+ * @return bool
+ */
+function blkt_je_role_pouzita(int $id): bool {
+    $skupiny = blkt_get_skupiny();
+    foreach ($skupiny as $skupina) {
+        if (!empty($skupina['blkt_role'])) {
+            $role_ids = array_map('trim', explode(',', $skupina['blkt_role']));
+            if (in_array($id, $role_ids)) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 /* === TABULKA blkt_konfigurace === */
@@ -992,5 +1369,29 @@ function blkt_delete_zivotopis_typ(string $typ): bool {
     return blkt_db_connect()
         ->prepare("DELETE FROM blkt_zivotopis WHERE blkt_typ = :typ")
         ->execute([':typ' => $typ]);
+}
+
+// Přidání indexů pro lepší výkon (spustit jednou při instalaci)
+function blkt_create_indexes(): void {
+    $pdo = blkt_db_connect();
+
+    // Index pro rychlé vyhledávání uživatelů
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_mail ON blkt_uzivatele(blkt_mail)");
+
+    // Index pro skupiny uživatelů
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_idskupiny ON blkt_uzivatele(blkt_idskupiny)");
+
+    // Index pro konfigurace
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_kod ON blkt_konfigurace(blkt_kod)");
+
+    // Index pro příspěvky
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_kategorie ON blkt_prispevky(blkt_kategorie)");
+
+    // Index pro detaily obsahu
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_slug ON blkt_obsah_detaily(blkt_slug)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_parent_type ON blkt_obsah_detaily(blkt_parent_id, blkt_type)");
+
+    // Index pro obrázky
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_created ON blkt_images(blkt_created_at DESC)");
 }
 ?>
