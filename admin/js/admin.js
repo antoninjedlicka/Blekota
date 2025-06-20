@@ -1,6 +1,6 @@
 // admin/js/admin.js
 // Kompletní administrační sekce s AJAX + Tabs + Notifikace + Responsivní záložky + LOADER
-// Sloučená verze všech funkcí
+// Aktualizovaná verze se standardními modaly
 
 document.addEventListener('DOMContentLoaded', () => {
   // ============================================
@@ -580,59 +580,84 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================
-  // 1) Galerie obrázků pro TinyMCE
+  // 1) Galerie obrázků pro TinyMCE - UPRAVENO PRO STANDARDNÍ MODAL
   // ============================================
   window.blkt_openGalleryModal = function(editor) {
-    const overlay   = document.getElementById('blkt-gallery-overlay');
-    const modal     = document.getElementById('blkt-gallery-modal');
+    console.log('[GalleryModal] Opening');
+
+    const overlay = document.getElementById('blkt-gallery-overlay');
+    const modal = document.getElementById('blkt-gallery-modal');
     const galleryEl = modal.querySelector('.blkt-gallery-images');
-    const btnInsert = modal.querySelector('#blkt-gallery-insert');
+    const btnInsert = document.getElementById('blkt-gallery-insert');
+
     let selectedUrl = '', selectedAlt = '';
 
-    overlay.style.display = 'block';
-    modal.style.display   = 'block';
+    // Použijeme standardní funkci pro otevření
+    if (typeof blkt_otevri_modal === 'function') {
+      blkt_otevri_modal('blkt-gallery-modal', 'blkt-gallery-overlay');
+    } else {
+      overlay.style.display = 'block';
+      modal.style.display = 'block';
+    }
 
-    galleryEl.innerHTML = '<p>Načítám galerii...</p>';
+    btnInsert.disabled = true;
+    galleryEl.innerHTML = '<p>Načítám…</p>';
+
     fetch('action/list_images.php')
         .then(r => r.json())
         .then(list => {
+          console.log('[GalleryModal] Loaded', list.length, 'images');
           galleryEl.innerHTML = '';
           list.forEach(img => {
             const thumb = document.createElement('img');
-            thumb.src       = img.url;
-            thumb.alt       = img.alt;
-            thumb.title     = img.title;
+            thumb.src = img.url;
+            thumb.alt = img.alt;
+            thumb.title = img.title;
             thumb.className = 'blkt-gallery-thumb';
-            thumb.style.cssText = 'width:100px;height:100px;object-fit:cover;cursor:pointer;margin:.25rem;';
             thumb.addEventListener('click', () => {
               galleryEl.querySelectorAll('.selected').forEach(e => e.classList.remove('selected'));
               thumb.classList.add('selected');
               selectedUrl = img.url;
               selectedAlt = img.alt;
               btnInsert.disabled = false;
+              console.log('[GalleryModal] Selected', selectedUrl);
             });
             galleryEl.append(thumb);
           });
         })
-        .catch(() => blkt_notifikace('Nepodařilo se načíst galerii.', 'error'));
+        .catch(() => {
+          console.error('[GalleryModal] Error loading images');
+          blkt_notifikace('Nepodařilo se načíst galerii.', 'error');
+        });
 
+    // Použijeme standardní close funkci
     modal.querySelector('.blkt-modal-close').onclick =
-        modal.querySelector('#blkt-gallery-cancel').onclick = () => {
-          overlay.style.display = 'none';
-          modal.style.display   = 'none';
+        document.getElementById('blkt-gallery-cancel').onclick = () => {
+          console.log('[GalleryModal] Closing');
+          if (typeof blkt_zavri_modal === 'function') {
+            blkt_zavri_modal('blkt-gallery-modal', 'blkt-gallery-overlay');
+          } else {
+            overlay.style.display = 'none';
+            modal.style.display = 'none';
+          }
         };
 
+    // Vložit
     btnInsert.onclick = () => {
-      const align = modal.querySelector('#blkt-gallery-align').value;
-      const disp  = modal.querySelector('#blkt-gallery-display').value;
+      console.log('[GalleryModal] Inserting', selectedUrl);
+      const align = document.getElementById('blkt-gallery-align').value;
+      const disp = document.getElementById('blkt-gallery-display').value;
       let style = '';
-      if (align==='left' || align==='right') style = `float:${align};margin:0 1em 1em 0;`;
-      else if (align==='center')              style = 'display:block;margin:0 auto 1em;';
-      editor.insertContent(
-          `<img src="${selectedUrl}" alt="${selectedAlt}" style="${style}display:${disp};">`
-      );
-      overlay.style.display = 'none';
-      modal.style.display   = 'none';
+      if (align==='left'||align==='right') style = `float:${align};margin:0 1em 1em 0;`;
+      else if (align==='center') style = 'display:block;margin:0 auto 1em;';
+      editor.insertContent(`<img src="${selectedUrl}" alt="${selectedAlt}" style="${style}display:${disp};">`);
+
+      if (typeof blkt_zavri_modal === 'function') {
+        blkt_zavri_modal('blkt-gallery-modal', 'blkt-gallery-overlay');
+      } else {
+        overlay.style.display = 'none';
+        modal.style.display = 'none';
+      }
     };
   };
 
@@ -640,91 +665,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // 2) Vložit / upravit obrázek pro TinyMCE
   // ============================================
   window.blkt_openImageModal = function(editor, existingImg) {
-    const overlay = document.getElementById('blkt-gallery-overlay');
-    const modal   = document.getElementById('blkt-gallery-modal');
-
-    overlay.style.display = 'block';
-    modal.style.display   = 'block';
-
-    modal.querySelector('h3').textContent = existingImg ? 'Upravit obrázek' : 'Vložit obrázek';
-    modal.querySelector('.blkt-modal-body').innerHTML = `
-      <div class="blkt-formular-skupina">
-        <input type="text" id="blkt-img-src" placeholder=" " required>
-        <label for="blkt-img-src">URL obrázku</label>
-      </div>
-      <div class="blkt-formular-skupina">
-        <input type="text" id="blkt-img-alt" placeholder=" ">
-        <label for="blkt-img-alt">Alt text</label>
-      </div>
-      <div class="blkt-formular-skupina">
-        <select id="blkt-img-align" required>
-          <option value="" disabled selected></option>
-          <option value="">žádné</option>
-          <option value="left">vlevo (text obtéká)</option>
-          <option value="right">vpravo (text obtéká)</option>
-          <option value="center">na střed</option>
-        </select>
-        <label for="blkt-img-align">Zarovnání</label>
-      </div>
-      <div class="blkt-formular-skupina">
-        <select id="blkt-img-display" required>
-          <option value="" disabled selected></option>
-          <option value="inline">vložit do textu</option>
-          <option value="block">blok (nový řádek)</option>
-        </select>
-        <label for="blkt-img-display">Zobrazení</label>
-      </div>
-      <div class="modal-actions" style="text-align:right;">
-        <button type="button" id="blkt-img-cancel" class="btn btn-cancel">Zrušit</button>
-        <button type="button" id="blkt-img-insert" class="btn btn-save" disabled>Vložit/Uložit</button>
-      </div>
-    `;
-
-    const srcIn   = document.getElementById('blkt-img-src');
-    const altIn   = document.getElementById('blkt-img-alt');
-    const alignIn = document.getElementById('blkt-img-align');
-    const dispIn  = document.getElementById('blkt-img-display');
-    const btnIns  = document.getElementById('blkt-img-insert');
-
-    if (existingImg) {
-      srcIn.value   = existingImg.src;
-      altIn.value   = existingImg.alt || '';
-      const s = existingImg.style;
-      if (s.float==='left')       alignIn.value='left';
-      else if (s.float==='right') alignIn.value='right';
-      else if (s.display==='block' && s.marginLeft==='auto' && s.marginRight==='auto')
-        alignIn.value='center';
-      dispIn.value = s.display||'';
-      btnIns.disabled = false;
-    }
-
-    srcIn.addEventListener('input', () => {
-      btnIns.disabled = !srcIn.value.trim();
-    });
-
-    modal.querySelector('#blkt-img-cancel').onclick =
-        modal.querySelector('.blkt-modal-close').onclick = () => {
-          overlay.style.display = 'none';
-          modal.style.display   = 'none';
-        };
-
-    btnIns.onclick = () => {
-      const src   = srcIn.value.trim();
-      const alt   = altIn.value.trim();
-      const align = alignIn.value;
-      const disp  = dispIn.value;
-      let style = '';
-      if (align==='left' || align==='right') style = `float:${align};margin:0 1em 1em 0;`;
-      else if (align==='center')              style = 'display:block;margin:0 auto 1em;';
-      style += `display:${disp};`;
-      const html = `<img src="${src}" alt="${alt}" style="${style}">`;
-
-      if (existingImg) existingImg.outerHTML = html;
-      else              editor.insertContent(html);
-
-      overlay.style.display = 'none';
-      modal.style.display   = 'none';
-    };
+    console.log('[ImageModal] Dispatching to GalleryModal');
+    window.blkt_openGalleryModal(editor);
   };
 
   // ============================================
@@ -785,13 +727,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function loadSectionScript(section) {
     const prev = document.getElementById('section-script');
     if (prev) prev.remove();
-
-    // ODSTRAŇTE TUTO PODMÍNKU - nastaveni POTŘEBUJE svůj JS
-    // const sectionsWithoutJS = ['nastaveni'];
-    // if (sectionsWithoutJS.includes(section)) {
-    //     console.log(`Sekce ${section} nemá vlastní JS`);
-    //     return;
-    // }
 
     const script = document.createElement('script');
     script.id    = 'section-script';
@@ -1072,7 +1007,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================
-  // 8) Sekce UŽIVATELE
+  // 8) Sekce UŽIVATELE - UPRAVENO PRO STANDARDNÍ MODALY
   // ============================================
   function initUsersSection() {
     const table   = document.getElementById('users-table');
@@ -1081,11 +1016,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const addBtn  = document.getElementById('add-user-btn');
     const editBtn = document.getElementById('edit-user-btn');
     const delBtn  = document.getElementById('delete-user-btn');
-    const overlay = document.getElementById('blkt-user-overlay');
-    const modal   = document.getElementById('blkt-user-modal');
-    const form    = document.getElementById('blkt-user-form');
-    const titleEl = document.getElementById('blkt-modal-title');
-    const closeEl = document.getElementById('blkt-modal-close');
 
     if (table) {
       table.addEventListener('click', e => {
@@ -1102,78 +1032,177 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    function showModal(mode,data={}) {
-      overlay.style.display = 'block';
-      modal.style.display   = 'block';
-      titleEl.textContent   = mode==='add'?'Přidat uživatele'
-          : mode==='edit'?'Upravit uživatele'
-              :'Potvrďte smazání';
-      let html='';
-      if(mode==='delete'){
-        html=`
-          <input type="hidden" name="blkt_id" value="${data.id}">
-          <p>Smazat <strong>${data.jmeno} ${data.prijmeni}</strong>?</p>
-          <div class="modal-actions">
-            <button type="button" class="btn btn-cancel" id="blkt-cancel">Ne</button>
-            <button type="submit" class="btn btn-save">Ano</button>
-          </div>`;
+    // Přidání nového uživatele
+    if (addBtn) addBtn.onclick = () => showUserModal('add');
+
+    // Úprava uživatele
+    if (editBtn) editBtn.onclick = () => {
+      const id = document.getElementById('card-id').value;
+      showUserModal('edit', {
+        id,
+        jmeno: document.getElementById('card-jmeno').textContent,
+        prijmeni: document.getElementById('card-prijmeni').textContent,
+        mail: document.getElementById('card-mail').textContent,
+        admin: document.getElementById('card-admin-text').textContent === 'Ano' ? '1' : '0'
+      });
+    };
+
+    // Mazání uživatele - POUŽIJEME STANDARDNÍ POTVRZOVACÍ MODAL
+    if (delBtn) delBtn.onclick = () => {
+      const id = document.getElementById('card-id').value;
+      const jmeno = document.getElementById('card-jmeno').textContent;
+      const prijmeni = document.getElementById('card-prijmeni').textContent;
+
+      // Použijeme standardní potvrzovací modal
+      if (typeof blkt_potvrdit_akci === 'function') {
+        blkt_potvrdit_akci(
+            'Potvrďte smazání',
+            `Opravdu chcete smazat uživatele <strong>${jmeno} ${prijmeni}</strong>?`,
+            () => {
+              // Akce po potvrzení
+              const formData = new FormData();
+              formData.append('blkt_id', id);
+
+              const closeLoading = blkt_zobraz_loading ? blkt_zobraz_loading('Mažu uživatele...') : () => {};
+
+              fetch('action/delete_user.php', {
+                method: 'POST',
+                body: formData
+              })
+                  .then(r => r.json())
+                  .then(j => {
+                    closeLoading();
+                    if (j.status === 'ok') {
+                      blkt_notifikace(j.message || 'Uživatel byl smazán', 'success');
+                      loadSection('uzivatele'); // Obnovit seznam
+                    } else {
+                      blkt_notifikace('Chyba: ' + j.error, 'error');
+                    }
+                  })
+                  .catch(e => {
+                    closeLoading();
+                    blkt_notifikace('Síťová chyba: ' + e.message, 'error');
+                  });
+            },
+            null, // onCancel callback
+            'danger' // typ modalu
+        );
       } else {
-        html=`
-          <input type="hidden" name="blkt_id" value="${data.id || ''}">
-          <div class="blkt-formular-skupina"><input type="text" name="blkt_jmeno" placeholder=" " required value="${data.jmeno || ''}"><label>Jméno</label></div>
-          <div class="blkt-formular-skupina"><input type="text" name="blkt_prijmeni" placeholder=" " required value="${data.prijmeni || ''}"><label>Příjmení</label></div>
-          <div class="blkt-formular-skupina"><input type="email" name="blkt_mail" placeholder=" " required value="${data.mail || ''}"><label>E-mail</label></div>
-          <div class="blkt-formular-skupina"><select name="blkt_admin" required>
+        // Fallback pokud standardní modaly nejsou k dispozici
+        if (confirm(`Opravdu chcete smazat uživatele ${jmeno} ${prijmeni}?`)) {
+          const formData = new FormData();
+          formData.append('blkt_id', id);
+
+          fetch('action/delete_user.php', {
+            method: 'POST',
+            body: formData
+          })
+              .then(r => r.json())
+              .then(j => {
+                if (j.status === 'ok') {
+                  blkt_notifikace(j.message || 'Uživatel byl smazán', 'success');
+                  loadSection('uzivatele');
+                } else {
+                  blkt_notifikace('Chyba: ' + j.error, 'error');
+                }
+              });
+        }
+      }
+    };
+
+    // Funkce pro zobrazení user modalu - můžeme vytvořit dynamicky nebo použít existující
+    function showUserModal(mode, data = {}) {
+      // Pro jednoduchost použijeme existující overlay a modal
+      // V budoucnu můžeme vytvořit standardní modal
+      const overlay = document.getElementById('blkt-user-overlay') || createUserModal();
+      const modal = document.getElementById('blkt-user-modal');
+      const form = document.getElementById('blkt-user-form');
+      const titleEl = document.getElementById('blkt-modal-title');
+      const closeEl = document.getElementById('blkt-modal-close');
+
+      if (!overlay || !modal) return;
+
+      overlay.style.display = 'block';
+      modal.style.display = 'block';
+
+      titleEl.textContent = mode === 'add' ? 'Přidat uživatele' : 'Upravit uživatele';
+
+      const html = `
+        <input type="hidden" name="blkt_id" value="${data.id || ''}">
+        <div class="blkt-formular-skupina">
+          <input type="text" name="blkt_jmeno" placeholder=" " required value="${data.jmeno || ''}">
+          <label>Jméno</label>
+        </div>
+        <div class="blkt-formular-skupina">
+          <input type="text" name="blkt_prijmeni" placeholder=" " required value="${data.prijmeni || ''}">
+          <label>Příjmení</label>
+        </div>
+        <div class="blkt-formular-skupina">
+          <input type="email" name="blkt_mail" placeholder=" " required value="${data.mail || ''}">
+          <label>E-mail</label>
+        </div>
+        <div class="blkt-formular-skupina">
+          <select name="blkt_admin" required>
             <option value="0"${data.admin === '0' ? ' selected' : ''}>Ne</option>
             <option value="1"${data.admin === '1' ? ' selected' : ''}>Ano</option>
-          </select><label>Admin</label></div>
-          <div class="modal-actions">
-            <button type="button" class="btn btn-cancel" id="blkt-cancel">Zrušit</button>
-            <button type="submit" class="btn btn-save">${mode === 'add' ? 'Přidat' : 'Uložit'}</button>
-          </div>`;
-      }
+          </select>
+          <label>Admin</label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-cancel" id="blkt-user-cancel">Zrušit</button>
+          <button type="submit" class="btn btn-save">${mode === 'add' ? 'Přidat' : 'Uložit'}</button>
+        </div>
+      `;
+
       form.action = `action/${mode}_user.php`;
       form.innerHTML = html;
-      document.getElementById('blkt-cancel').onclick = closeModal;
-      closeEl.onclick = closeModal;
-    }
 
-    function closeModal(){
-      overlay.style.display='none';
-      modal.style.display='none';
-    }
+      // Event listenery
+      document.getElementById('blkt-user-cancel').onclick = closeUserModal;
+      closeEl.onclick = closeUserModal;
 
-    if (addBtn) addBtn.onclick = () => showModal('add');
-    if (editBtn) editBtn.onclick = () => {
-      const id=document.getElementById('card-id').value;
-      showModal('edit',{ id,
-        jmeno:document.getElementById('card-jmeno').textContent,
-        prijmeni:document.getElementById('card-prijmeni').textContent,
-        mail:document.getElementById('card-mail').textContent,
-        admin:document.getElementById('card-admin-text').textContent==='Ano'?'1':'0'
-      });
-    };
-    if (delBtn) delBtn.onclick = () => {
-      const id=document.getElementById('card-id').value;
-      showModal('delete',{ id,
-        jmeno:document.getElementById('card-jmeno').textContent,
-        prijmeni:document.getElementById('card-prijmeni').textContent
-      });
-    };
+      function closeUserModal() {
+        overlay.style.display = 'none';
+        modal.style.display = 'none';
+      }
 
-    if (form) {
+      // Submit
       form.onsubmit = e => {
         e.preventDefault();
-        fetch(form.action,{method:'POST',body:new FormData(form)})
+        fetch(form.action, {method:'POST', body:new FormData(form)})
             .then(r=>r.json()).then(j=>{
           if(j.status==='ok'){
             blkt_notifikace(j.message || 'Operace úspěšná', 'success');
-            closeModal();
+            closeUserModal();
             loadSection('uzivatele');
           }
           else blkt_notifikace('Chyba: '+j.error, 'error');
         }).catch(e=>blkt_notifikace('Síťová chyba: '+e.message, 'error'));
       };
+    }
+
+    // Vytvoření user modalu pokud neexistuje (pro zpětnou kompatibilitu)
+    function createUserModal() {
+      const adminContent = document.querySelector('.admin-content');
+      if (!adminContent) return null;
+
+      const overlayHtml = `<div id="blkt-user-overlay" class="blkt-modal-overlay" style="display:none;"></div>`;
+      const modalHtml = `
+        <div id="blkt-user-modal" class="blkt-modal medium" style="display:none;">
+          <div class="blkt-modal-header">
+            <h3 id="blkt-modal-title">Uživatel</h3>
+            <button type="button" id="blkt-modal-close" class="blkt-modal-close">&times;</button>
+          </div>
+          <div class="blkt-modal-body">
+            <form id="blkt-user-form" method="post"></form>
+          </div>
+        </div>
+      `;
+
+      adminContent.insertAdjacentHTML('beforeend', overlayHtml);
+      adminContent.insertAdjacentHTML('beforeend', modalHtml);
+
+      return document.getElementById('blkt-user-overlay');
     }
   }
 
@@ -1204,7 +1233,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================
   // 12) Načtení výchozí sekce podle URL
   // ============================================
-  const pocatecniSekce = blkt_ziskej_sekci_z_url();
+  const pocatecniSekce = blkt_ziskaj_sekci_z_url();
   loadSection(pocatecniSekce, false);
 
 // ============================================

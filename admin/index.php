@@ -30,9 +30,12 @@ $uzivatel = blkt_uzivatel_info();
           rel="stylesheet">
     <!-- CSS a JS přesunuto do složek admin/css a admin/js -->
     <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/modal.css">
     <script defer src="js/admin.js"></script>
     <!-- TinyMCE (načte se, až je potřeba ve stránce příspěvků) -->
     <script defer src="../editor/tinymce.min.js"></script>
+    <!-- Modal helpers -->
+    <script defer src="js/modal-helpers.js"></script>
 </head>
 <body>
 <header class="blkt-hlavicka">

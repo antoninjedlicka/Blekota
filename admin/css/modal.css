@@ -1,0 +1,415 @@
+/* ==================== */
+/* Standardní modaly    */
+/* ==================== */
+
+/* Overlay - překrývá pouze obsah sekce, ne celou stránku */
+.blkt-modal-overlay {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 100;
+    animation: blkt-fadeIn 0.3s ease;
+}
+
+/* Samotný modal */
+.blkt-modal {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--blkt-glass);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    z-index: 101;
+    animation: blkt-slideInDown 0.4s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Hlavička modalu */
+.blkt-modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--blkt-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), transparent);
+    flex-shrink: 0;
+}
+
+.blkt-modal-header h3 {
+    margin: 0;
+    color: var(--blkt-primary);
+    font-size: 1.3em;
+    font-weight: 600;
+}
+
+/* Tlačítko zavření */
+.blkt-modal-close {
+    background: none !important;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: var(--blkt-text-light);
+    transition: all 0.3s ease;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    line-height: 1;
+    padding: 0;
+    margin: 0;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+}
+
+.blkt-modal-close:hover {
+    color: var(--blkt-danger);
+    transform: rotate(90deg);
+    background: rgba(231, 76, 60, 0.1) !important;
+    box-shadow: none !important;
+}
+
+/* Tělo modalu */
+.blkt-modal-body {
+    padding: 1.5rem;
+    flex: 1;
+    overflow-y: auto;
+    max-height: calc(80vh - 140px); /* Odečteme výšku hlavičky a patičky */
+}
+
+/* Patička modalu s akcemi */
+.blkt-modal-footer,
+.modal-actions {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--blkt-border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    background: linear-gradient(135deg, transparent, rgba(52, 152, 219, 0.05));
+    flex-shrink: 0;
+}
+
+/* Varianta modalu se záložkami na levo */
+.blkt-modal-footer.center {
+    justify-content: center;
+}
+
+.blkt-modal-footer.left {
+    justify-content: flex-start;
+}
+
+/* Velikosti modalů */
+.blkt-modal.small {
+    max-width: 400px;
+}
+
+.blkt-modal.medium {
+    max-width: 600px;
+}
+
+.blkt-modal.large {
+    max-width: 800px;
+}
+
+.blkt-modal.extra-large {
+    max-width: 1000px;
+}
+
+/* Modaly na celou šířku (jen na velkých obrazovkách) */
+.blkt-modal.fullwidth {
+    max-width: 95vw;
+    width: 95vw;
+}
+
+/* Animace */
+@keyframes blkt-fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes blkt-slideInDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+@keyframes blkt-slideInUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -40%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+/* Speciální obsah modalů */
+
+/* Galerie obrázků v modalu */
+.blkt-modal .blkt-gallery-images {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.75rem;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 0.5rem;
+    border: 1px solid var(--blkt-border-light);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.blkt-modal .blkt-gallery-thumb {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px var(--blkt-shadow);
+}
+
+.blkt-modal .blkt-gallery-thumb:hover {
+    border-color: var(--blkt-primary);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px var(--blkt-shadow-hover);
+}
+
+.blkt-modal .blkt-gallery-thumb.selected {
+    border-color: var(--blkt-success);
+    box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.2);
+    transform: scale(1.05);
+}
+
+/* Formuláře v modalech */
+.blkt-modal .blkt-formular-skupina {
+    margin-bottom: 1.5rem;
+}
+
+.blkt-modal .blkt-formular-skupina:last-child {
+    margin-bottom: 0;
+}
+
+/* Loading stav modalu */
+.blkt-modal.loading .blkt-modal-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    color: var(--blkt-text-light);
+    font-style: italic;
+}
+
+.blkt-modal.loading .blkt-modal-body::before {
+    content: '';
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--blkt-border-light);
+    border-top: 3px solid var(--blkt-primary);
+    border-radius: 50%;
+    animation: blkt-spin 1s linear infinite;
+    margin-right: 1rem;
+}
+
+@keyframes blkt-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responzivita */
+@media (max-width: 768px) {
+    .blkt-modal {
+        max-width: 95vw;
+        width: 95vw;
+        max-height: 90vh;
+    }
+
+    .blkt-modal-header {
+        padding: 1rem;
+    }
+
+    .blkt-modal-body {
+        padding: 1rem;
+        max-height: calc(90vh - 120px);
+    }
+
+    .blkt-modal-footer,
+    .modal-actions {
+        padding: 0.75rem 1rem;
+        flex-direction: column;
+    }
+
+    .blkt-modal-footer button,
+    .modal-actions button {
+        width: 100%;
+        margin: 0.25rem 0;
+    }
+
+    .blkt-modal .blkt-gallery-images {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        max-height: 200px;
+    }
+
+    .blkt-modal .blkt-gallery-thumb {
+        height: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .blkt-modal {
+        max-width: 100vw;
+        width: 100vw;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    .blkt-modal-header {
+        border-radius: 0;
+    }
+
+    .blkt-modal .blkt-gallery-images {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+        gap: 0.5rem;
+    }
+
+    .blkt-modal .blkt-gallery-thumb {
+        height: 70px;
+    }
+}
+
+/* Speciální třídy pro různé typy modalů */
+
+/* Modal pro potvrzení smazání */
+.blkt-modal.confirm {
+    max-width: 400px;
+}
+
+.blkt-modal.confirm .blkt-modal-body {
+    text-align: center;
+    padding: 2rem 1.5rem;
+}
+
+.blkt-modal.confirm .blkt-modal-body p {
+    font-size: 1.1em;
+    margin-bottom: 1.5rem;
+}
+
+.blkt-modal.confirm .blkt-modal-body .icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.blkt-modal.confirm.danger .icon {
+    color: var(--blkt-danger);
+}
+
+.blkt-modal.confirm.warning .icon {
+    color: var(--blkt-warning);
+}
+
+.blkt-modal.confirm.info .icon {
+    color: var(--blkt-info);
+}
+
+/* Modal pro barevnou paletu */
+.blkt-modal.color-picker .blkt-modal-body {
+    padding: 0;
+}
+
+.blkt-modal.color-picker .blkt-palette-section {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--blkt-border-light);
+}
+
+.blkt-modal.color-picker .blkt-palette-section:last-child {
+    border-bottom: none;
+}
+
+.blkt-modal.color-picker .blkt-palette-presets {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.blkt-modal.color-picker .blkt-color-preset {
+    width: 50px;
+    height: 50px;
+    border: 3px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    padding: 0;
+    margin: 0;
+}
+
+.blkt-modal.color-picker .blkt-color-preset:hover {
+    transform: scale(1.1);
+    border-color: rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.blkt-modal.color-picker .blkt-color-preset.active {
+    border-color: #333;
+    transform: scale(1.1);
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.blkt-modal.color-picker .blkt-color-preset.active::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.blkt-modal.color-picker .blkt-preview-box {
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    border: 2px solid var(--blkt-border);
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.blkt-modal.color-picker .blkt-preview-box p {
+    margin: 0;
+}
+
+/* Pozadí pro barevnou paletu */
+.blkt-modal.color-picker {
+    animation: blkt-slideInUp 0.4s ease;
+}

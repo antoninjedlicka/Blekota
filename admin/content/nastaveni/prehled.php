@@ -100,52 +100,32 @@ $je_vlastni_barva = !array_key_exists($nastaveni['THEME'], $blkt_prednastavene_b
     </div>
 </form>
 
-<!-- Barevná paleta -->
-<div id="blkt-color-palette" class="blkt-color-palette" style="display: none;">
-    <div class="blkt-palette-header">
-        <h4>Vyberte barvu</h4>
-        <button type="button" class="blkt-palette-close">&times;</button>
+<!-- STANDARDNÍ MODAL PRO VÝBĚR BARVY -->
+<div id="blkt-color-overlay" class="blkt-modal-overlay" style="display:none;"></div>
+<div id="blkt-color-modal" class="blkt-modal color-picker medium" style="display:none;">
+    <div class="blkt-modal-header">
+        <h3>Vyberte barvu</h3>
+        <button type="button" class="blkt-modal-close">&times;</button>
     </div>
 
-    <!-- HTML5 color picker -->
-    <div class="blkt-palette-custom">
-        <label>Vlastní barva:</label>
-        <input type="color" id="blkt-html-color-picker" value="<?= htmlspecialchars($nastaveni['THEME']) ?>">
-    </div>
+    <div class="blkt-modal-body">
+        <!-- HTML5 color picker -->
+        <div class="blkt-palette-section">
+            <h4>Vlastní barva</h4>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <label style="position: static; background: none; padding: 0; transform: none; color: var(--blkt-text);">Výběr barvy:</label>
+                <input type="color" id="blkt-html-color-picker" value="<?= htmlspecialchars($nastaveni['THEME']) ?>" style="width: 60px; height: 40px;">
+            </div>
 
-    <!-- Náhled -->
-    <div class="blkt-palette-preview">
-        <div class="blkt-preview-box" id="blkt-color-preview-box" style="background-color: <?= htmlspecialchars($nastaveni['THEME']) ?>">
-            <p>Náhled vybrané barvy</p>
+            <!-- Náhled -->
+            <div class="blkt-preview-box" id="blkt-color-preview-box" style="background-color: <?= htmlspecialchars($nastaveni['THEME']) ?>">
+                <p>Náhled vybrané barvy</p>
+            </div>
         </div>
     </div>
 
-    <div class="blkt-palette-actions">
-        <button type="button" class="btn btn-cancel" id="blkt-palette-cancel">Zrušit</button>
-        <button type="button" class="btn btn-save" id="blkt-palette-apply">Použít</button>
+    <div class="blkt-modal-footer">
+        <button type="button" class="btn btn-cancel" id="blkt-color-cancel">Zrušit</button>
+        <button type="button" class="btn btn-save" id="blkt-color-apply">Použít</button>
     </div>
 </div>
-
-<script>
-    // Dočasná inline inicializace pro jistotu
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Nastavení: DOMContentLoaded');
-
-        // Test, zda existují elementy
-        console.log('Form:', document.getElementById('blkt-form-nastaveni'));
-        console.log('Picker button:', document.getElementById('blkt-color-picker-btn'));
-        console.log('Palette:', document.getElementById('blkt-color-palette'));
-
-        // Jednoduchý test palety
-        const btn = document.getElementById('blkt-color-picker-btn');
-        const palette = document.getElementById('blkt-color-palette');
-
-        if (btn && palette) {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                console.log('Otevírám paletu');
-                palette.style.display = 'block';
-            });
-        }
-    });
-</script>

@@ -646,29 +646,6 @@ button.blkt-galerie-odebrat:hover {
   color: var(--blkt-primary) !important;
 }
 
-/* Modal close tlačítka */
-#blkt-modal-close,
-.blkt-modal-close {
-  background: none !important;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: var(--blkt-text-light);
-  transition: all 0.3s ease;
-  width: auto;
-  height: auto;
-  padding: 0;
-  margin: 0;
-  text-transform: none;
-}
-
-#blkt-modal-close:hover,
-.blkt-modal-close:hover {
-  color: var(--blkt-danger);
-  transform: rotate(90deg);
-  box-shadow: none;
-}
-
 .btn-cancel {
   background: linear-gradient(135deg, var(--blkt-danger), var(--blkt-danger-light));
 }
@@ -777,76 +754,6 @@ button.blkt-galerie-odebrat:hover {
 .user-avatar:hover {
   transform: scale(1.05);
   box-shadow: 0 8px 24px var(--blkt-shadow-hover);
-}
-
-/* Modály */
-.admin-content .blkt-modal-overlay {
-  display: none;
-  position: absolute;
-  inset: 0;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  background: rgba(0,0,0,0.3);
-  z-index: 100;
-  animation: fadeIn 0.3s ease;
-}
-
-.admin-content .blkt-modal {
-  display: none;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: var(--blkt-glass);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-  max-width: 400px;
-  width: 90%;
-  z-index: 101;
-  animation: slideInDown 0.5s ease;
-}
-
-.admin-content .blkt-modal-header {
-  padding: 1rem;
-  border-bottom: 1px solid var(--blkt-border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(135deg, rgba(52,152,219,0.1), transparent);
-  border-radius: 12px 12px 0 0;
-}
-
-.admin-content .blkt-modal-header h3 {
-  margin: 0;
-  color: var(--blkt-primary);
-}
-
-.admin-content #blkt-modal-close {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: var(--blkt-text-light);
-  transition: all 0.3s ease;
-}
-
-.admin-content #blkt-modal-close:hover {
-  color: var(--blkt-danger);
-  transform: rotate(90deg);
-}
-
-.admin-content .blkt-modal-body {
-  padding: 1.5rem;
-}
-
-.admin-content .modal-actions {
-  padding: 1rem;
-  border-top: 1px solid var(--blkt-border);
-  text-align: right;
-  background: linear-gradient(135deg, transparent, rgba(52,152,219,0.05));
-  border-radius: 0 0 12px 12px;
 }
 
 /* Záložky */
@@ -1392,40 +1299,6 @@ p img:hover {
   box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1) !important;
 }
 
-/* Galerie v modalu */
-.blkt-gallery-images {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: 100px;
-  padding: 0 1rem;
-  gap: 0.5rem;
-  max-height: 320px;
-  overflow-y: auto;
-  margin: 0 -1rem 1rem;
-}
-
-.blkt-gallery-thumb {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border: 2px solid transparent;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 6px var(--blkt-shadow);
-}
-
-.blkt-gallery-thumb:hover {
-  border-color: var(--blkt-primary);
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px var(--blkt-shadow-hover);
-}
-
-.blkt-gallery-thumb.selected {
-  border-color: var(--blkt-success);
-  box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.2);
-}
-
 /* Notifikace */
 .blkt-notifikace {
   position: fixed;
@@ -1757,99 +1630,9 @@ p img:hover {
   max-width: 500px;
 }
 
-/* Responzivita */
-@media (max-width: 1000px) {
-  .admin-menu {
-    width: 60px !important;
-    min-width: 60px !important;
-    overflow-x: hidden;
-  }
-
-  .menu-item {
-    padding: 0.75rem 0;
-    justify-content: center;
-  }
-
-  .menu-item span {
-    display: none;
-  }
-
-  .menu-item img {
-    margin: 0;
-    width: 24px;
-    height: 24px;
-  }
-
-  .menu-item:hover {
-    padding-left: 0;
-  }
-
-  .admin-wrapper {
-    width: 100%;
-    max-width: 1000px;
-    border-radius: 0;
-    margin: 100px 0 80px 0;
-  }
-
-  .blkt-gallery-images {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 800px) {
-  .blkt-gallery-images {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 600px) {
-  .blkt-notifikace {
-    left: 10px;
-    right: 10px;
-    max-width: none;
-  }
-
-  .dashboard-stats {
-    grid-template-columns: 1fr;
-  }
-
-  .blkt-cv-stats ul {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 500px) {
-  .blkt-gallery-images {
-    grid-template-columns: 1fr;
-  }
-
-  /* Záložky na mobilu - horizontální scroll */
-  .blkt-tabs {
-    padding: 0 12px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-  }
-
-  .blkt-tabs::-webkit-scrollbar {
-    height: 4px;
-  }
-
-  .blkt-tabs::-webkit-scrollbar-thumb {
-    background: rgba(52, 152, 219, 0.3);
-    border-radius: 2px;
-  }
-
-  .blkt-tabs button {
-    padding: 0.75rem 1rem;
-    font-size: 1em;
-    white-space: nowrap;
-  }
-}
 /* ==================== */
 /* Admin Loader - CSS   */
 /* ==================== */
-/* Přidej tyto styly do admin/css/admin.css */
 
 /* Loader kontejner - pouze v rámci admin-content */
 .blkt-admin-loader {
@@ -2035,10 +1818,11 @@ p img:hover {
     opacity: 1;
   }
   100% {
-    transform: translate(-50%, -50%) scale(5); /* Změň z 3 na 5 nebo víc */
+    transform: translate(-50%, -50%) scale(5);
     opacity: 0;
   }
 }
+
 /* ==================== */
 /* Výběr barvy - CSS   */
 /* ==================== */
@@ -2066,11 +1850,31 @@ p img:hover {
 /* Levá polovina - select */
 .blkt-barva-select-wrapper {
   flex: 1;
+  position: relative;
 }
 
 .blkt-barva-select-wrapper select {
   width: 100%;
   height: 48px;
+}
+
+.blkt-barva-select-wrapper label {
+  position: absolute;
+  top: -0.75rem;
+  left: 0.75rem;
+  transform: translateY(0);
+  font-size: 0.85rem;
+  color: var(--blkt-text-light);
+  background: white;
+  border-radius: 4px;
+  padding: 0 0.5rem;
+  pointer-events: none;
+  transition: all 0.2s ease-out;
+  font-weight: 600;
+}
+
+.blkt-barva-select-wrapper select:focus + label {
+  color: var(--blkt-primary);
 }
 
 /* Pravá polovina - hex input a tlačítko */
@@ -2140,233 +1944,41 @@ p img:hover {
   z-index: 1;
 }
 
-/* Barevná paleta */
-.blkt-color-palette {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-  z-index: 1000;
-  width: 360px;
-  animation: slideInDown 0.3s ease;
-}
-
-.blkt-palette-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid var(--blkt-border);
-  background: linear-gradient(135deg, rgba(52,152,219,0.1), transparent);
-  border-radius: 12px 12px 0 0;
-}
-
-.blkt-palette-header h4 {
-  margin: 0;
-  font-size: 1.1rem;
-  color: var(--blkt-primary);
-}
-
-.blkt-palette-close {
-  background: none !important;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: var(--blkt-text-light);
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-}
-
-.blkt-palette-close:hover {
-  background: var(--blkt-danger-light) !important;
-  color: white;
-  transform: rotate(90deg);
-}
-
-/* Přednastavené barvy */
-.blkt-palette-presets {
-  padding: 1.5rem;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0.75rem;
-}
-
-.blkt-color-preset {
-  width: 50px;
-  height: 50px;
-  border: 3px solid transparent;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.blkt-color-preset::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.3), transparent);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.blkt-color-preset:hover {
-  transform: scale(1.1);
-  border-color: rgba(0,0,0,0.2);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.blkt-color-preset:hover::after {
-  opacity: 1;
-}
-
-.blkt-color-preset.active {
-  border-color: #333;
-  transform: scale(1.1);
-  box-shadow: 0 0 0 4px rgba(0,0,0,0.1);
-}
-
-.blkt-color-preset.active::before {
-  content: '✓';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  font-size: 20px;
-  font-weight: bold;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-  z-index: 1;
-}
-
-/* Vlastní barva */
-.blkt-palette-custom {
-  padding: 0 1.5rem 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.blkt-palette-custom label {
-  position: static;
-  font-weight: 500;
-  color: var(--blkt-text);
-  background: none;
-  padding: 0;
-  white-space: nowrap;
-}
-
-.blkt-palette-custom input[type="color"] {
-  width: 60px;
-  height: 40px;
-  border: 2px solid var(--blkt-border);
-  border-radius: 6px;
-  cursor: pointer;
-  padding: 2px;
-}
-
-.blkt-palette-custom input[type="color"]:hover {
-  border-color: var(--blkt-primary);
-}
-
-/* Náhled */
-.blkt-palette-preview {
-  padding: 0 1.5rem 1.5rem;
-}
-
-.blkt-preview-box {
-  padding: 2rem;
-  border-radius: 8px;
-  text-align: center;
-  font-weight: 600;
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
-  border: 2px solid var(--blkt-border);
-  position: relative;
-  overflow: hidden;
-}
-
-.blkt-preview-box::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
-  pointer-events: none;
-}
-
-.blkt-preview-box p {
-  margin: 0;
-  position: relative;
-  z-index: 1;
-}
-
-/* Akce */
-.blkt-palette-actions {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid var(--blkt-border);
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  background: linear-gradient(135deg, transparent, rgba(52,152,219,0.05));
-  border-radius: 0 0 12px 12px;
-}
-
-.blkt-palette-actions button {
-  padding: 0.6rem 1.5rem;
-  font-size: 0.9rem;
-}
-
-/* Přidat do admin/css/admin.css */
-
-/* Oprava labelu pro select v barevném schématu */
-.blkt-barva-select-wrapper {
-  position: relative;
-}
-
-.blkt-barva-select-wrapper label {
-  position: absolute;
-  top: -0.75rem;
-  left: 0.75rem;
-  transform: translateY(0);
-  font-size: 0.85rem;
-  color: var(--blkt-text-light);
-  background: white;
-  border-radius: 4px;
-  padding: 0 0.5rem;
-  pointer-events: none;
-  transition: all 0.2s ease-out;
-  font-weight: 600;
-}
-
-.blkt-barva-select-wrapper select:focus + label {
-  color: var(--blkt-primary);
-}
-
-/* Speciální styl pro skupinu barev */
-.blkt-barva-skupina {
-  margin-top: 2rem;
-}
-
-.blkt-barva-skupina .blkt-barva-label {
-  display: none; /* Skryjeme původní label */
-}
-
 /* Responzivita */
+@media (max-width: 1000px) {
+  .admin-menu {
+    width: 60px !important;
+    min-width: 60px !important;
+    overflow-x: hidden;
+  }
+
+  .menu-item {
+    padding: 0.75rem 0;
+    justify-content: center;
+  }
+
+  .menu-item span {
+    display: none;
+  }
+
+  .menu-item img {
+    margin: 0;
+    width: 24px;
+    height: 24px;
+  }
+
+  .menu-item:hover {
+    padding-left: 0;
+  }
+
+  .admin-wrapper {
+    width: 100%;
+    max-width: 1000px;
+    border-radius: 0;
+    margin: 100px 0 80px 0;
+  }
+}
+
 @media (max-width: 768px) {
   .blkt-barva-container {
     flex-direction: column;
@@ -2379,184 +1991,44 @@ p img:hover {
 }
 
 @media (max-width: 600px) {
-  .blkt-color-palette {
-    width: 90%;
-    max-width: 360px;
+  .blkt-notifikace {
+    left: 10px;
+    right: 10px;
+    max-width: none;
   }
 
-  .blkt-palette-presets {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.5rem;
-    padding: 1rem;
+  .dashboard-stats {
+    grid-template-columns: 1fr;
   }
 
-  .blkt-color-preset {
-    width: 45px;
-    height: 45px;
+  .blkt-cv-stats ul {
+    grid-template-columns: 1fr;
   }
 }
-/* Barevná paleta - fixní pozice */
-.blkt-color-palette {
-  position: fixed !important;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-  z-index: 1000;
-  width: 360px;
-  animation: slideInDown 0.3s ease;
-}
-/* Barevná paleta */
-.blkt-color-palette {
-  position: fixed !important;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-  z-index: 1000;
-  width: 360px;
-  animation: slideInDown 0.3s ease;
-  display: none;
+
+@media (max-width: 500px) {
+  /* Záložky na mobilu - horizontální scroll */
+  .blkt-tabs {
+    padding: 0 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .blkt-tabs::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .blkt-tabs::-webkit-scrollbar-thumb {
+    background: rgba(52, 152, 219, 0.3);
+    border-radius: 2px;
+  }
+
+  .blkt-tabs button {
+    padding: 0.75rem 1rem;
+    font-size: 1em;
+    white-space: nowrap;
+  }
 }
 
-.blkt-palette-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid #ddd;
-  margin-bottom: 10px;
-}
-
-.blkt-palette-header h4 {
-  margin: 0;
-  color: var(--blkt-primary);
-}
-
-.blkt-palette-close {
-  background: none !important;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #666;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-}
-
-.blkt-palette-close:hover {
-  color: var(--blkt-danger);
-}
-
-.blkt-palette-presets {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0.75rem;
-  padding: 1.5rem;
-}
-
-.blkt-color-preset {
-  width: 50px;
-  height: 50px;
-  border: 3px solid transparent;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 0;
-}
-
-.blkt-color-preset:hover {
-  transform: scale(1.1);
-  border-color: rgba(0,0,0,0.2);
-}
-
-.blkt-color-preset.active {
-  border-color: #333;
-  transform: scale(1.1);
-}
-
-.blkt-color-preset.active::after {
-  content: '✓';
-  position: absolute;
-  color: white;
-  font-size: 20px;
-  font-weight: bold;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-}
-
-.blkt-palette-custom {
-  padding: 0 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.blkt-palette-custom label {
-  position: static !important;
-  background: none !important;
-  padding: 0 !important;
-  transform: none !important;
-  color: #333 !important;
-}
-
-.blkt-palette-preview {
-  padding: 10px 1.5rem;;
-}
-
-.blkt-preview-box {
-  padding: 2rem;
-  border-radius: 8px;
-  text-align: center;
-  font-weight: 600;
-  border: 2px solid #ddd;
-}
-
-.blkt-palette-actions {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #ddd;
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-}
-/* Oprava pro color preset tlačítka */
-.blkt-color-preset {
-  width: 50px;
-  height: 50px;
-  border: 3px solid transparent;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 0;
-  margin: 0;
-  position: relative;
-}
-
-.blkt-color-preset.active::after {
-  content: '✓';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  font-size: 20px;
-  font-weight: bold;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-}
-
-/* Oprava náhledu */
-.blkt-preview-box {
-  padding: 2rem;
-  border-radius: 8px;
-  text-align: center;
-  font-weight: 600;
-  border: 2px solid #ddd;
-  transition: all 0.3s ease;
-}
-
-.blkt-preview-box p {
-  margin: 0;
-}
+/* Konec admin.css */

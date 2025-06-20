@@ -88,7 +88,17 @@ function initNastaveniSection() {
     const hexInput = document.getElementById('blkt-color-hex-input');
     const colorBtn = document.getElementById('blkt-color-picker-btn');
     const themeSelect = document.getElementById('blkt-theme-select');
-    const palette = document.getElementById('blkt-color-palette');
+
+    // Prvky modalu
+    const overlay = document.getElementById('blkt-color-overlay');
+    const modal = document.getElementById('blkt-color-modal');
+    const closeBtn = modal?.querySelector('.blkt-modal-close');
+    const cancelBtn = document.getElementById('blkt-color-cancel');
+    const applyBtn = document.getElementById('blkt-color-apply');
+    const htmlPicker = document.getElementById('blkt-html-color-picker');
+    const previewBox = document.getElementById('blkt-color-preview-box');
+
+    let tempColor = hexInput ? hexInput.value : '#3498db';
 
     // ZMĚNA BARVY V HEX INPUTU
     if (hexInput) {
@@ -139,84 +149,84 @@ function initNastaveniSection() {
         });
     }
 
-    // OTEVŘENÍ PALETY
-    if (colorBtn) {
+    // OTEVŘENÍ MODALU
+    if (colorBtn && overlay && modal) {
         colorBtn.addEventListener('click', function(e) {
             e.preventDefault();
 
-            if (palette) {
-                palette.style.display = 'block';
+            // Nastavit aktuální barvu do modalu
+            tempColor = hexInput.value;
+            if (htmlPicker) {
+                htmlPicker.value = tempColor;
+            }
 
-                // Nastavit aktuální barvu do palety
-                const currentColor = hexInput.value;
-                const htmlPicker = document.getElementById('blkt-html-color-picker');
-                if (htmlPicker) {
-                    htmlPicker.value = currentColor;
-                }
+            // Aktualizovat náhled a presets
+            blkt_aktualizuj_nahled_palety(tempColor);
 
-                // Aktualizovat náhled
-                blkt_aktualizuj_nahled_palety(currentColor);
+            // Zobrazit modal
+            overlay.style.display = 'block';
+            modal.style.display = 'block';
+        });
+    }
+
+    // ZAVŘENÍ MODALU
+    function blkt_zavri_modal() {
+        if (overlay && modal) {
+            overlay.style.display = 'none';
+            modal.style.display = 'none';
+        }
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', blkt_zavri_modal);
+    }
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', blkt_zavri_modal);
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) {
+                blkt_zavri_modal();
             }
         });
     }
 
-    // PRÁCE S PALETOU
-    if (palette) {
-        let tempColor = hexInput ? hexInput.value : '#3498db';
+    // APLIKOVÁNÍ BARVY
+    if (applyBtn) {
+        applyBtn.addEventListener('click', function() {
+            if (hexInput) {
+                hexInput.value = tempColor;
+                hexInput.dispatchEvent(new Event('input'));
+            }
+            blkt_zavri_modal();
+        });
+    }
 
-        // Zavřít tlačítka
-        const closeBtn = palette.querySelector('.blkt-palette-close');
-        const cancelBtn = document.getElementById('blkt-palette-cancel');
-
-        if (closeBtn) {
-            closeBtn.addEventListener('click', function() {
-                palette.style.display = 'none';
-            });
-        }
-
-        if (cancelBtn) {
-            cancelBtn.addEventListener('click', function() {
-                palette.style.display = 'none';
-            });
-        }
-
-        // Aplikovat barvu
-        const applyBtn = document.getElementById('blkt-palette-apply');
-        if (applyBtn) {
-            applyBtn.addEventListener('click', function() {
-                if (hexInput) {
-                    hexInput.value = tempColor;
-                    hexInput.dispatchEvent(new Event('input'));
-                }
-                palette.style.display = 'none';
-            });
-        }
-
-        // Kliknutí na přednastavené barvy
-        palette.querySelectorAll('.blkt-color-preset').forEach(function(btn) {
+    // KLIKNUTÍ NA PŘEDNASTAVENÉ BARVY
+    if (modal) {
+        modal.querySelectorAll('.blkt-color-preset').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 tempColor = this.dataset.color;
-                const htmlPicker = document.getElementById('blkt-html-color-picker');
                 if (htmlPicker) {
                     htmlPicker.value = tempColor;
                 }
                 blkt_aktualizuj_nahled_palety(tempColor);
             });
         });
-
-        // HTML color picker
-        const htmlPicker = document.getElementById('blkt-html-color-picker');
-        if (htmlPicker) {
-            htmlPicker.addEventListener('input', function() {
-                tempColor = this.value;
-                blkt_aktualizuj_nahled_palety(tempColor);
-            });
-        }
     }
 
-    // Funkce pro aktualizaci náhledu v paletě
+    // HTML COLOR PICKER
+    if (htmlPicker) {
+        htmlPicker.addEventListener('input', function() {
+            tempColor = this.value;
+            blkt_aktualizuj_nahled_palety(tempColor);
+        });
+    }
+
+    // Funkce pro aktualizaci náhledu v modalu
     function blkt_aktualizuj_nahled_palety(color) {
-        const previewBox = document.getElementById('blkt-color-preview-box');
         if (previewBox && /^#[0-9A-Fa-f]{6}$/.test(color)) {
             previewBox.style.backgroundColor = color;
 
@@ -230,13 +240,15 @@ function initNastaveniSection() {
         }
 
         // Označit aktivní preset
-        document.querySelectorAll('.blkt-color-preset').forEach(btn => {
-            if (btn.dataset.color === color) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        });
+        if (modal) {
+            modal.querySelectorAll('.blkt-color-preset').forEach(btn => {
+                if (btn.dataset.color === color) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
     }
 
     console.log('=== initNastaveniSection END ===');
