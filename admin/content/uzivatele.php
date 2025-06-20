@@ -1,8 +1,9 @@
 <?php
 // admin/content/uzivatele.php
-// Načtení dat z DB a vykreslení záložek + includ první záložky
 
-require_once __DIR__ . '/../../databaze.php';
+// Načtení databází
+require_once __DIR__ . '/../databaze.php';
+
 
 $pdo = blkt_db_connect();
 

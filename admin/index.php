@@ -8,12 +8,73 @@ require_once __DIR__ . '/../includes/session.php';
 // Načtení auth funkcí
 require_once __DIR__ . '/../includes/auth.php';
 
-// Kontrola přihlášení a admin oprávnění
-blkt_vyzaduj_prihlaseni();
-blkt_vyzaduj_admina();
 
-// Získání informací o uživateli
+// Kontrola přihlášení (už ne nutně admin)
+blkt_vyzaduj_prihlaseni();
+
+// Získání informací o uživateli a jeho oprávnění
 $uzivatel = blkt_uzivatel_info();
+$povolene_sekce = blkt_ziskej_povolene_sekce();
+
+// Pokud uživatel nemá přístup k žádné sekci, přesměrovat
+if (empty($povolene_sekce)) {
+    $_SESSION['blkt_chyba_opravneni'] = 'Nemáte oprávnění k žádné administrační sekci.';
+    header('Location: /');
+    exit;
+}
+
+// Definice všech sekcí s jejich vlastnostmi
+$vsechny_sekce = [
+    'dashboard' => [
+        'nazev' => 'Dashboard',
+        'ikona' => '/media/icons/dashboard.svg',
+        'alt' => 'Dashboard'
+    ],
+    'uzivatele' => [
+        'nazev' => 'Uživatelé',
+        'ikona' => '/media/icons/users.svg',
+        'alt' => 'Uživatelé'
+    ],
+    'nastaveni' => [
+        'nazev' => 'Nastavení',
+        'ikona' => '/media/icons/settings.svg',
+        'alt' => 'Nastavení'
+    ],
+    'homepage' => [
+        'nazev' => 'Homepage',
+        'ikona' => '/media/icons/home.svg',
+        'alt' => 'Homepage'
+    ],
+    'seo' => [
+        'nazev' => 'SEO',
+        'ikona' => '/media/icons/seo.svg',
+        'alt' => 'SEO'
+    ],
+    'prispevky' => [
+        'nazev' => 'Příspěvky',
+        'ikona' => '/media/icons/post.svg',
+        'alt' => 'Příspěvky'
+    ],
+    'zivotopis' => [
+        'nazev' => 'Životopis',
+        'ikona' => '/media/icons/zivotopis.svg',
+        'alt' => 'Životopis'
+    ],
+    'obrazky' => [
+        'nazev' => 'Média',
+        'ikona' => '/media/icons/images.svg',
+        'alt' => 'Média'
+    ]
+];
+
+// Získat první povolenou sekci jako výchozí
+$prvni_povolena_sekce = 'dashboard';
+foreach ($vsechny_sekce as $sekce_id => $sekce_info) {
+    if (in_array($sekce_id, $povolene_sekce) || in_array('all', $povolene_sekce)) {
+        $prvni_povolena_sekce = $sekce_id;
+        break;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="cs">
@@ -36,6 +97,11 @@ $uzivatel = blkt_uzivatel_info();
     <script defer src="../editor/tinymce.min.js"></script>
     <!-- Modal helpers -->
     <script defer src="js/modal-helpers.js"></script>
+
+    <script>
+        // Předat první povolenou sekci do JavaScriptu
+        window.prvniPovolenaSekce = '<?= $prvni_povolena_sekce ?>';
+    </script>
 </head>
 <body>
 <header class="blkt-hlavicka">
@@ -43,43 +109,40 @@ $uzivatel = blkt_uzivatel_info();
 </header>
 <div class="admin-wrapper">
     <aside class="admin-menu">
-        <div class="menu-item active" data-section="dashboard">
-            <img src="/media/icons/dashboard.svg" alt="Dashboard">
-            <span>Dashboard</span>
+        <?php foreach ($vsechny_sekce as $sekce_id => $sekce_info): ?>
+            <?php if (in_array($sekce_id, $povolene_sekce) || in_array('all', $povolene_sekce)): ?>
+                <div class="menu-item <?= $sekce_id === $prvni_povolena_sekce ? 'active' : '' ?>" data-section="<?= $sekce_id ?>">
+                    <img src="<?= htmlspecialchars($sekce_info['ikona']) ?>" alt="<?= htmlspecialchars($sekce_info['alt']) ?>">
+                    <span><?= htmlspecialchars($sekce_info['nazev']) ?></span>
+                </div>
+            <?php endif; ?>
+        <?php endforeach; ?>
+
+        <div class="menu-divider"></div>
+
+        <!-- Informace o uživateli -->
+        <div class="menu-user-info">
+            <div class="user-name">
+                <?= htmlspecialchars($uzivatel['jmeno'] . ' ' . $uzivatel['prijmeni']) ?>
+            </div>
+            <?php if ($uzivatel['admin']): ?>
+                <span class="admin-badge">Admin</span>
+            <?php else: ?>
+                <?php
+                $opravneni = blkt_ziskej_opravneni_uzivatele();
+                if (!empty($opravneni['skupina'])): ?>
+                    <span class="group-badge"><?= htmlspecialchars($opravneni['skupina']) ?></span>
+                <?php endif; ?>
+            <?php endif; ?>
         </div>
-        <div class="menu-item" data-section="uzivatele">
-            <img src="/media/icons/users.svg" alt="Uživatelé">
-            <span>Uživatelé</span>
-        </div>
-        <div class="menu-item" data-section="nastaveni">
-            <img src="/media/icons/settings.svg" alt="Nastavení">
-            <span>Nastavení</span>
-        </div>
-        <div class="menu-item" data-section="homepage">
-            <img src="/media/icons/home.svg" alt="Homepage">
-            <span>Homepage</span>
-        </div>
-        <div class="menu-item" data-section="seo">
-            <img src="/media/icons/seo.svg" alt="SEO">
-            <span>SEO</span>
-        </div>
-        <div class="menu-item" data-section="prispevky">
-            <img src="/media/icons/post.svg" alt="Příspěvky">
-            <span>Příspěvky</span>
-        </div>
-        <div class="menu-item" data-section="zivotopis">
-            <img src="/media/icons/zivotopis.svg" alt="Životopis">
-            <span>Životopis</span>
-        </div>
-        <div class="menu-item" data-section="obrazky">
-            <img src="/media/icons/images.svg" alt="Média">
-            <span>Média</span>
-        </div>
+
+        <a href="/logout.php" class="menu-logout">
+            <img src="/media/icons/logout.svg" alt="Odhlásit">
+            <span>Odhlásit</span>
+        </a>
     </aside>
 
     <main class="admin-content">
-        <!-- Přidej tuto strukturu do admin/index.php přímo do <main class="admin-content"> jako první element -->
-
         <!-- Admin Loader -->
         <div id="blkt-admin-loader" class="blkt-admin-loader">
             <div class="blkt-loader-content">
@@ -152,6 +215,13 @@ $uzivatel = blkt_uzivatel_info();
                 </div>
             </div>
         </div>
+
+        <?php if ($chyba = blkt_chyba_opravneni()): ?>
+            <div class="blkt-chyba-opravneni">
+                <?= htmlspecialchars($chyba) ?>
+            </div>
+        <?php endif; ?>
+
         <section id="admin-section" class="admin-section">
             <!-- Sem se AJAXem vloží celý obsah sekce (včetně vlastních záložek) -->
             <p>Načítám obsah…</p>

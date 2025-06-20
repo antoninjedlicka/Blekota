@@ -311,10 +311,19 @@ function showGroupModal(mode, data = {}) {
   document.getElementById('blkt-group-nazev').value = data.nazev || '';
   document.getElementById('blkt-group-popis').value = data.popis || '';
 
-  // Nastavit checkboxy rolí
+  // Nastavit checkboxy rolí - OPRAVENO
   const roleIds = data.role ? data.role.split(',').map(id => id.trim()) : [];
+  console.log('Role IDs:', roleIds); // Debug
+
   document.querySelectorAll('.role-checkbox').forEach(checkbox => {
-    checkbox.checked = roleIds.includes(checkbox.value);
+    // Resetovat checkbox
+    checkbox.checked = false;
+
+    // Zkontrolovat, zda je hodnota v seznamu
+    if (roleIds.includes(checkbox.value)) {
+      checkbox.checked = true;
+      console.log('Checking checkbox:', checkbox.value); // Debug
+    }
   });
 
   // Event listenery

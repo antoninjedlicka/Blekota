@@ -1243,5 +1243,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const pocatecniSekce = blkt_ziskej_sekci_z_url();
         loadSection(pocatecniSekce, false);
       });
-
+  // ============================================
+  // 13) Načtení výchozí sekce podle oprávnění
+  // ============================================
+  // Změníme načtení výchozí sekce podle URL na načtení první povolené sekce
+  const pocatecniSekce = window.prvniPovolenaSekce || blkt_ziskej_sekci_z_url() || 'dashboard';
+  loadSection(pocatecniSekce, false);
 }); // konec DOMContentLoaded

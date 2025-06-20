@@ -85,13 +85,36 @@
             <div class="blkt-formular-skupina">
                 <label style="position: static; margin-bottom: 1rem; display: block; font-weight: 600;">Oprávnění skupiny:</label>
                 <div class="role-checkboxes">
-                    <?php foreach ($role as $r): ?>
-                        <label class="role-checkbox-label">
-                            <input type="checkbox" name="role[]" value="<?= $r['blkt_idrole'] ?>" class="role-checkbox">
-                            <span class="role-name"><?= htmlspecialchars($r['blkt_nazev']) ?></span>
-                            <?php if (!empty($r['blkt_popis'])): ?>
-                                <span class="role-description"><?= htmlspecialchars($r['blkt_popis']) ?></span>
-                            <?php endif; ?>
+                    <?php foreach ($role as $r):
+                        // Dekódovat JSON oprávnění
+                        $opravneni = json_decode($r['blkt_obsahrole'], true) ?? [];
+                        ?>
+                        <label class="role-checkbox-label" for="role-<?= $r['blkt_idrole'] ?>">
+                            <input type="checkbox"
+                                   name="role[]"
+                                   value="<?= $r['blkt_idrole'] ?>"
+                                   id="role-<?= $r['blkt_idrole'] ?>"
+                                   class="role-checkbox">
+                            <div class="role-info">
+                                <span class="role-name"><?= htmlspecialchars($r['blkt_nazev']) ?></span>
+                                <?php if (!empty($r['blkt_popis'])): ?>
+                                    <span class="role-description"><?= htmlspecialchars($r['blkt_popis']) ?></span>
+                                <?php endif; ?>
+
+                                <?php if (!empty($opravneni)): ?>
+                                    <div class="role-permissions">
+                                        <?php if (isset($opravneni['read']) && $opravneni['read']): ?>
+                                            <span class="permission-badge read">Číst</span>
+                                        <?php endif; ?>
+                                        <?php if (isset($opravneni['write']) && $opravneni['write']): ?>
+                                            <span class="permission-badge write">Upravovat</span>
+                                        <?php endif; ?>
+                                        <?php if (isset($opravneni['delete']) && $opravneni['delete']): ?>
+                                            <span class="permission-badge delete">Mazat</span>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
                         </label>
                     <?php endforeach; ?>
                 </div>
@@ -167,22 +190,77 @@
         cursor: pointer;
         transition: all 0.3s ease;
         border-radius: 6px;
-        position: static;
+        position: static !important;
         background: transparent;
         font-weight: normal;
+        transform: none !important;
+        top: auto !important;
+        left: auto !important;
     }
 
     .role-checkbox-label:hover {
         background: rgba(52, 152, 219, 0.05);
     }
 
+    /* Důležité - přepsat globální styly pro checkboxy */
     .role-checkbox {
+        -webkit-appearance: checkbox !important;
+        -moz-appearance: checkbox !important;
+        appearance: checkbox !important;
         margin-right: 0.75rem;
         margin-top: 0.2rem;
         cursor: pointer;
-        width: 18px;
-        height: 18px;
+        width: 18px !important;
+        height: 18px !important;
         flex-shrink: 0;
+        position: static !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        display: inline-block !important;
+    }
+
+    /* Zajistit, že checkbox není skrytý */
+    input[type="checkbox"].role-checkbox {
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: static !important;
+        width: 18px !important;
+        height: 18px !important;
+    }
+
+    .role-info {
+        flex: 1;
+    }
+
+    .role-permissions {
+        margin-top: 0.5rem;
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .permission-badge {
+        font-size: 0.75em;
+        padding: 0.2rem 0.5rem;
+        border-radius: 12px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .permission-badge.read {
+        background: linear-gradient(135deg, #3498db, #5dade2);
+        color: white;
+    }
+
+    .permission-badge.write {
+        background: linear-gradient(135deg, #f39c12, #f8c471);
+        color: white;
+    }
+
+    .permission-badge.delete {
+        background: linear-gradient(135deg, #e74c3c, #ec7063);
+        color: white;
     }
 
     .role-name {
