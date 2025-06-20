@@ -2429,6 +2429,7 @@ p img:hover {
   align-items: center;
   padding: 1rem;
   border-bottom: 1px solid #ddd;
+  margin-bottom: 10px;
 }
 
 .blkt-palette-header h4 {
@@ -2503,7 +2504,7 @@ p img:hover {
 }
 
 .blkt-palette-preview {
-  padding: 1.5rem;
+  padding: 10px 1.5rem;;
 }
 
 .blkt-preview-box {

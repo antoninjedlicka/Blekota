@@ -107,18 +107,6 @@ $je_vlastni_barva = !array_key_exists($nastaveni['THEME'], $blkt_prednastavene_b
         <button type="button" class="blkt-palette-close">&times;</button>
     </div>
 
-    <!-- Přednastavené barvy -->
-    <div class="blkt-palette-presets">
-        <?php foreach ($blkt_prednastavene_barvy as $hex => $nazev): ?>
-            <button type="button"
-                    class="blkt-color-preset"
-                    data-color="<?= $hex ?>"
-                    style="background-color: <?= $hex ?>"
-                    title="<?= $nazev ?>">
-            </button>
-        <?php endforeach; ?>
-    </div>
-
     <!-- HTML5 color picker -->
     <div class="blkt-palette-custom">
         <label>Vlastní barva:</label>
