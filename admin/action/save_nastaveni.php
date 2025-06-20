@@ -1,18 +1,6 @@
 <?php
 // admin/action/save_nastaveni.php
-session_start(); // TOTO MŮŽE CHYBĚT!
-
 require_once __DIR__ . '/../databaze.php';
-
-// Kontrola AJAX požadavku
-$is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-    strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
-
-// Pokud není AJAX, přesměrujeme
-if (!$is_ajax) {
-    header('Location: ../index.php#nastaveni');
-    exit;
-}
 
 header('Content-Type: application/json');
 
@@ -36,12 +24,12 @@ try {
                 // Vytvoříme nový záznam
                 $nazvy = [
                     'WWW' => 'Webová adresa webu',
-                    'BLOG' => 'Webová adresa blogu',
+                    'blog' => 'Webová adresa blogu',
                     'THEME' => 'Téma webu'
                 ];
 
                 blkt_insert_konfigurace([
-                    'nazev' => $nazvy[$kod],
+                    'nazev' => $nazvy[$kod] ?? $kod,
                     'kod' => $kod,
                     'hodnota' => $hodnota
                 ]);
@@ -53,4 +41,4 @@ try {
 }
 
 echo json_encode($response);
-exit; // Důležité pro ukončení
+?>

@@ -57,7 +57,7 @@ $je_vlastni_barva = !array_key_exists($nastaveni['THEME'], $blkt_prednastavene_b
             <div class="blkt-barva-container">
                 <!-- Levá polovina - výběr přednastavených barev -->
                 <div class="blkt-barva-select-wrapper">
-                    <select name="THEME_SELECT" id="blkt-theme-select" required>
+                    <select name="THEME_SELECT" id="blkt-theme-select">
                         <?php foreach ($blkt_prednastavene_barvy as $hex => $nazev): ?>
                             <option value="<?= $hex ?>"
                                     data-color="<?= $hex ?>"
