@@ -109,37 +109,43 @@ foreach ($vsechny_sekce as $sekce_id => $sekce_info) {
 </header>
 <div class="admin-wrapper">
     <aside class="admin-menu">
-        <?php foreach ($vsechny_sekce as $sekce_id => $sekce_info): ?>
-            <?php if (in_array($sekce_id, $povolene_sekce) || in_array('all', $povolene_sekce)): ?>
-                <div class="menu-item <?= $sekce_id === $prvni_povolena_sekce ? 'active' : '' ?>" data-section="<?= $sekce_id ?>">
-                    <img src="<?= htmlspecialchars($sekce_info['ikona']) ?>" alt="<?= htmlspecialchars($sekce_info['alt']) ?>">
-                    <span><?= htmlspecialchars($sekce_info['nazev']) ?></span>
-                </div>
-            <?php endif; ?>
-        <?php endforeach; ?>
-
-        <div class="menu-divider"></div>
-
-        <!-- Informace o uživateli -->
-        <div class="menu-user-info">
-            <div class="user-name">
-                <?= htmlspecialchars($uzivatel['jmeno'] . ' ' . $uzivatel['prijmeni']) ?>
-            </div>
-            <?php if ($uzivatel['admin']): ?>
-                <span class="admin-badge">Admin</span>
-            <?php else: ?>
-                <?php
-                $opravneni = blkt_ziskej_opravneni_uzivatele();
-                if (!empty($opravneni['skupina'])): ?>
-                    <span class="group-badge"><?= htmlspecialchars($opravneni['skupina']) ?></span>
+        <!-- Horní část - položky menu -->
+        <div class="menu-top-section">
+            <?php foreach ($vsechny_sekce as $sekce_id => $sekce_info): ?>
+                <?php if (in_array($sekce_id, $povolene_sekce) || in_array('all', $povolene_sekce)): ?>
+                    <div class="menu-item <?= $sekce_id === $prvni_povolena_sekce ? 'active' : '' ?>" data-section="<?= $sekce_id ?>">
+                        <img src="<?= htmlspecialchars($sekce_info['ikona']) ?>" alt="<?= htmlspecialchars($sekce_info['alt']) ?>">
+                        <span><?= htmlspecialchars($sekce_info['nazev']) ?></span>
+                    </div>
                 <?php endif; ?>
-            <?php endif; ?>
+            <?php endforeach; ?>
         </div>
 
-        <a href="/logout.php" class="menu-logout">
-            <img src="/media/icons/logout.svg" alt="Odhlásit">
-            <span>Odhlásit</span>
-        </a>
+        <!-- Spodní část - user info + logout -->
+        <div class="menu-bottom-section">
+            <div class="menu-divider"></div>
+
+            <!-- Informace o uživateli -->
+            <div class="menu-user-info">
+                <div class="user-name">
+                    <?= htmlspecialchars($uzivatel['jmeno'] . ' ' . $uzivatel['prijmeni']) ?>
+                </div>
+                <?php if ($uzivatel['admin']): ?>
+                    <span class="admin-badge">Admin</span>
+                <?php else: ?>
+                    <?php
+                    $opravneni = blkt_ziskej_opravneni_uzivatele();
+                    if (!empty($opravneni['skupina'])): ?>
+                        <span class="group-badge"><?= htmlspecialchars($opravneni['skupina']) ?></span>
+                    <?php endif; ?>
+                <?php endif; ?>
+            </div>
+
+            <a href="/logout.php" class="menu-logout">
+                <img src="/media/icons/logout.svg" alt="Odhlásit">
+                <span>Odhlásit</span>
+            </a>
+        </div>
     </aside>
 
     <main class="admin-content">

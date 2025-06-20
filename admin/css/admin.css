@@ -2031,4 +2031,329 @@ p img:hover {
   }
 }
 
+/* ==================== */
+/* Admin menu - úpravy  */
+/* ==================== */
+
+/* Rozdělující čára */
+.menu-divider {
+  height: 1px;
+  background: var(--blkt-border);
+  margin: 1rem 0;
+  opacity: 0.3;
+}
+
+/* Informace o uživateli */
+.menu-user-info {
+  padding: 1rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.menu-user-info .user-name {
+  font-weight: 600;
+  color: var(--blkt-text);
+  margin-bottom: 0.5rem;
+  font-size: 0.9em;
+}
+
+.admin-badge,
+.group-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75em;
+  font-weight: 500;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-badge {
+  background: linear-gradient(135deg, var(--blkt-danger), var(--blkt-danger-light));
+  color: white;
+}
+
+.group-badge {
+  background: linear-gradient(135deg, var(--blkt-primary), var(--blkt-primary-light));
+  color: white;
+}
+
+/* Tlačítko odhlásit - upravené jako běžná položka menu */
+.menu-logout {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  color: var(--blkt-text);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none !important;
+  background: transparent;
+  border: none;
+  width: 100%;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.menu-logout::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--blkt-danger);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.menu-logout img {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.75rem;
+  transition: transform 0.3s ease;
+  filter: none;
+}
+
+.menu-logout span {
+  color: inherit;
+}
+
+.menu-logout:hover {
+  background: linear-gradient(90deg, rgba(231,76,60,0.1), transparent);
+  padding-left: 1.5rem;
+  color: var(--blkt-danger);
+}
+
+.menu-logout:hover::before {
+  transform: translateX(0);
+}
+
+.menu-logout:hover img {
+  transform: scale(1.1);
+  filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
+}
+
+/* Responzivita - když je menu zúžené */
+@media (max-width: 1000px) {
+  .menu-user-info {
+    padding: 0.75rem 0;
+  }
+
+  .menu-user-info .user-name {
+    display: none;
+  }
+
+  .admin-badge,
+  .group-badge {
+    font-size: 0.65em;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .menu-logout {
+    padding: 0.75rem 0;
+    justify-content: center;
+  }
+
+  .menu-logout span {
+    display: none;
+  }
+
+  .menu-logout img {
+    margin: 0;
+    width: 24px;
+    height: 24px;
+  }
+
+  .menu-logout:hover {
+    padding-left: 0;
+  }
+}
+
+/* Extra stylování pro menu položky - sjednocení */
+.menu-item,
+.menu-logout {
+  box-sizing: border-box;
+  min-height: 48px;
+}
+
+/* Ujistíme se, že ikona odhlášení je vidět správně */
+.menu-logout svg,
+.menu-logout path {
+  fill: currentColor;
+}
+/* ==================== */
+/* Admin menu - úpravy  */
+/* ==================== */
+
+/* Upravíme admin-menu na flex kontejner */
+.admin-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Roztáhne obsah mezi vrch a spodek */
+}
+
+/* Wrapper pro horní část menu (položky menu) */
+.menu-top-section {
+  flex: 0 0 auto; /* Nezabírá víc místa než potřebuje */
+}
+
+/* Wrapper pro spodní část menu (user info + logout) */
+.menu-bottom-section {
+  flex: 0 0 auto; /* Nezabírá víc místa než potřebuje */
+  margin-top: auto; /* Přesune sekci úplně dolů */
+  padding-bottom: 1rem;
+}
+
+/* Rozdělující čára */
+.menu-divider {
+  height: 1px;
+  background: var(--blkt-border);
+  margin: 1rem 0;
+  opacity: 0.3;
+}
+
+/* Informace o uživateli */
+.menu-user-info {
+  padding: 1rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.menu-user-info .user-name {
+  font-weight: 600;
+  color: var(--blkt-text);
+  margin-bottom: 0.5rem;
+  font-size: 0.9em;
+}
+
+.admin-badge,
+.group-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75em;
+  font-weight: 500;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-badge {
+  background: linear-gradient(135deg, var(--blkt-danger), var(--blkt-danger-light));
+  color: white;
+}
+
+.group-badge {
+  background: linear-gradient(135deg, var(--blkt-primary), var(--blkt-primary-light));
+  color: white;
+}
+
+/* Tlačítko odhlásit - upravené jako běžná položka menu */
+.menu-logout {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  color: var(--blkt-text);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none !important;
+  background: transparent;
+  border: none;
+  width: 100%;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.menu-logout::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--blkt-danger);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.menu-logout img {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.75rem;
+  transition: transform 0.3s ease;
+  filter: none;
+}
+
+.menu-logout span {
+  color: inherit;
+}
+
+.menu-logout:hover {
+  background: linear-gradient(90deg, rgba(231,76,60,0.1), transparent);
+  padding-left: 1.5rem;
+  color: var(--blkt-danger);
+}
+
+.menu-logout:hover::before {
+  transform: translateX(0);
+}
+
+.menu-logout:hover img {
+  transform: scale(1.1);
+  filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
+}
+
+/* Responzivita - když je menu zúžené */
+@media (max-width: 1000px) {
+  .menu-user-info {
+    padding: 0.75rem 0;
+  }
+
+  .menu-user-info .user-name {
+    display: none;
+  }
+
+  .admin-badge,
+  .group-badge {
+    font-size: 0.65em;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .menu-logout {
+    padding: 0.75rem 0;
+    justify-content: center;
+  }
+
+  .menu-logout span {
+    display: none;
+  }
+
+  .menu-logout img {
+    margin: 0;
+    width: 24px;
+    height: 24px;
+  }
+
+  .menu-logout:hover {
+    padding-left: 0;
+  }
+}
+
+/* Extra stylování pro menu položky - sjednocení */
+.menu-item,
+.menu-logout {
+  box-sizing: border-box;
+  min-height: 48px;
+}
+
+/* Ujistíme se, že ikona odhlášení je vidět správně */
+.menu-logout svg,
+.menu-logout path {
+  fill: currentColor;
+}
 /* Konec admin.css */
