@@ -1,5 +1,5 @@
 // admin/js/uzivatele.js
-// Správa uživatelů a skupin - UPRAVENÁ VERZE
+// Správa uživatelů a skupin - KOMPLETNÍ VERZE
 
 function initUsersSection() {
   console.log('initUsersSection() - start');
@@ -87,7 +87,7 @@ function initUserManagement() {
     };
   }
 
-  // Smazání uživatele - POUŽIJEME STANDARDNÍ MODAL
+  // Smazání uživatele
   if (delBtn) {
     delBtn.onclick = () => {
       const id = document.getElementById('card-id').value;
@@ -121,15 +121,15 @@ function initUserManagement() {
                   })
                   .catch(e => blkt_notifikace('Síťová chyba: ' + e.message, 'error'));
             },
-            null, // onCancel callback
-            'danger' // typ modalu
+            null,
+            'danger'
         );
       }
     };
   }
 }
 
-// Modal pro uživatele - UPRAVENÁ VERZE
+// Modal pro uživatele
 function showUserModal(mode, data = {}) {
   const overlay = document.getElementById('blkt-user-overlay');
   const modal = document.getElementById('blkt-user-modal');
@@ -228,10 +228,179 @@ function showUserModal(mode, data = {}) {
 }
 
 // ============================================
-// SPRÁVA SKUPIN A ROLÍ - zbytek kódu zůstává stejný
+// SPRÁVA SKUPIN A ROLÍ
 // ============================================
 function initGroupManagement() {
-  // ... původní kód ...
+  const table = document.getElementById('groups-table');
+  const card = document.getElementById('group-card');
+  const toolbar = document.getElementById('group-toolbar');
+  const addBtn = document.getElementById('add-group-btn');
+  const editBtn = document.getElementById('edit-group-btn');
+  const delBtn = document.getElementById('delete-group-btn');
+
+  if (!table) return;
+
+  // Kliknutí na řádek tabulky
+  table.addEventListener('click', e => {
+    const row = e.target.closest('tr');
+    if (!row || !row.dataset.id) return;
+
+    // Označit aktivní řádek
+    table.querySelectorAll('tr').forEach(r => r.classList.remove('active'));
+    row.classList.add('active');
+
+    // Zobrazit kartu skupiny
+    document.getElementById('group-card-id').value = row.dataset.id;
+    document.getElementById('group-card-nazev').textContent = row.dataset.nazev;
+    document.getElementById('group-card-popis').textContent = row.dataset.popis || 'Bez popisu';
+
+    // Zobrazit seznam rolí
+    const roleList = document.getElementById('group-card-role-list');
+    roleList.innerHTML = '';
+
+    try {
+      const roleNazvy = JSON.parse(row.dataset.roleNazvy || '[]');
+      if (roleNazvy.length > 0) {
+        roleNazvy.forEach(nazev => {
+          const li = document.createElement('li');
+          li.textContent = nazev;
+          roleList.appendChild(li);
+        });
+      } else {
+        roleList.innerHTML = '<li style="background: transparent; color: var(--blkt-text-light);">Žádné role nejsou přiřazeny</li>';
+      }
+    } catch (e) {
+      console.error('Chyba při parsování rolí:', e);
+    }
+
+    card.style.display = 'block';
+    toolbar.style.display = 'flex';
+  });
+
+  // Přidání skupiny
+  if (addBtn) {
+    addBtn.onclick = () => showGroupModal('add');
+  }
+
+  // Úprava skupiny
+  if (editBtn) {
+    editBtn.onclick = () => {
+      const id = document.getElementById('group-card-id').value;
+      const row = table.querySelector(`tr[data-id="${id}"]`);
+      if (row) {
+        showGroupModal('edit', {
+          id,
+          nazev: row.dataset.nazev,
+          popis: row.dataset.popis,
+          role: row.dataset.role
+        });
+      }
+    };
+  }
+
+  // Smazání skupiny
+  if (delBtn) {
+    delBtn.onclick = () => {
+      const id = document.getElementById('group-card-id').value;
+      const nazev = document.getElementById('group-card-nazev').textContent;
+
+      if (typeof window.blkt_potvrdit_akci === 'function') {
+        window.blkt_potvrdit_akci(
+            'Smazat skupinu',
+            `Opravdu chcete smazat skupinu "<strong>${nazev}</strong>"?<br><br>Uživatelé ve skupině nebudou smazáni, ale budou bez skupiny.`,
+            () => {
+              const formData = new FormData();
+              formData.append('blkt_idskupiny', id);
+
+              fetch('action/delete_skupina.php', {
+                method: 'POST',
+                body: formData
+              })
+                  .then(r => r.json())
+                  .then(j => {
+                    if (j.status === 'ok') {
+                      blkt_notifikace(j.message || 'Skupina byla smazána', 'success');
+                      if (typeof window.loadSection === 'function') {
+                        window.loadSection('uzivatele');
+                      }
+                    } else {
+                      blkt_notifikace('Chyba: ' + j.error, 'error');
+                    }
+                  })
+                  .catch(e => blkt_notifikace('Síťová chyba: ' + e.message, 'error'));
+            },
+            null,
+            'warning'
+        );
+      }
+    };
+  }
+}
+
+// Modal pro skupiny
+function showGroupModal(mode, data = {}) {
+  const overlay = document.getElementById('blkt-group-overlay');
+  const modal = document.getElementById('blkt-group-modal');
+  const form = document.getElementById('blkt-group-form');
+  const titleEl = document.getElementById('blkt-group-modal-title');
+  const closeEl = document.getElementById('blkt-group-modal-close');
+  const cancelBtn = document.getElementById('blkt-group-cancel');
+
+  if (!overlay || !modal) return;
+
+  overlay.style.display = 'block';
+  modal.style.display = 'block';
+
+  titleEl.textContent = mode === 'add' ? 'Přidat skupinu' : 'Upravit skupinu';
+
+  // Naplnit formulář daty
+  document.getElementById('blkt-group-modal-id').value = data.id || '';
+  document.getElementById('blkt-group-nazev').value = data.nazev || '';
+  document.getElementById('blkt-group-popis').value = data.popis || '';
+
+  // Nastavit checkboxy rolí
+  const roleIds = data.role ? data.role.split(',').map(id => id.trim()) : [];
+  console.log('Role IDs:', roleIds);
+
+  document.querySelectorAll('.role-checkbox').forEach(checkbox => {
+    checkbox.checked = roleIds.includes(checkbox.value);
+  });
+
+  // Event listenery
+  function closeGroupModal() {
+    overlay.style.display = 'none';
+    modal.style.display = 'none';
+  }
+
+  cancelBtn.onclick = closeGroupModal;
+  closeEl.onclick = closeGroupModal;
+
+  overlay.onclick = e => {
+    if (e.target === overlay) closeGroupModal();
+  };
+
+  // Submit
+  form.onsubmit = e => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const action = mode === 'add' ? 'add_skupina.php' : 'edit_skupina.php';
+
+    fetch(`action/${action}`, { method: 'POST', body: formData })
+        .then(r => r.json())
+        .then(j => {
+          if (j.status === 'ok') {
+            blkt_notifikace(j.message || 'Operace úspěšná', 'success');
+            closeGroupModal();
+            if (typeof window.loadSection === 'function') {
+              window.loadSection('uzivatele');
+            }
+          } else {
+            blkt_notifikace('Chyba: ' + j.error, 'error');
+          }
+        })
+        .catch(e => blkt_notifikace('Síťová chyba: ' + e.message, 'error'));
+  };
 }
 
 // Zajistíme, že funkce blkt_notifikace existuje
