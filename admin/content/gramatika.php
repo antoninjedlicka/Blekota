@@ -8,14 +8,14 @@ $pdo = blkt_db_connect();
 // Definice všech gramatických nastavení, které budeme ukládat
 $gramatika_nastaveni = [
     'gramatika_predlozky' => [
-        'nazev' => 'Jednopísmenné předložky',
-        'popis' => 'Seznam jednopísmenných předložek, za kterými se vloží nezalomitelná mezera',
+        'nazev' => 'Předložky',
+        'popis' => 'Seznam předložek, za kterými se vloží nezalomitelná mezera',
         'vychozi' => 'k,s,v,z,o,u,a,i',
         'typ' => 'seznam'
     ],
     'gramatika_spojky' => [
-        'nazev' => 'Jednopísmenné spojky',
-        'popis' => 'Seznam jednopísmenných spojek, za kterými se vloží nezalomitelná mezera',
+        'nazev' => 'Spojky',
+        'popis' => 'Seznam spojek, za kterými se vloží nezalomitelná mezera',
         'vychozi' => 'a,i',
         'typ' => 'seznam'
     ],
@@ -28,6 +28,12 @@ $gramatika_nastaveni = [
     'gramatika_cislovky' => [
         'nazev' => 'Číslovky',
         'popis' => 'Upravit mezery mezi čísly a jednotkami (např. 10 kg, 5 m)',
+        'vychozi' => '1',
+        'typ' => 'prepinac'
+    ],
+    'gramatika_tisice' => [
+        'nazev' => 'Formátování tisíců',
+        'popis' => 'Přidat nezalomitelné mezery do čísel (např. 1000 → 1 000)',
         'vychozi' => '1',
         'typ' => 'prepinac'
     ],

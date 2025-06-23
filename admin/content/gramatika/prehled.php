@@ -1,7 +1,10 @@
-<?php
-// admin/content/gramatika/prehled.php
-// Přehled všech nastavení české gramatiky a typografie
-?>
+<div class="blkt-formular-skupina">
+            <textarea id="blkt-gramatika-test-input"
+                      rows="3"
+                      placeholder=" ">V roce 2024 jsme s firmou ABC, s.r.o. a s panem Novákem zahájili projekt o hodnotě cca 150000 Kč. Práce probíhaly v období 10-15. prosince při teplotách -5 °C až 2 °C. Na projektu pracovalo 5 lidí po dobu 120 h, tj. celkem 600 h práce. Použili jsme 250 kg materiálu, 50 l barvy a 1000 ks spojovacích prvků. Výsledky byly mj. prezentovány v médiích, např. v ČT1, což přineslo pozitivní ohlasy. "Projekt byl úspěšný," řekl k tomu ředitel. Spotřeba energie činila 1500 kWh, tedy průměrně 12,5 kWh/den. Celková úspora oproti původnímu plánu byla 15 % resp. 22500 Kč. Další fáze začne v dubnu 2025...<?php
+                // admin/content/gramatika/prehled.php
+                // Přehled všech nastavení české gramatiky a typografie
+                ?>
 
 <form id="blkt-form-gramatika" action="action/save_gramatika.php" method="post" class="nastaveni-form">
 
@@ -18,8 +21,8 @@
                 foreach ($predlozky as $predlozka):
                     ?>
                     <span class="blkt-tag">
-                        <?= htmlspecialchars($predlozka) ?>
-                        <button type="button" class="blkt-tag-remove" aria-label="Odebrat">×</button>
+                    <?= htmlspecialchars($predlozka) ?>
+                    <button type="button" class="blkt-tag-remove" aria-label="Odebrat">×</button>
                     </span>
                 <?php endforeach; ?>
                 <input type="text" class="blkt-tag-input" placeholder="Přidat předložku...">
@@ -36,8 +39,8 @@
                 foreach ($spojky as $spojka):
                     ?>
                     <span class="blkt-tag">
-                        <?= htmlspecialchars($spojka) ?>
-                        <button type="button" class="blkt-tag-remove" aria-label="Odebrat">×</button>
+                    <?= htmlspecialchars($spojka) ?>
+                    <button type="button" class="blkt-tag-remove" aria-label="Odebrat">×</button>
                     </span>
                 <?php endforeach; ?>
                 <input type="text" class="blkt-tag-input" placeholder="Přidat spojku...">
@@ -60,8 +63,8 @@
                 foreach ($zkratky as $zkratka):
                     ?>
                     <span class="blkt-tag">
-                        <?= htmlspecialchars($zkratka) ?>
-                        <button type="button" class="blkt-tag-remove" aria-label="Odebrat">×</button>
+                    <?= htmlspecialchars($zkratka) ?>
+                    <button type="button" class="blkt-tag-remove" aria-label="Odebrat">×</button>
                     </span>
                 <?php endforeach; ?>
                 <input type="text" class="blkt-tag-input" placeholder="Přidat zkratku...">
@@ -89,6 +92,18 @@
                     <span class="role-description"><?= $gramatika_nastaveni['gramatika_cislovky']['popis'] ?></span>
                 </div>
             </label>
+
+            <label class="role-checkbox-label">
+                <input type="checkbox"
+                       name="gramatika_tisice"
+                       value="1"
+                       class="role-checkbox"
+                    <?= $gramatika_data['gramatika_tisice'] == '1' ? 'checked' : '' ?>>
+                <div class="role-info">
+                    <span class="role-name"><?= $gramatika_nastaveni['gramatika_tisice']['nazev'] ?></span>
+                    <span class="role-description"><?= $gramatika_nastaveni['gramatika_tisice']['popis'] ?></span>
+                </div>
+            </label>
         </div>
 
         <div class="blkt-formular-skupina">
@@ -98,8 +113,8 @@
                 foreach ($jednotky as $jednotka):
                     ?>
                     <span class="blkt-tag">
-                        <?= htmlspecialchars($jednotka) ?>
-                        <button type="button" class="blkt-tag-remove" aria-label="Odebrat">×</button>
+                    <?= htmlspecialchars($jednotka) ?>
+                    <button type="button" class="blkt-tag-remove" aria-label="Odebrat">×</button>
                     </span>
                 <?php endforeach; ?>
                 <input type="text" class="blkt-tag-input" placeholder="Přidat jednotku...">
@@ -161,14 +176,14 @@
             <textarea id="blkt-gramatika-test-input"
                       rows="3"
                       placeholder=" ">Například s firmou ABC a s panem Novákem jsme šli k autu o 5 hodině. Cena byla cca 1000 Kč za 10 kg materiálu. "Citace v uvozovkách" a rozsah 10-20...</textarea>
-            <label>Testovací text</label>
-        </div>
+    <label>Testovací text</label>
+</div>
 
-        <div class="blkt-gramatika-nahled">
-            <h4>Výsledek po úpravách:</h4>
-            <div id="blkt-gramatika-test-output"></div>
-        </div>
-    </div>
+<div class="blkt-gramatika-nahled">
+    <h4>Výsledek po úpravách:</h4>
+    <div id="blkt-gramatika-test-output"></div>
+</div>
+</div>
 
 </form>
 
