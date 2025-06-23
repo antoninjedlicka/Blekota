@@ -64,6 +64,11 @@ $vsechny_sekce = [
         'nazev' => 'Média',
         'ikona' => '/media/icons/images.svg',
         'alt' => 'Média'
+    ],
+    'gramatika' => [
+        'nazev' => 'Gramatika',
+        'ikona' => '/media/icons/gramatika.svg',
+        'alt' => 'Gramatika'
     ]
 ];
 
