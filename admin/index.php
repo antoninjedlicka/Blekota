@@ -15,6 +15,8 @@ blkt_vyzaduj_prihlaseni();
 // Získání informací o uživateli a jeho oprávnění
 $uzivatel = blkt_uzivatel_info();
 $povolene_sekce = blkt_ziskej_povolene_sekce();
+// DEBUG - smazat po otestování
+echo "<!--DEBUG: Povolené sekce: " . print_r($povolene_sekce, true) . "-->";
 
 // Pokud uživatel nemá přístup k žádné sekci, přesměrovat
 if (empty($povolene_sekce)) {

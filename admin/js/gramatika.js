@@ -2,13 +2,120 @@
 // Funkce pro správu nastavení české gramatiky
 
 function initGramatikaSection() {
-    console.log('=== initGramatikaSection START ===');
+
+    // Inicializace tag inputů
+    function initTagInputs() {
+        const tagWrappers = document.querySelectorAll('.blkt-tag-input-wrapper');
+
+        tagWrappers.forEach(wrapper => {
+            const input = wrapper.querySelector('.blkt-tag-input');
+            const hiddenInput = wrapper.nextElementSibling;
+            const dataName = wrapper.dataset.name;
+
+            // Funkce pro aktualizaci hidden inputu
+            function updateHiddenInput() {
+                const tags = [];
+                wrapper.querySelectorAll('.blkt-tag').forEach(tag => {
+                    const text = tag.firstChild.textContent.trim();
+                    tags.push(text);
+                });
+                hiddenInput.value = tags.join(',');
+
+                // Trigger change event pro náhled
+                hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+
+            // Funkce pro přidání tagu
+            function addTag(value) {
+                value = value.trim();
+                if (!value) return;
+
+                // Zkontrolovat duplicity
+                const existingTags = [];
+                wrapper.querySelectorAll('.blkt-tag').forEach(tag => {
+                    existingTags.push(tag.firstChild.textContent.trim().toLowerCase());
+                });
+
+                if (existingTags.includes(value.toLowerCase())) {
+                    blkt_notifikace('Tato hodnota už je přidaná', 'warning');
+                    return;
+                }
+
+                // Vytvořit nový tag
+                const tagElement = document.createElement('span');
+                tagElement.className = 'blkt-tag';
+                tagElement.innerHTML = `
+                    ${value}
+                    <button type="button" class="blkt-tag-remove" aria-label="Odebrat">×</button>
+                `;
+
+                // Vložit před input
+                wrapper.insertBefore(tagElement, input);
+
+                // Přidat event listener pro odebrání
+                tagElement.querySelector('.blkt-tag-remove').addEventListener('click', function() {
+                    tagElement.remove();
+                    updateHiddenInput();
+                });
+
+                // Vyčistit input a aktualizovat hidden
+                input.value = '';
+                updateHiddenInput();
+            }
+
+            // Event listenery pro input
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    addTag(this.value);
+                }
+            });
+
+            input.addEventListener('blur', function() {
+                if (this.value.trim()) {
+                    addTag(this.value);
+                }
+            });
+
+            // Event listenery pro existující tagy
+            wrapper.querySelectorAll('.blkt-tag-remove').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.parentElement.remove();
+                    updateHiddenInput();
+                });
+            });
+
+            // Kliknutí na wrapper zaměří input
+            wrapper.addEventListener('click', function(e) {
+                if (e.target === wrapper) {
+                    input.focus();
+                }
+            });
+
+            // Focus/blur pro label efekt
+            input.addEventListener('focus', function() {
+                wrapper.classList.add('has-focus');
+            });
+
+            input.addEventListener('blur', function() {
+                wrapper.classList.remove('has-focus');
+            });
+
+            // Pokud jsou nějaké tagy, nastavit label nahoru
+            if (wrapper.querySelectorAll('.blkt-tag').length > 0) {
+                wrapper.classList.add('has-focus');
+            }
+        });
+    }console.log('=== initGramatikaSection START ===');
 
     const form = document.getElementById('blkt-form-gramatika');
     if (!form) {
         console.error('Formulář gramatiky nenalezen!');
         return;
     }
+
+    // Inicializace tag inputů
+    initTagInputs();
 
     // AJAX submit formuláře
     form.addEventListener('submit', function(e) {
@@ -81,7 +188,7 @@ function initGramatikaSection() {
     if (testInput && testOutput) {
         // Funkce pro aplikaci gramatických pravidel
         function blkt_aplikuj_gramatiku(text) {
-            // Získat aktuální nastavení z formuláře
+            // Získat aktuální nastavení z formuláře - nyní z hidden inputů
             const predlozky = document.querySelector('[name="gramatika_predlozky"]').value.split(',').map(s => s.trim()).filter(s => s);
             const spojky = document.querySelector('[name="gramatika_spojky"]').value.split(',').map(s => s.trim()).filter(s => s);
             const zkratky = document.querySelector('[name="gramatika_zkratky"]').value.split(',').map(s => s.trim()).filter(s => s);

@@ -255,7 +255,7 @@ function blkt_ziskej_povolene_sekce(?int $uzivatel_id = null): array {
 
     if (isset($opravneni['je_admin']) && $opravneni['je_admin']) {
         // Admin má přístup ke všem sekcím
-        return ['dashboard', 'uzivatele', 'nastaveni', 'homepage', 'seo', 'prispevky', 'zivotopis', 'obrazky'];
+        return ['all'];
     }
 
     return $opravneni['sekce'] ?? [];
