@@ -160,7 +160,7 @@
         <div class="blkt-formular-skupina">
             <textarea id="blkt-gramatika-test-input"
                       rows="3"
-                      placeholder=" ">Například s firmou ABC a s panem Novákem jsme šli k autu o 5 hodině. Cena byla cca 1000 Kč za 10 kg materiálu. "Citace v uvozovkách" a rozsah 10-20...</textarea>
+                      placeholder=" ">V roce 2024 jsme s firmou ABC, s.r.o. a s panem Novákem zahájili projekt o hodnotě cca 150000 Kč. Práce probíhaly v období 10-15. prosince při teplotách -5 °C až 2 °C. Na projektu pracovalo 5 lidí po dobu 120 h, tj. celkem 600 h práce. Použili jsme 250 kg materiálu, 50 l barvy a 1000 ks spojovacích prvků. Výsledky byly mj. prezentovány v médiích, např. v ČT1, což přineslo pozitivní ohlasy. "Projekt byl úspěšný," řekl k tomu ředitel. Spotřeba energie činila 1500 kWh, tedy průměrně 12,5 kWh/den. Celková úspora oproti původnímu plánu byla 15 % resp. 22500 Kč. Další fáze začne v dubnu 2025...</textarea>
             <label>Testovací text</label>
         </div>
 
