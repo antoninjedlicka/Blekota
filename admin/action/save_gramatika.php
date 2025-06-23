@@ -17,7 +17,6 @@ try {
         'gramatika_spojky',
         'gramatika_zkratky',
         'gramatika_cislovky',
-        'gramatika_tisice',
         'gramatika_uvozovky',
         'gramatika_pomlcky',
         'gramatika_tecky',
@@ -31,7 +30,7 @@ try {
         }
 
         // Pro checkboxy - pokud nejsou zaškrtnuté, nastavíme 0
-        if (in_array($kod, ['gramatika_cislovky', 'gramatika_tisice', 'gramatika_uvozovky', 'gramatika_pomlcky', 'gramatika_tecky'])) {
+        if (in_array($kod, ['gramatika_cislovky', 'gramatika_uvozovky', 'gramatika_pomlcky', 'gramatika_tecky'])) {
             $hodnota = isset($_POST[$kod]) && $_POST[$kod] == '1' ? '1' : '0';
         } else {
             // Pro textové hodnoty - odstranění přebytečných mezer
@@ -60,7 +59,6 @@ try {
                 'gramatika_spojky' => 'Spojky',
                 'gramatika_zkratky' => 'Zkratky s tečkou',
                 'gramatika_cislovky' => 'Úprava číslovek',
-                'gramatika_tisice' => 'Formátování tisíců',
                 'gramatika_uvozovky' => 'České uvozovky',
                 'gramatika_pomlcky' => 'Pomlčky',
                 'gramatika_tecky' => 'Tři tečky',
@@ -76,7 +74,7 @@ try {
     }
 
     // Pro checkboxy které nebyly odeslány (nezaškrtnuté) musíme explicitně nastavit 0
-    $checkbox_klice = ['gramatika_cislovky', 'gramatika_tisice', 'gramatika_uvozovky', 'gramatika_pomlcky', 'gramatika_tecky'];
+    $checkbox_klice = ['gramatika_cislovky', 'gramatika_uvozovky', 'gramatika_pomlcky', 'gramatika_tecky'];
     foreach ($checkbox_klice as $kod) {
         if (!isset($_POST[$kod])) {
             // Zjistíme, jestli záznam existuje
@@ -88,7 +86,6 @@ try {
             } else {
                 $nazvy = [
                     'gramatika_cislovky' => 'Úprava číslovek',
-                    'gramatika_tisice' => 'Formátování tisíců',
                     'gramatika_uvozovky' => 'České uvozovky',
                     'gramatika_pomlcky' => 'Pomlčky',
                     'gramatika_tecky' => 'Tři tečky'

@@ -31,12 +31,6 @@ $gramatika_nastaveni = [
         'vychozi' => '1',
         'typ' => 'prepinac'
     ],
-    'gramatika_tisice' => [
-        'nazev' => 'Formátování tisíců',
-        'popis' => 'Přidat nezalomitelné mezery do čísel (např. 1000 → 1 000)',
-        'vychozi' => '1',
-        'typ' => 'prepinac'
-    ],
     'gramatika_uvozovky' => [
         'nazev' => 'České uvozovky',
         'popis' => 'Nahradit rovné uvozovky českými „uvozovkami"',

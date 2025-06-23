@@ -84,37 +84,100 @@ function initGramatikaSection() {
                     updateHiddenInput();
                 });
             });
+
+            // Kliknutí na wrapper zaměří input
+            wrapper.addEventListener('click', function(e) {
+                if (e.target === wrapper) {
+                    input.focus();
+                }
+            });
+
+            // Focus/blur pro label efekt
+            input.addEventListener('focus', function() {
+                wrapper.classList.add('has-focus');
+            });
+
+            input.addEventListener('blur', function() {
+                wrapper.classList.remove('has-focus');
+            });
+
+            // Pokud jsou nějaké tagy, nastavit label nahoru
+            if (wrapper.querySelectorAll('.blkt-tag').length > 0) {
+                wrapper.classList.add('has-focus');
+            }
         });
+    }console.log('=== initGramatikaSection START ===');
+
+    const form = document.getElementById('blkt-form-gramatika');
+    if (!form) {
+        console.error('Formulář gramatiky nenalezen!');
+        return;
     }
 
     // Inicializace tag inputů
     initTagInputs();
 
-    // Formulář
-    const form = document.getElementById('blkt-form-gramatika');
-    if (!form) return;
-
-    // AJAX odeslání formuláře
+    // AJAX submit formuláře
     form.addEventListener('submit', function(e) {
         e.preventDefault();
+        console.log('Odesílám nastavení gramatiky...');
 
-        const formData = new FormData(this);
+        const formData = new FormData(form);
 
-        fetch(this.action, {
+        // Debug - vypsat co odesíláme
+        for (let [key, value] of formData.entries()) {
+            console.log(key + ': ' + value);
+        }
+
+        fetch('action/save_gramatika.php', {
             method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
             body: formData
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'ok') {
-                    blkt_notifikace('Nastavení uloženo', 'success');
-                } else {
-                    blkt_notifikace('Chyba při ukládání: ' + (data.error || 'Neznámá chyba'), 'error');
+            .then(r => {
+                console.log('Response status:', r.status);
+                if (!r.ok) {
+                    throw new Error('HTTP error! status: ' + r.status);
+                }
+                return r.text();
+            })
+            .then(text => {
+                console.log('Response text:', text);
+                try {
+                    const data = JSON.parse(text);
+                    console.log('Parsed data:', data);
+
+                    if (typeof window.blkt_notifikace === 'function') {
+                        if (data.status === 'ok') {
+                            window.blkt_notifikace('Nastavení gramatiky bylo úspěšně uloženo.', 'success');
+
+                            // Aktualizovat náhled
+                            blkt_aktualizuj_nahled_gramatiky();
+                        } else {
+                            window.blkt_notifikace('Chyba: ' + data.error, 'error');
+                        }
+                    } else {
+                        alert(data.status === 'ok' ? 'Uloženo!' : 'Chyba!');
+                    }
+                } catch (e) {
+                    console.error('JSON parse error:', e);
+                    console.error('Response was:', text);
+                    if (typeof window.blkt_notifikace === 'function') {
+                        window.blkt_notifikace('Chyba při zpracování odpovědi serveru', 'error');
+                    } else {
+                        alert('Chyba při zpracování odpovědi serveru');
+                    }
                 }
             })
-            .catch(error => {
-                blkt_notifikace('Chyba při komunikaci se serverem', 'error');
-                console.error('Error:', error);
+            .catch(err => {
+                console.error('Fetch error:', err);
+                if (typeof window.blkt_notifikace === 'function') {
+                    window.blkt_notifikace('Chyba při ukládání: ' + err.message, 'error');
+                } else {
+                    alert('Chyba při ukládání!');
+                }
             });
     });
 
@@ -132,7 +195,6 @@ function initGramatikaSection() {
             const jednotky = document.querySelector('[name="gramatika_jednotky"]').value.split(',').map(s => s.trim()).filter(s => s);
 
             const upravCislovky = document.querySelector('[name="gramatika_cislovky"]').checked;
-            const upravTisice = document.querySelector('[name="gramatika_tisice"]')?.checked || false;
             const upravUvozovky = document.querySelector('[name="gramatika_uvozovky"]').checked;
             const upravPomlcky = document.querySelector('[name="gramatika_pomlcky"]').checked;
             const upravTecky = document.querySelector('[name="gramatika_tecky"]').checked;
@@ -159,16 +221,7 @@ function initGramatikaSection() {
                 upravenyText = upravenyText.replace(regex, `${zkratka}<span class="nbsp">&nbsp;</span>`);
             });
 
-            // 4. Formátování tisíců - MUSÍ BÝT PŘED číslovkami s jednotkami
-            if (upravTisice) {
-                // Najít všechna čísla s více než 3 číslicemi
-                upravenyText = upravenyText.replace(/\b(\d{1,3})(\d{3})+\b/g, function(match) {
-                    // Rozdělit číslo na skupiny po třech číslicích zprava
-                    return match.replace(/\B(?=(\d{3})+(?!\d))/g, '<span class="nbsp">&nbsp;</span>');
-                });
-            }
-
-            // 5. Číslovky a jednotky
+            // 4. Číslovky a jednotky
             if (upravCislovky) {
                 jednotky.forEach(jednotka => {
                     // Regex pro číslo následované mezerou a jednotkou
@@ -177,7 +230,7 @@ function initGramatikaSection() {
                 });
             }
 
-            // 6. České uvozovky
+            // 5. České uvozovky
             if (upravUvozovky) {
                 // Jednoduché nahrazení - první uvozovka otevírací, druhá zavírací
                 let pocetUvozovek = 0;
@@ -187,12 +240,12 @@ function initGramatikaSection() {
                 });
             }
 
-            // 7. Pomlčky mezi čísly
+            // 6. Pomlčky mezi čísly
             if (upravPomlcky) {
                 upravenyText = upravenyText.replace(/(\d+)\s*-\s*(\d+)/g, '$1–$2');
             }
 
-            // 8. Tři tečky na elipsu
+            // 7. Tři tečky na elipsu
             if (upravTecky) {
                 upravenyText = upravenyText.replace(/\.\.\./g, '…');
             }
