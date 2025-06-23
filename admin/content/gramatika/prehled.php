@@ -173,15 +173,14 @@
 </form>
 
 <style>
-    /* Správné styly pro checkboxy - stejné jako u skupin */
+    /* Správné styly pro checkboxy - BEZ PADDINGU VLEVO */
     .role-checkbox-label {
         display: flex;
         align-items: flex-start;
-        padding: 0.5rem;
-        padding-left: 0; /* Odstraněno levé odsazení */
+        padding: 0.5rem 0.5rem 0.5rem 0; /* Padding všude kromě leva */
         margin-bottom: 0.5rem;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: background-color 0.3s ease; /* Pouze barva pozadí */
         border-radius: 6px;
         position: static !important;
         background: transparent;
@@ -193,7 +192,7 @@
 
     .role-checkbox-label:hover {
         background: rgba(52, 152, 219, 0.05);
-        padding-left: 0.5rem; /* Při hoveru přidáme malé odsazení pro efekt */
+        /* ŽÁDNÉ ZMĚNY PADDINGU! */
     }
 
     /* Důležité - přepsat globální styly pro checkboxy */
@@ -240,13 +239,13 @@
         display: block;
     }
 
-    /* Tag input styly */
+    /* Tag input styly - ORANŽOVÉ RÁMEČKY! */
     .blkt-tag-input-wrapper {
         position: relative;
         width: 100%;
         min-height: 48px;
         background: rgba(255, 255, 255, 0.8);
-        border: 2px solid var(--blkt-border-light);
+        border: 2px solid #ff6b35; /* ORANŽOVÝ RÁMEČEK HNED! */
         border-radius: 8px;
         padding: 0.5rem;
         display: flex;
@@ -257,10 +256,11 @@
         cursor: text;
     }
 
+    /* BEZ FOCUS EFEKTU - žádný extra rámeček při kliknutí */
     .blkt-tag-input-wrapper:focus-within {
         background: white;
-        border-color: var(--blkt-primary);
-        box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+        border-color: #ff6b35; /* Zůstává oranžová */
+        /* ŽÁDNÝ box-shadow! */
     }
 
     .blkt-tag-input-wrapper.has-focus label {
@@ -319,13 +319,19 @@
 
     .blkt-tag-input {
         border: none;
-        outline: none;
+        outline: none; /* Toto odstraní focus rámeček kolem inputu */
         background: transparent;
         flex: 1;
         min-width: 100px;
         font-size: 1em;
         font-family: inherit;
         padding: 0.25rem 0;
+    }
+
+    /* Odstranění focus rámečku i pro všechny inputy uvnitř */
+    .blkt-tag-input:focus {
+        outline: none !important;
+        box-shadow: none !important;
     }
 
     .blkt-tag-input::placeholder {
@@ -344,16 +350,15 @@
         margin: 1rem 0;
     }
 
-    /* Extra stylování pro checkbox boxy v admin boxu */
+    /* Extra stylování pro checkbox boxy v admin boxu - BEZ PADDINGU VLEVO */
     .blkt-admin-box .role-checkbox-label {
         background: var(--blkt-glass-light);
-        padding: 1rem;
-        padding-left: 1rem; /* Zachováme padding v admin boxu */
+        padding: 1rem 1rem 1rem 0; /* Padding všude kromě leva */
         margin-bottom: 0.75rem;
     }
 
     .blkt-admin-box .role-checkbox-label:hover {
-        padding-left: 1.5rem; /* Mírný posun při hoveru */
+        /* ŽÁDNÉ ZMĚNY PADDINGU! Checkbox zůstává na místě */
     }
 
     .blkt-admin-box .role-checkbox-label:last-child {
