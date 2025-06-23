@@ -115,47 +115,41 @@
         <h2>Typografické úpravy</h2>
         <p>Automatické nahrazování znaků pro lepší typografii.</p>
 
-        <div class="blkt-checkbox-skupina">
-            <label class="role-checkbox-label">
-                <input type="checkbox"
-                       name="gramatika_uvozovky"
-                       value="1"
-                       class="role-checkbox"
-                    <?= $gramatika_data['gramatika_uvozovky'] == '1' ? 'checked' : '' ?>>
-                <div class="role-info">
-                    <span class="role-name"><?= $gramatika_nastaveni['gramatika_uvozovky']['nazev'] ?></span>
-                    <span class="role-description"><?= $gramatika_nastaveni['gramatika_uvozovky']['popis'] ?></span>
-                </div>
-            </label>
-        </div>
+        <label class="role-checkbox-label">
+            <input type="checkbox"
+                   name="gramatika_uvozovky"
+                   value="1"
+                   class="role-checkbox"
+                <?= $gramatika_data['gramatika_uvozovky'] == '1' ? 'checked' : '' ?>>
+            <div class="role-info">
+                <span class="role-name"><?= $gramatika_nastaveni['gramatika_uvozovky']['nazev'] ?></span>
+                <span class="role-description"><?= $gramatika_nastaveni['gramatika_uvozovky']['popis'] ?></span>
+            </div>
+        </label>
 
-        <div class="blkt-checkbox-skupina">
-            <label class="role-checkbox-label">
-                <input type="checkbox"
-                       name="gramatika_pomlcky"
-                       value="1"
-                       class="role-checkbox"
-                    <?= $gramatika_data['gramatika_pomlcky'] == '1' ? 'checked' : '' ?>>
-                <div class="role-info">
-                    <span class="role-name"><?= $gramatika_nastaveni['gramatika_pomlcky']['nazev'] ?></span>
-                    <span class="role-description"><?= $gramatika_nastaveni['gramatika_pomlcky']['popis'] ?></span>
-                </div>
-            </label>
-        </div>
+        <label class="role-checkbox-label">
+            <input type="checkbox"
+                   name="gramatika_pomlcky"
+                   value="1"
+                   class="role-checkbox"
+                <?= $gramatika_data['gramatika_pomlcky'] == '1' ? 'checked' : '' ?>>
+            <div class="role-info">
+                <span class="role-name"><?= $gramatika_nastaveni['gramatika_pomlcky']['nazev'] ?></span>
+                <span class="role-description"><?= $gramatika_nastaveni['gramatika_pomlcky']['popis'] ?></span>
+            </div>
+        </label>
 
-        <div class="blkt-checkbox-skupina">
-            <label class="role-checkbox-label">
-                <input type="checkbox"
-                       name="gramatika_tecky"
-                       value="1"
-                       class="role-checkbox"
-                    <?= $gramatika_data['gramatika_tecky'] == '1' ? 'checked' : '' ?>>
-                <div class="role-info">
-                    <span class="role-name"><?= $gramatika_nastaveni['gramatika_tecky']['nazev'] ?></span>
-                    <span class="role-description"><?= $gramatika_nastaveni['gramatika_tecky']['popis'] ?></span>
-                </div>
-            </label>
-        </div>
+        <label class="role-checkbox-label">
+            <input type="checkbox"
+                   name="gramatika_tecky"
+                   value="1"
+                   class="role-checkbox"
+                <?= $gramatika_data['gramatika_tecky'] == '1' ? 'checked' : '' ?>>
+            <div class="role-info">
+                <span class="role-name"><?= $gramatika_nastaveni['gramatika_tecky']['nazev'] ?></span>
+                <span class="role-description"><?= $gramatika_nastaveni['gramatika_tecky']['popis'] ?></span>
+            </div>
+        </label>
     </div>
 
     <!-- Náhled -->
@@ -179,6 +173,73 @@
 </form>
 
 <style>
+    /* Správné styly pro checkboxy - stejné jako u skupin */
+    .role-checkbox-label {
+        display: flex;
+        align-items: flex-start;
+        padding: 0.5rem;
+        padding-left: 0; /* Odstraněno levé odsazení */
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-radius: 6px;
+        position: static !important;
+        background: transparent;
+        font-weight: normal;
+        transform: none !important;
+        top: auto !important;
+        left: auto !important;
+    }
+
+    .role-checkbox-label:hover {
+        background: rgba(52, 152, 219, 0.05);
+        padding-left: 0.5rem; /* Při hoveru přidáme malé odsazení pro efekt */
+    }
+
+    /* Důležité - přepsat globální styly pro checkboxy */
+    .role-checkbox {
+        -webkit-appearance: checkbox !important;
+        -moz-appearance: checkbox !important;
+        appearance: checkbox !important;
+        margin-right: 0.75rem;
+        margin-top: 0.2rem;
+        cursor: pointer;
+        width: 18px !important;
+        height: 18px !important;
+        flex-shrink: 0;
+        position: static !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        display: inline-block !important;
+    }
+
+    /* Zajistit, že checkbox není skrytý */
+    input[type="checkbox"].role-checkbox {
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: static !important;
+        width: 18px !important;
+        height: 18px !important;
+    }
+
+    .role-info {
+        flex: 1;
+    }
+
+    .role-name {
+        font-weight: 600;
+        color: var(--blkt-text);
+        margin-right: 0.5rem;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .role-description {
+        font-size: 0.85em;
+        color: var(--blkt-text-light);
+        display: block;
+    }
+
     /* Tag input styly */
     .blkt-tag-input-wrapper {
         position: relative;
@@ -283,6 +344,22 @@
         margin: 1rem 0;
     }
 
+    /* Extra stylování pro checkbox boxy v admin boxu */
+    .blkt-admin-box .role-checkbox-label {
+        background: var(--blkt-glass-light);
+        padding: 1rem;
+        padding-left: 1rem; /* Zachováme padding v admin boxu */
+        margin-bottom: 0.75rem;
+    }
+
+    .blkt-admin-box .role-checkbox-label:hover {
+        padding-left: 1.5rem; /* Mírný posun při hoveru */
+    }
+
+    .blkt-admin-box .role-checkbox-label:last-child {
+        margin-bottom: 0;
+    }
+
     /* Nápověda u formulářových polí */
     .form-help {
         display: block;
@@ -298,12 +375,12 @@
         padding: 1.5rem;
         background: white;
         border-radius: 8px;
-        border: 2px solid var(--blkt-border-light);
+        border: 2px solid var(--blkt-warning);
     }
 
     .blkt-gramatika-nahled h4 {
         margin: 0 0 1rem 0;
-        color: var(--blkt-primary);
+        color: var(--blkt-warning);
     }
 
     #blkt-gramatika-test-output {
@@ -314,7 +391,7 @@
 
     /* Zvýraznění nezalomitelných mezer v náhledu */
     #blkt-gramatika-test-output .nbsp {
-        background: rgba(52, 152, 219, 0.2);
+        background: rgba(243, 156, 18, 0.2);
         padding: 0 2px;
         border-radius: 3px;
     }
